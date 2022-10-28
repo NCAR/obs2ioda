@@ -543,6 +543,7 @@ isec = 0
 call get_julian_time(iyear, imonth, iday, ihour, imin, isec, gstime, epochtime)
 
 ! do superobbing of ahi_himawari observations
+! Superobbing code is based on WRFDA's AHI superobbing code from https://github.com/wrf-model/WRF/blob/develop/var/da/da_radiance/da_read_obs_netcdf4ahi_jaxa.inc
 ! npixel => x direction => nx
 ! nline  => y direction => ny
 if ( do_superob ) then
@@ -707,6 +708,7 @@ if ( do_superob ) then
   end do y_loop
 
 else
+
   nlocs = 0
   do jj = 1, nline , subsample
      do ii = 1, npixel , subsample
@@ -747,6 +749,7 @@ else
      end do
   end if
 
+  iloc = 0
   ! do thinning every subsample pixels
   do jj = 1, nline, subsample
      do ii = 1, npixel, subsample

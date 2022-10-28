@@ -6,7 +6,7 @@ Compile: cd goes_abi/src; make
 ```
 Usage: goes_abi_converter.x
 ```
-Run-time options are specified through ``namelist.goes_abi_converter``.  
+Run-time options are specified through ``namelist.goes_abi_converter``.
 List of GoesReBroadcast files (exclude path) to be processed are specified in a plain text file.
 
 Example namelist.goes_abi_converter:
@@ -16,7 +16,9 @@ Example namelist.goes_abi_converter:
   data_dir = '/data/goes',         ! path of the GRB nc files
   data_id = 'OR_ABI-L1b-RadF-M6'   ! prefix of the downloaded GRB nc files
   sat_id = 'G16'
-  n_subsample = 1
+  n_subsample = 1                  ! skip n_subsample of pixels
+  do_superob = .false.             ! default option is no superobbing (if do_superob = .true., then no thinning is done)
+  superob_halfwidth = 29
 /
 ```
 Example content of flist.txt:

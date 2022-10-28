@@ -81,10 +81,9 @@ program Goes_ReBroadcast_converter
    integer(i_kind)                 :: n_subsample
    logical                         :: do_superob
    integer(i_kind)                 :: superob_halfwidth
-   logical                         :: do_thinning
    logical                         :: write_iodav1
 
-   namelist /data_nml/ nc_list_file, data_dir, data_id, sat_id, do_thinning, n_subsample, do_superob, superob_halfwidth
+   namelist /data_nml/ nc_list_file, data_dir, data_id, sat_id, n_subsample, do_superob, superob_halfwidth
 
    real(r_kind)                    :: sdtb ! to be done
    integer(i_kind)                 :: istat
@@ -117,7 +116,6 @@ program Goes_ReBroadcast_converter
    data_dir          = '.'
    data_id           = 'OR_ABI-L1b-RadC-M3'
    sat_id            = 'G16'
-   do_thinning       = .false.
    n_subsample       = 1
    do_superob        = .false.
    superob_halfwidth = 1
@@ -842,70 +840,6 @@ subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon,
 
    nvars = nband
 
-   if ( do_thinning ) then
-     nlocs = 0
-     do iline = 1, ny, n_subsample
-        do isample = 1, nx, n_subsample
-           if ( .not. got_latlon(isample,iline) ) cycle
-           if ( sat_zen(isample,iline) > 80.0 ) cycle
-           ! qf (DQF, Data Quality Flag)
-           ! 0:good, 1:conditionally_usable, 2:out_of_range, 3:no_value
-           ! keep only qf=0,1 pixels
-           if ( all(qf(:,isample,iline) > 1) ) cycle
-           if ( all(bt(:,isample,iline)<0.0) ) cycle
-           nlocs = nlocs + 1
-        end do
-     end do
-
-     write(0,*) 'nlocs = ', nlocs
-     if ( nlocs <= 0 ) then
-        return
-     end if
-
-     allocate (name_var_tb(1:nband))
-     allocate (datetime(nlocs))
-     allocate (lat_out(nlocs))
-     allocate (lon_out(nlocs))
-     allocate (scan_pos_out(nlocs))
-     allocate (sat_zen_out(nlocs))
-     allocate (sat_azi_out(nlocs))
-     allocate (sun_zen_out(nlocs))
-     allocate (sun_azi_out(nlocs))
-     allocate (bt_out(nband,nlocs))
-     allocate (err_out(nband,nlocs))
-     allocate (qf_out(nband,nlocs))
-
-     read(time_start( 1: 4), '(i4)') iyear
-     read(time_start( 6: 7), '(i2)') imonth
-     read(time_start( 9:10), '(i2)') iday
-     read(time_start(12:13), '(i2)') ihour
-     read(time_start(15:16), '(i2)') imin
-     read(time_start(18:19), '(i2)') isec
-
-     iloc = 0
-     do iline = 1, ny, n_subsample
-        do isample = 1, nx, n_subsample
-           if ( .not. got_latlon(isample,iline) ) cycle
-           if ( sat_zen(isample,iline) > 80.0 ) cycle
-           if ( all(qf(:,isample,iline) > 1) ) cycle
-           if ( all(bt(:,isample,iline)<0.0) ) cycle
-           iloc = iloc + 1
-           write(unit=datetime(iloc), fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a)')  &
-                 iyear, '-', imonth, '-', iday, 'T', ihour, ':', imin, ':', isec, 'Z'
-           lat_out(iloc) = lat(isample,iline)
-           lon_out(iloc) = lon(isample,iline)
-           sat_zen_out(iloc) = sat_zen(isample,iline)
-           sun_zen_out(iloc) = sun_zen(isample,iline)
-           bt_out(1:nband,iloc) = bt(1:nband,isample,iline)
-           qf_out(1:nband,iloc) = qf(1:nband,isample,iline)
-           scan_pos_out(iloc) = isample
-           sat_azi_out(iloc) = missing_r
-           sun_azi_out(iloc) = missing_r
-           err_out(1:nband,iloc) = 1.0 !missing_r
-        end do
-     end do
-   end if
-
    ! Superobbing code is based on WRFDA's AHI superobbing code from https://github.com/wrf-model/WRF/blob/develop/var/da/da_radiance/da_read_obs_netcdf4ahi_jaxa.inc
    if ( do_superob ) then
       nlocs = 0
@@ -1025,6 +959,70 @@ subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon,
 
          end do fov_loop
       end do scan_loop
+
+   else
+
+     nlocs = 0
+     do iline = 1, ny, n_subsample
+        do isample = 1, nx, n_subsample
+           if ( .not. got_latlon(isample,iline) ) cycle
+           if ( sat_zen(isample,iline) > 80.0 ) cycle
+           ! qf (DQF, Data Quality Flag)
+           ! 0:good, 1:conditionally_usable, 2:out_of_range, 3:no_value
+           ! keep only qf=0,1 pixels
+           if ( all(qf(:,isample,iline) > 1) ) cycle
+           if ( all(bt(:,isample,iline)<0.0) ) cycle
+           nlocs = nlocs + 1
+        end do
+     end do
+
+     write(0,*) 'nlocs = ', nlocs
+     if ( nlocs <= 0 ) then
+        return
+     end if
+
+     allocate (name_var_tb(1:nband))
+     allocate (datetime(nlocs))
+     allocate (lat_out(nlocs))
+     allocate (lon_out(nlocs))
+     allocate (scan_pos_out(nlocs))
+     allocate (sat_zen_out(nlocs))
+     allocate (sat_azi_out(nlocs))
+     allocate (sun_zen_out(nlocs))
+     allocate (sun_azi_out(nlocs))
+     allocate (bt_out(nband,nlocs))
+     allocate (err_out(nband,nlocs))
+     allocate (qf_out(nband,nlocs))
+
+     read(time_start( 1: 4), '(i4)') iyear
+     read(time_start( 6: 7), '(i2)') imonth
+     read(time_start( 9:10), '(i2)') iday
+     read(time_start(12:13), '(i2)') ihour
+     read(time_start(15:16), '(i2)') imin
+     read(time_start(18:19), '(i2)') isec
+
+     iloc = 0
+     do iline = 1, ny, n_subsample
+        do isample = 1, nx, n_subsample
+           if ( .not. got_latlon(isample,iline) ) cycle
+           if ( sat_zen(isample,iline) > 80.0 ) cycle
+           if ( all(qf(:,isample,iline) > 1) ) cycle
+           if ( all(bt(:,isample,iline)<0.0) ) cycle
+           iloc = iloc + 1
+           write(unit=datetime(iloc), fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a)')  &
+                 iyear, '-', imonth, '-', iday, 'T', ihour, ':', imin, ':', isec, 'Z'
+           lat_out(iloc) = lat(isample,iline)
+           lon_out(iloc) = lon(isample,iline)
+           sat_zen_out(iloc) = sat_zen(isample,iline)
+           sun_zen_out(iloc) = sun_zen(isample,iline)
+           bt_out(1:nband,iloc) = bt(1:nband,isample,iline)
+           qf_out(1:nband,iloc) = qf(1:nband,isample,iline)
+           scan_pos_out(iloc) = isample
+           sat_azi_out(iloc) = missing_r
+           sun_azi_out(iloc) = missing_r
+           err_out(1:nband,iloc) = 1.0 !missing_r
+        end do
+     end do
    end if
 
    call open_netcdf_for_write(trim(fname),ncfileid)
