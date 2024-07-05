@@ -98,7 +98,7 @@ character(len=nstring), dimension(ninst) :: inst_list = &
 
 character(len=nstring), dimension(ninst_geo) :: geoinst_list = &
    (/                     &
-      'ahi_himawari8   '  &
+      'ahi_himawari9   '  &                              ! MRI -- changed from ahi_himawari8 to ahi_himawari9
    /)
 ! variables for outputing netcdf files
 character(len=nstring), dimension(n_ncdim) :: name_ncdim = &
@@ -427,7 +427,7 @@ subroutine set_ahi_obserr(name_inst, nchan, obserrors)
    obserrors(:) = missing_r
    if ( name_inst(1:3) == 'ahi' ) then
       select case ( trim(name_inst) )
-         case ( 'ahi_himawari8' )
+         case ( 'ahi_himawari9' )                                    ! MRI -- changed from ahi_himawari8 to ahi_himawari9
             obserrors = (/ 2.2, 3.0, 2.5, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2 /)
          case default
             return
