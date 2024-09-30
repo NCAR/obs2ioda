@@ -1,66 +1,62 @@
 # obs2ioda-v2.x
-
 ## Installation
-
-`obs2ioda-v2` uses CMake as its build system. Follow these steps to build the project:
+obs2ioda-v2 utilizes CMake as its primary build system. Follow the steps below to build the project:
 
 ### Prerequisites
-
-Ensure the following libraries are installed:
+Please make sure the following libraries are installed:
 - NetCDF
-- NCEP BUFR library
+- NCEP BUFR library. (Instructions for installing the NCEP BUFR library are provided in a subsequent section)
 
-Instructions for installing the NCEP BUFR library are provided below.
+If you have an environment preconfigured for `mpas-jedi`, simply source that environment prior to building `obs2ioda`.
 
 ### Build Instructions
-
-1. Create and navigate to the build directory:
+1. First, clone the repository into your preferred directory (`<OBS2IODA_ROOT_DIR>`):
    ```bash
-   mkdir build
-   cd build
+   git clone https://github.com/NCAR/obs2ioda.git <OBS2IODA_ROOT_DIR>
    ```
-
-2. Configure the build using CMake. The only required argument is the path to the NCEP BUFR library:
+2. Create a new directory `build` and navigate into it:
+   ```bash
+   mkdir build && cd build
+   ```
+3. Locate the NCEP BUFR library by executing the following command in the `NCEP BUFR` library's build directory:
+   ```bash
+   find . -name *libbufr*
+   ```
+4. Next, run CMake to configure the build. Remember to specify the path to the NCEP BUFR library:
    ```bash
    cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>
    ```
-
-3. Build `obs2ioda-v2`:
+5. Finally, build the project using this command:
    ```bash
    make
    ```
-
-The `obs2ioda-v2` executable will be available in the `bin` directory inside the build directory.
+The `obs2ioda-v2` executable will reside in the `bin` directory within the build directory.
 
 ---
+## Installing NCEP BUFR Library
+To install the NCEP BUFR library, follow these steps:
 
-## NCEP BUFR Library Installation
-
-To install the NCEP BUFR library:
-
-1. Clone the repository:
+1. Clone the NCEP BUFR repository into a directory of your choice (`<NCEP_BUFR_ROOT_DIR>`):
    ```bash
-   git clone https://github.com/NOAA-EMC/NCEPLIBS-bufr.git
+   git clone https://github.com/NOAA-EMC/NCEPLIBS-bufr.git <NCEP_BUFR_ROOT_DIR>
    ```
-
-2. Create a build directory and enter it:
+2. Create a new directory `build` and navigate into it:
    ```bash
-   mkdir build
-   cd build
+   mkdir build && cd build
    ```
-
-3. Configure the build using CMake (ensure NetCDF is also installed):
+3. Run CMake to configure the build (Ensure NetCDF is installed):
    ```bash
    cmake <NCEP_BUFR_ROOT_DIR>
    ```
-
-4. Build the library:
+4. Build the library with the command:
    ```bash
    make
    ```
-
-Make sure to note the path to the NCEP BUFR library, as it will be required when building `obs2ioda-v2`.
-
+5. To locate the NCEP BUFR library, run:
+   ```bash
+   find . -name *libbufr*
+   ```
+Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the build process of `obs2ioda-v2`.
 ## caveate
 NetCDF-Fortran interface does not allow reading/writing NF90_STRING, so ``station_id`` and ``variable_names`` are still written out as  
 ``char station_id(nlocs, nstring)``  
