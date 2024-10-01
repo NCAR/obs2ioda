@@ -78,21 +78,21 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       xdata(ityp,itim)%max_datetime = xdata(ityp,itim)%xinfo_char(imax_datetime(1),iv)
 
       if ( write_opt == write_nc_conv ) then
-         ncfname = trim(outdir)//trim(obtype_list(ityp))//'_obs_'//trim(filedate)//'.h5'
+         ncfname = trim(outdir)//trim(obtype_list(ityp)%str)//'_obs_'//trim(filedate)//'.h5'
       else if ( write_opt == write_nc_radiance ) then
-         ncfname = trim(outdir)//trim(inst_list(ityp))//'_obs_'//trim(filedate)//'.h5'
+         ncfname = trim(outdir)//trim(inst_list(ityp)%str)//'_obs_'//trim(filedate)//'.h5'
       else if ( write_opt == write_nc_radiance_geo ) then
-         ncfname = trim(outdir)//trim(geoinst_list(ityp))//'_obs_'//trim(filedate)//'.h5'
+         ncfname = trim(outdir)//trim(geoinst_list(ityp)%str)//'_obs_'//trim(filedate)//'.h5'
       end if
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          iv = ufo_vars_getindex(name_sen_info, 'sensor_channel')
          allocate (ichan(xdata(ityp,itim)%nvars))
          ichan(:) = xdata(ityp,itim)%xseninfo_int(:,iv)
          allocate (obserr(xdata(ityp,itim)%nvars))
-         if  ( geoinst_list(ityp) == 'ahi_himawari8' ) then
-             call set_ahi_obserr(geoinst_list(ityp), xdata(ityp,itim)%nvars, obserr)
+         if  ( geoinst_list(ityp)%str == 'ahi_himawari8' ) then
+             call set_ahi_obserr(geoinst_list(ityp)%str, xdata(ityp,itim)%nvars, obserr)
          else
-             call set_brit_obserr(inst_list(ityp), xdata(ityp,itim)%nvars, obserr)
+             call set_brit_obserr(inst_list(ityp)%str, xdata(ityp,itim)%nvars, obserr)
          end if
       end if
       write(*,*) '--- writing ', trim(ncfname)
@@ -144,11 +144,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       if ( write_opt == write_nc_conv ) then
          do i = 1, xdata(ityp,itim) % nvars
             ivar = xdata(ityp,itim) % var_idx(i)
-            ncname = trim(name_var_met(ivar))
+            ncname = trim(name_var_met(ivar)%str)
+!            ncname = trim(name_var_met(ivar))
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
-            call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_FLOAT,'units',unit_var_met(ivar))
+            call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_FLOAT,'units',unit_var_met(ivar)%str)
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
-            call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_FLOAT,'units',unit_var_met(ivar))
+            call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_FLOAT,'units',unit_var_met(ivar)%str)
             igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_INT)
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
@@ -175,7 +176,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             iflag = iflag_radiance(i)
          end if
          if ( iflag /= itrue ) cycle var_info_def_loop
-         ncname = trim(name_var_info(i))
+         ncname = trim(name_var_info(i)%str)
          igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
          idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i))
          dim1 = ncid_ncdim(idim)
@@ -195,7 +196,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          do i = 1, nsen_info
-            ncname = trim(name_sen_info(i))
+            ncname = trim(name_sen_info(i)%str)
             igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
             idim = ufo_vars_getindex(name_ncdim, dim_sen_info(1,i))
             dim1 = ncid_ncdim(idim)
@@ -222,16 +223,20 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          var_loop: do i = 1, xdata(ityp,itim) % nvars
             ivar = xdata(ityp,itim) % var_idx(i)
             if ( vflag(ivar,ityp) == itrue ) then
-               ncname = trim(name_var_met(ivar))
+               ncname = trim(name_var_met(ivar)%str)
+               !ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%val)
-               ncname = trim(name_var_met(ivar))
+               ncname = trim(name_var_met(ivar)%str)
+               !ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%err)
-               ncname = trim(name_var_met(ivar))
+               ncname = trim(name_var_met(ivar)%str)
+               !ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%qm)
-               ncname = trim(name_var_met(ivar))
+               ncname = trim(name_var_met(ivar)%str)
+!               ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%rptype)
             end if
@@ -270,23 +275,23 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             iflag = iflag_radiance(i)
          end if
          if ( iflag /= itrue ) cycle var_info_loop
-         ncname = trim(name_var_info(i))
+         ncname = trim(name_var_info(i)%str)
          igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
          if ( type_var_info(i) == nf90_int ) then
             call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xinfo_int(:,i))
          else if ( type_var_info(i) == nf90_float ) then
             call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xinfo_float(:,i))
          else if ( type_var_info(i) == nf90_char ) then
-            if ( trim(name_var_info(i)) == 'variable_names' ) then
+            if ( trim(name_var_info(i)%str) == 'variable_names' ) then
                if ( write_opt == write_nc_conv ) then
                   call put_netcdf_var(ncid_ncgrp(igrp),ncname,name_var_met(xdata(ityp,itim)%var_idx(:)))
                end if
-            else if ( trim(name_var_info(i)) == 'station_id' ) then
+            else if ( trim(name_var_info(i)%str) == 'station_id' ) then
                allocate(str_nstring(xdata(ityp,itim)%nlocs))
                str_nstring(:) = xdata(ityp,itim)%xinfo_char(:,i)
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,str_nstring)
                deallocate(str_nstring)
-            else if ( trim(name_var_info(i)) == 'datetime' ) then
+            else if ( trim(name_var_info(i)%str) == 'datetime' ) then
                allocate(str_ndatetime(xdata(ityp,itim)%nlocs))
                do ii = 1, xdata(ityp,itim)%nlocs
                   str_tmp = xdata(ityp,itim)%xinfo_char(ii,i)
@@ -302,7 +307,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          do i = 1, nsen_info
-            ncname = trim(name_sen_info(i))
+            ncname = trim(name_sen_info(i)%str)
             igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
             if ( type_sen_info(i) == nf90_int ) then
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xseninfo_int(:,i))

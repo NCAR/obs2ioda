@@ -7,8 +7,14 @@
 
 module ufo_vars_mod
 
+ use kinds, only: str_t
 implicit none
 private
+interface ufo_vars_getindex
+  module procedure ufo_vars_getindex_char_array
+  module procedure ufo_vars_getindex_str_t_array
+end interface ufo_vars_getindex
+
 public :: ufo_vars_getindex
 
 INTEGER, PARAMETER, PUBLIC :: n_aerosols_gocart_default=14,&
@@ -171,23 +177,41 @@ contains
 
 ! ------------------------------------------------------------------------------
 
-integer function ufo_vars_getindex(vars, varname)
+integer function ufo_vars_getindex_char_array(vars, varname)
 implicit none
 character(len=*), intent(in) :: vars(:)
 character(len=*), intent(in) :: varname
 
 integer :: ivar
 
-ufo_vars_getindex = -1
+ufo_vars_getindex_char_array = -1
 
 do ivar = 1, size(vars)
   if (trim(vars(ivar)) == trim(varname)) then
-    ufo_vars_getindex = ivar
+    ufo_vars_getindex_char_array = ivar
     exit
   endif
 enddo
 
-end function ufo_vars_getindex
+end function ufo_vars_getindex_char_array
+
+integer function ufo_vars_getindex_str_t_array(vars, varname)
+  implicit none
+  type(str_t), dimension(:), intent(in) :: vars
+  character(len=*), intent(in) :: varname
+
+  integer :: ivar
+
+  ufo_vars_getindex_str_t_array = -1
+
+  do ivar = 1, size(vars)
+    if (trim(vars(ivar)%str) == trim(varname)) then
+      ufo_vars_getindex_str_t_array = ivar
+      exit
+    endif
+  enddo
+
+end function ufo_vars_getindex_str_t_array
 
 ! ------------------------------------------------------------------------------
 

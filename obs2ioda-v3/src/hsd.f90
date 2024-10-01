@@ -653,21 +653,21 @@ if ( do_superob ) then
         do i = 1, nvar_info
            if ( type_var_info(i) == nf90_int ) then
            else if ( type_var_info(i) == nf90_float ) then
-              if ( trim(name_var_info(i)) == 'station_elevation' ) then
+              if ( trim(name_var_info(i)%str) == 'station_elevation' ) then
                  xdata(1,1)%xinfo_float(iloc,i) = missing_r
-              else if ( trim(name_var_info(i)) == 'latitude' ) then
+              else if ( trim(name_var_info(i)%str) == 'latitude' ) then
                  xdata(1,1)%xinfo_float(iloc,i) = latitude(ix,iy)
-              else if ( trim(name_var_info(i)) == 'longitude' ) then
+              else if ( trim(name_var_info(i)%str) == 'longitude' ) then
                  xdata(1,1)%xinfo_float(iloc,i) = longitude(ix,iy)
               end if
            else if ( type_var_info(i) == nf90_char ) then
-              if ( trim(name_var_info(i)) == 'datetime' ) then
+              if ( trim(name_var_info(i)%str) == 'datetime' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = datetime
-              else if ( trim(name_var_info(i)) == 'station_id' ) then
+              else if ( trim(name_var_info(i)%str) == 'station_id' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
               end if
            else if ( type_var_info(i) == nf90_int64 ) then
-              if ( trim(name_var_info(i)) == 'dateTime' ) then
+              if ( trim(name_var_info(i)%str) == 'dateTime' ) then
                  xdata(1,1)%xinfo_int64(iloc,i) = epochtime
               end if
            end if
@@ -675,17 +675,17 @@ if ( do_superob ) then
 
         do i = 1, nsen_info
            if ( type_sen_info(i) == nf90_float ) then
-              if ( trim(name_sen_info(i)) == 'scan_position' ) then
+              if ( trim(name_sen_info(i)%str) == 'scan_position' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = ix
-              else if ( trim(name_sen_info(i)) == 'sensor_zenith_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'sensor_zenith_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = satzen(ix,iy)
-              else if ( trim(name_sen_info(i)) == 'solar_zenith_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'solar_zenith_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = solzen(ix,iy)
-              else if ( trim(name_sen_info(i)) == 'sensor_azimuth_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'sensor_azimuth_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = missing_r
-              else if ( trim(name_sen_info(i)) == 'solar_azimuth_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'solar_azimuth_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = missing_r
-              else if ( trim(name_sen_info(i)) == 'sensor_view_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'sensor_view_angle' ) then
                  !call calc_sensor_view_angle(trim(rlink%inst), rlink%scanpos, xdata(1,1)%xseninfo_float(iloc,i))
                  xdata(1,1)%xseninfo_float(iloc,i) = satzen(ix,iy)
               end if
@@ -757,21 +757,21 @@ else
         do i = 1, nvar_info
            if ( type_var_info(i) == nf90_int ) then
            else if ( type_var_info(i) == nf90_float ) then
-              if ( trim(name_var_info(i)) == 'station_elevation' ) then
+              if ( trim(name_var_info(i)%str) == 'station_elevation' ) then
                  xdata(1,1)%xinfo_float(iloc,i) = missing_r
-              else if ( trim(name_var_info(i)) == 'latitude' ) then
+              else if ( trim(name_var_info(i)%str) == 'latitude' ) then
                  xdata(1,1)%xinfo_float(iloc,i) = latitude(ii,jj)
-              else if ( trim(name_var_info(i)) == 'longitude' ) then
+              else if ( trim(name_var_info(i)%str) == 'longitude' ) then
                  xdata(1,1)%xinfo_float(iloc,i) = longitude(ii,jj)
               end if
            else if ( type_var_info(i) == nf90_char ) then
-              if ( trim(name_var_info(i)) == 'datetime' ) then
+              if ( trim(name_var_info(i)%str) == 'datetime' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = datetime
-              else if ( trim(name_var_info(i)) == 'station_id' ) then
+              else if ( trim(name_var_info(i)%str) == 'station_id' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
               end if
            else if ( type_var_info(i) == nf90_int64 ) then
-              if ( trim(name_var_info(i)) == 'dateTime' ) then
+              if ( trim(name_var_info(i)%str) == 'dateTime' ) then
                  xdata(1,1)%xinfo_int64(iloc,i) = epochtime
               end if
            end if
@@ -779,17 +779,17 @@ else
 
         do i = 1, nsen_info
            if ( type_sen_info(i) == nf90_float ) then
-              if ( trim(name_sen_info(i)) == 'scan_position' ) then
+              if ( trim(name_sen_info(i)%str) == 'scan_position' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = ii
-              else if ( trim(name_sen_info(i)) == 'sensor_zenith_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'sensor_zenith_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = satzen(ii,jj)
-              else if ( trim(name_sen_info(i)) == 'solar_zenith_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'solar_zenith_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = solzen(ii,jj)
-              else if ( trim(name_sen_info(i)) == 'sensor_azimuth_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'sensor_azimuth_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = missing_r
-              else if ( trim(name_sen_info(i)) == 'solar_azimuth_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'solar_azimuth_angle' ) then
                  xdata(1,1)%xseninfo_float(iloc,i) = missing_r
-              else if ( trim(name_sen_info(i)) == 'sensor_view_angle' ) then
+              else if ( trim(name_sen_info(i)%str) == 'sensor_view_angle' ) then
                  !call calc_sensor_view_angle(trim(rlink%inst), rlink%scanpos, xdata(1,1)%xseninfo_float(iloc,i))
                  xdata(1,1)%xseninfo_float(iloc,i) = satzen(ii,jj)
               end if

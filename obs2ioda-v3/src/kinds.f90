@@ -101,4 +101,11 @@ module kinds
   integer, parameter, public  :: num_bytes_for_r_kind = &
        real_byte_sizes( default_real )
 
+  type :: str_t
+    character(:), allocatable :: str
+  end type str_t
+
+  public :: str_t
+
+
 end module kinds

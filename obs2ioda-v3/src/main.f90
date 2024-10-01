@@ -1,7 +1,8 @@
 program obs2ioda
 
 use define_mod, only: write_nc_conv, write_nc_radiance, write_nc_radiance_geo, StrLen, xdata, &
-   ninst
+   ninst, init_obtype_list, init_name_var_met, init_name_sen_info, init_unit_var_met, init_name_var_info, &
+        init_inst_list, init_geoinst_list
 use kinds, only: i_kind
 use prepbufr_mod, only: read_prepbufr, sort_obs_conv, filter_obs_conv, do_tv_to_ts
 use radiance_mod, only: read_amsua_amsub_mhs, read_airs_colocate_amsua, sort_obs_radiance, &
@@ -57,6 +58,13 @@ integer(i_kind)         :: itime
 integer(i_kind)         :: superob_halfwidth
 character (len=DateLen14) :: dtime, datetmp
 
+call init_obtype_list
+call init_name_var_met
+call init_name_sen_info
+call init_unit_var_met
+call init_name_var_info
+call init_inst_list
+call init_geoinst_list
 
 do_tv_to_ts = .true.
 do_radiance = .false. ! initialize

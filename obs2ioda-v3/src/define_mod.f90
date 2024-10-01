@@ -1,8 +1,8 @@
 module define_mod
 
-use kinds, only: r_kind, i_kind, i_llong
+use kinds, only: r_kind, i_kind, i_llong, str_t
 use ufo_vars_mod, only: var_ps, var_prs, var_u, var_v, var_ts, var_tv, var_q, var_tb
-use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
+use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64, nf90_string
 
 implicit none
 
@@ -29,27 +29,20 @@ integer(i_kind), parameter :: write_nc_radiance_geo = 3
 character(len=3), parameter :: dtime_min = '-3h'
 character(len=3), parameter :: dtime_max = '+3h'
 
-! variables for defining observation types and met variables each type has
-character(len=nstring), dimension(nobtype) :: obtype_list = &
-   (/                 &
-      'sondes      ', &
-      'aircraft    ', &
-      'sfc         ', &
-      'satwind     ', &  !AMV winds from prepbufr file
-      'satwnd      ', &  !AMV winds from bufr file
-      'profiler    ', &
-      'ascat       '  &
-   /)
+type(str_t), dimension(nobtype) :: obtype_list
 
-character(len=nstring), dimension(nvar_met) :: name_var_met = &
-   (/           &
-      var_u,    &
-      var_v,    &
-      var_ts,   &
-      var_tv,   &
-      var_q,    &
-      var_ps    &
-   /)
+type(str_t), dimension(nvar_met) :: name_var_met
+
+type(str_t), dimension(nsen_info) :: name_sen_info
+
+type(str_t), dimension(nvar_met) :: unit_var_met
+
+type(str_t), dimension(nvar_info) :: name_var_info
+
+type(str_t), dimension(ninst) :: inst_list
+
+type(str_t), dimension(ninst_geo) :: geoinst_list
+
 
 ! variable flags for var_u, var_v, var_ts, var_tv, var_q, var_ps
 integer(i_kind), dimension(nvar_met,nobtype) :: vflag = reshape ( &
@@ -63,43 +56,7 @@ integer(i_kind), dimension(nvar_met,nobtype) :: vflag = reshape ( &
       itrue, itrue, ifalse, ifalse, ifalse, ifalse  & ! ascat
    /), (/nvar_met,nobtype/) )
 
-character(len=nstring), dimension(nvar_met) :: unit_var_met = &
-   (/           &
-      'm/s   ', &
-      'm/s   ', &
-      'K     ', &
-      'K     ', &
-      'kg/kg ', &
-      'Pa    '  &
-   /)
 
-! variables for defining radiance instrument types
-character(len=nstring), dimension(ninst) :: inst_list = &
-   (/                     &
-      'amsua_n15       ', &
-      'amsua_n18       ', &
-      'amsua_n19       ', &
-      'amsua_metop-a   ', &
-      'amsua_metop-b   ', &
-      'amsua_metop-c   ', &
-!      'airs_aqua       ', &
-      'amsua_aqua      ', &
-      'mhs_n18         ', &
-      'mhs_n19         ', &
-      'mhs_metop-a     ', &
-      'mhs_metop-b     ', &
-      'mhs_metop-c     ', &
-      'iasi_metop-a    ', &
-      'iasi_metop-b    ', &
-      'iasi_metop-c    ', &
-      'cris_npp        ', &
-      'cris_n20        '  &
-   /)
-
-character(len=nstring), dimension(ninst_geo) :: geoinst_list = &
-   (/                     &
-      'ahi_himawari8   '  &
-   /)
 ! variables for outputing netcdf files
 character(len=nstring), dimension(n_ncdim) :: name_ncdim = &
    (/               &
@@ -115,18 +72,6 @@ character(len=nstring), dimension(n_ncgrp) :: name_ncgrp = &
       'ObsError  ', &
       'PreQC     ', &
       'ObsType   '  &
-   /)
-character(len=nstring), dimension(nvar_info) :: name_var_info = &
-   (/                      &
-      'air_pressure     ', &
-      'height           ', &
-      'station_elevation', &
-      'latitude         ', &
-      'longitude        ', &
-      'dateTime         ', &
-      'datetime         ', &
-      'station_id       ', &
-      'variable_names   '  &
    /)
 
 ! conv info flags for name_var_info
@@ -158,8 +103,8 @@ integer(i_kind), dimension(nvar_info) :: type_var_info = &
       nf90_float, &
       nf90_int64, &
       nf90_char,  &
-      nf90_char,  &
-      nf90_char   &
+      nf90_string,  &
+      nf90_string   &
    /)
 character(len=nstring), dimension(2,nvar_info) :: dim_var_info = reshape ( &
    (/                             &
@@ -173,16 +118,6 @@ character(len=nstring), dimension(2,nvar_info) :: dim_var_info = reshape ( &
       'nstring   ', 'nlocs     ', &
       'nstring   ', 'nvars     '  &
    /), (/2, nvar_info/) )
-character(len=nstring), dimension(nsen_info) :: name_sen_info = &
-   (/                         &
-      'solar_azimuth_angle ', &
-      'scan_position       ', &
-      'sensor_azimuth_angle', &
-      'solar_zenith_angle  ', &
-      'sensor_zenith_angle ', &
-      'sensor_view_angle   ', &
-      'sensor_channel      '  &
-   /)
 integer(i_kind), dimension(nsen_info) :: type_sen_info = &
    (/             &
       nf90_float, &
@@ -447,5 +382,80 @@ subroutine set_ahi_obserr(name_inst, nchan, obserrors)
       return
    end if
 end subroutine set_ahi_obserr
+
+subroutine init_name_var_met()
+   name_var_met(1)%str = var_u
+   name_var_met(2)%str = var_v
+   name_var_met(3)%str = var_ts
+   name_var_met(4)%str = var_tv
+   name_var_met(5)%str = var_q
+   name_var_met(6)%str = var_ps
+end subroutine init_name_var_met
+
+subroutine init_obtype_list()
+   obtype_list(1)%str = 'sondes'
+   obtype_list(2)%str = 'aircraft'
+   obtype_list(3)%str = 'sfc'
+   obtype_list(4)%str = 'satwind'
+   obtype_list(5)%str = 'satwnd'
+   obtype_list(6)%str = 'profiler'
+   obtype_list(7)%str = 'ascat'
+end subroutine init_obtype_list
+
+subroutine init_name_sen_info()
+   name_sen_info(1)%str = 'solar_azimuth_angle'
+   name_sen_info(2)%str = 'scan_position'
+   name_sen_info(3)%str = 'sensor_azimuth_angle'
+   name_sen_info(4)%str = 'solar_zenith_angle'
+   name_sen_info(5)%str = 'sensor_zenith_angle'
+   name_sen_info(6)%str = 'sensor_view_angle'
+   name_sen_info(7)%str = 'sensor_channel'
+end subroutine init_name_sen_info
+
+subroutine init_unit_var_met()
+    unit_var_met(1)%str = 'm/s'
+    unit_var_met(2)%str = 'm/s'
+    unit_var_met(3)%str = 'K'
+    unit_var_met(4)%str = 'K'
+    unit_var_met(5)%str = 'kg/kg'
+    unit_var_met(6)%str = 'Pa'
+end subroutine init_unit_var_met
+
+subroutine init_name_var_info()
+   name_var_info(1)%str = 'air_pressure'
+   name_var_info(2)%str = 'height'
+   name_var_info(3)%str = 'station_elevation'
+   name_var_info(4)%str = 'latitude'
+   name_var_info(5)%str = 'longitude'
+   name_var_info(6)%str = 'dateTime'
+   name_var_info(7)%str = 'datetime'
+   name_var_info(8)%str = 'station_id'
+   name_var_info(9)%str = 'variable_names'
+end subroutine init_name_var_info
+
+subroutine init_inst_list()
+  inst_list(1)%str = 'amsua_n15'
+  inst_list(2)%str = 'amsua_n18'
+  inst_list(3)%str = 'amsua_n19'
+  inst_list(4)%str = 'amsua_metop-a'
+  inst_list(5)%str = 'amsua_metop-b'
+  inst_list(6)%str = 'amsua_metop-c'
+  inst_list(7)%str = 'amsua_aqua'
+  inst_list(8)%str = 'mhs_n18'
+  inst_list(9)%str = 'mhs_n19'
+  inst_list(10)%str = 'mhs_metop-a'
+  inst_list(11)%str = 'mhs_metop-b'
+  inst_list(12)%str = 'mhs_metop-c'
+  inst_list(13)%str = 'iasi_metop-a'
+  inst_list(14)%str = 'iasi_metop-b'
+  inst_list(15)%str = 'iasi_metop-c'
+  inst_list(16)%str = 'cris_npp'
+  inst_list(17)%str = 'cris_n20'
+end subroutine init_inst_list
+
+subroutine init_geoinst_list()
+  geoinst_list(1)%str = 'ahi_himawari8'
+end subroutine init_geoinst_list
+
 
 end module define_mod

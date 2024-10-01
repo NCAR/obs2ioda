@@ -416,7 +416,7 @@ subroutine sort_obs_satwnd(filedate, nfgat)
       end if
       write(*,'(1x,20x,a10)') 'nlocs'
       do i = 1, nobtype
-         write(*,'(1x,a20,i10)') obtype_list(i), nlocs(i,ii)
+         write(*,'(1x,a20,i10)') obtype_list(i)%str, nlocs(i,ii)
       end do
    end do
 
@@ -475,25 +475,25 @@ subroutine sort_obs_satwnd(filedate, nfgat)
 
          do i = 1, nvar_info
             if ( type_var_info(i) == nf90_int ) then
-               if ( name_var_info(i) == 'record_number' ) then
+               if ( name_var_info(i)%str == 'record_number' ) then
                   xdata(ityp,itim)%xinfo_int(iloc(ityp,itim),i) = irec
                end if
             else if ( type_var_info(i) == nf90_float ) then
-               if ( trim(name_var_info(i)) == 'latitude' ) then
+               if ( trim(name_var_info(i)%str) == 'latitude' ) then
                   xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%lat
-               else if ( trim(name_var_info(i)) == 'longitude' ) then
+               else if ( trim(name_var_info(i)%str) == 'longitude' ) then
                   xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%lon
-               else if ( trim(name_var_info(i)) == trim(var_prs) ) then
+               else if ( trim(name_var_info(i)%str) == trim(var_prs) ) then
                   xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%prs
                end if
             else if ( type_var_info(i) == nf90_char ) then
-               if ( trim(name_var_info(i)) == 'datetime' ) then
+               if ( trim(name_var_info(i)%str) == 'datetime' ) then
                   xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%datetime
-               else if ( trim(name_var_info(i)) == 'station_id' ) then
+               else if ( trim(name_var_info(i)%str) == 'station_id' ) then
                   xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%stid
                end if
             else if ( type_var_info(i) == nf90_int64 ) then
-               if ( trim(name_var_info(i)) == 'dateTime' ) then
+               if ( trim(name_var_info(i)%str) == 'dateTime' ) then
                   xdata(ityp,itim)%xinfo_int64(iloc(ityp,itim),i) = rlink%epochtime
                end if
             end if ! type_var_info
@@ -501,11 +501,11 @@ subroutine sort_obs_satwnd(filedate, nfgat)
 
          do i = 1, nvars(ityp)
             ivar = xdata(ityp,itim)%var_idx(i)
-            if ( name_var_met(ivar) == trim(var_u) ) then
+            if ( name_var_met(ivar)%str == trim(var_u) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = rlink%uwind
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = rlink%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = rlink%err
-            else if ( name_var_met(ivar) == trim(var_v) ) then
+            else if ( name_var_met(ivar)%str == trim(var_v) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = rlink%vwind
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = rlink%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = rlink%err

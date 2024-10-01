@@ -1039,8 +1039,8 @@ subroutine sort_obs_radiance(filedate, nfgat)
       !write(*,*) 'num_report_decoded = ', sum(nrecs(:,ii))
       write(*,'(1x,20x,a10)') 'nlocs'
       do i = 1, ninst
-         !write(*,'(1x,a20,2i10)') inst_list(i), nrecs(i,ii), nlocs(i,ii)
-         write(*,'(1x,a20,i10)') inst_list(i), nlocs(i,ii)
+         !write(*,'(1x,a20,2i10)') inst_list(i)%str, nrecs(i,ii), nlocs(i,ii)
+         write(*,'(1x,a20,i10)') inst_list(i)%str, nlocs(i,ii)
       end do
    end do
 
@@ -1065,8 +1065,8 @@ subroutine sort_obs_radiance(filedate, nfgat)
          xdata(i,ii)%xinfo_char    (:,:) = ''
          xdata(i,ii)%xseninfo_float(:,:) = missing_r
          xdata(i,ii)%xseninfo_int  (:,:) = missing_i
-         if ( index(inst_list(i), 'iasi') > 0 .or. &
-              index(inst_list(i), 'cris') > 0 ) then
+         if ( index(inst_list(i)%str, 'iasi') > 0 .or. &
+              index(inst_list(i)%str, 'cris') > 0 ) then
             allocate (xdata(i,ii)%wavenumber(nvars(i)))
          end if
          if ( nvars(i) > 0 ) then
@@ -1106,27 +1106,27 @@ subroutine sort_obs_radiance(filedate, nfgat)
 
       do i = 1, nvar_info
          if ( type_var_info(i) == nf90_int ) then
-            if ( trim(name_var_info(i)) == 'record_number' ) then
+            if ( trim(name_var_info(i)%str) == 'record_number' ) then
                xdata(ityp,itim)%xinfo_int(iloc(ityp,itim),i) = irec
             end if
          else if ( type_var_info(i) == nf90_float ) then
-            if ( name_var_info(i) == 'time' ) then
+            if ( name_var_info(i)%str == 'time' ) then
                xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%dhr
-            else if ( trim(name_var_info(i)) == 'station_elevation' ) then
+            else if ( trim(name_var_info(i)%str) == 'station_elevation' ) then
                xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%elv
-            else if ( trim(name_var_info(i)) == 'latitude' ) then
+            else if ( trim(name_var_info(i)%str) == 'latitude' ) then
                xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%lat
-            else if ( trim(name_var_info(i)) == 'longitude' ) then
+            else if ( trim(name_var_info(i)%str) == 'longitude' ) then
                xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = rlink%lon
             end if
          else if ( type_var_info(i) == nf90_char ) then
-            if ( trim(name_var_info(i)) == 'datetime' ) then
+            if ( trim(name_var_info(i)%str) == 'datetime' ) then
                xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%datetime
-            else if ( trim(name_var_info(i)) == 'station_id' ) then
+            else if ( trim(name_var_info(i)%str) == 'station_id' ) then
                xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%inst
             end if
          else if ( type_var_info(i) == nf90_int64 ) then
-            if ( trim(name_var_info(i)) == 'dateTime' ) then
+            if ( trim(name_var_info(i)%str) == 'dateTime' ) then
                xdata(ityp,itim)%xinfo_int64(iloc(ityp,itim),i) = rlink%epochtime
             end if
          end if
@@ -1134,17 +1134,17 @@ subroutine sort_obs_radiance(filedate, nfgat)
 
       do i = 1, nsen_info
          if ( type_sen_info(i) == nf90_float ) then
-            if ( trim(name_sen_info(i)) == 'scan_position' ) then
+            if ( trim(name_sen_info(i)%str) == 'scan_position' ) then
                xdata(ityp,itim)%xseninfo_float(iloc(ityp,itim),i) = rlink%scanpos
-            else if ( trim(name_sen_info(i)) == 'sensor_zenith_angle' ) then
+            else if ( trim(name_sen_info(i)%str) == 'sensor_zenith_angle' ) then
                xdata(ityp,itim)%xseninfo_float(iloc(ityp,itim),i) = rlink%satzen
-            else if ( trim(name_sen_info(i)) == 'sensor_azimuth_angle' ) then
+            else if ( trim(name_sen_info(i)%str) == 'sensor_azimuth_angle' ) then
                xdata(ityp,itim)%xseninfo_float(iloc(ityp,itim),i) = rlink%satazi
-            else if ( trim(name_sen_info(i)) == 'solar_zenith_angle' ) then
+            else if ( trim(name_sen_info(i)%str) == 'solar_zenith_angle' ) then
                xdata(ityp,itim)%xseninfo_float(iloc(ityp,itim),i) = rlink%solzen
-            else if ( trim(name_sen_info(i)) == 'solar_azimuth_angle' ) then
+            else if ( trim(name_sen_info(i)%str) == 'solar_azimuth_angle' ) then
                xdata(ityp,itim)%xseninfo_float(iloc(ityp,itim),i) = rlink%solazi
-            else if ( trim(name_sen_info(i)) == 'sensor_view_angle' ) then
+            else if ( trim(name_sen_info(i)%str) == 'sensor_view_angle' ) then
                call calc_sensor_view_angle(trim(rlink%inst), rlink%scanpos, xdata(ityp,itim)%xseninfo_float(iloc(ityp,itim),i))
             end if
 !         else if ( type_sen_info(i) == nf90_int ) then
@@ -1273,11 +1273,11 @@ real(r_double) :: temperature
 fgat_loop: do ii = 1, nfgat
   inst_loop: do i = 1, ninst
 
-    if ( trim(inst_list(i)) /= 'cris_npp' .and. &
-         trim(inst_list(i)) /= 'cris_n20' .and. &
-         trim(inst_list(i)) /= 'iasi_metop-a' .and. &
-         trim(inst_list(i)) /= 'iasi_metop-b' .and. &
-         trim(inst_list(i)) /= 'iasi_metop-c' ) then
+    if ( trim(inst_list(i)%str) /= 'cris_npp' .and. &
+         trim(inst_list(i)%str) /= 'cris_n20' .and. &
+         trim(inst_list(i)%str) /= 'iasi_metop-a' .and. &
+         trim(inst_list(i)%str) /= 'iasi_metop-b' .and. &
+         trim(inst_list(i)%str) /= 'iasi_metop-c' ) then
        cycle inst_loop
     end if
 
@@ -1293,7 +1293,7 @@ fgat_loop: do ii = 1, nfgat
     allocate(band_c2(nchan))
     allocate(wavenumber(nchan))
 
-    call read_spc(trim(inst_list(i)), nchan, planck_c1, planck_c2, band_c1, band_c2, wavenumber, ierr)
+    call read_spc(trim(inst_list(i)%str), nchan, planck_c1, planck_c2, band_c1, band_c2, wavenumber, ierr)
     if ( ierr /= 0 ) then
       deallocate(planck_c1)
       deallocate(planck_c2)

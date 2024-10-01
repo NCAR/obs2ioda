@@ -727,7 +727,7 @@ subroutine sort_obs_conv(filedate, nfgat)
       !write(*,*) 'num_report_decoded = ', sum(nrecs(:,ii))
       write(*,'(1x,20x,2a10)') 'nrecs', 'nlocs'
       do i = 1, nobtype
-         write(*,'(1x,a20,2i10)') obtype_list(i), nrecs(i,ii), nlocs(i,ii)
+         write(*,'(1x,a20,2i10)') obtype_list(i)%str, nrecs(i,ii), nlocs(i,ii)
       end do
    end do
 
@@ -789,47 +789,47 @@ subroutine sort_obs_conv(filedate, nfgat)
 
          do i = 1, nvar_info
             if ( type_var_info(i) == nf90_int ) then
-               if ( name_var_info(i) == 'record_number' ) then
+               if ( name_var_info(i)%str == 'record_number' ) then
                   xdata(ityp,itim)%xinfo_int(iloc(ityp,itim),i) = irec
                end if
             else if ( type_var_info(i) == nf90_float ) then
-               if ( name_var_info(i) == 'time' ) then
+               if ( name_var_info(i)%str == 'time' ) then
                   if ( plink%each%dhr > missing_r ) then  ! time drift
                      xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%each%dhr
                   else
                      xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%dhr
                   end if
-               else if ( trim(name_var_info(i)) == 'station_elevation' ) then
+               else if ( trim(name_var_info(i)%str) == 'station_elevation' ) then
                   xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%elv
-               else if ( trim(name_var_info(i)) == 'latitude' ) then
+               else if ( trim(name_var_info(i)%str) == 'latitude' ) then
                   if ( plink%each%lat > missing_r ) then  ! drift
                      xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%each%lat
                   else
                      xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%lat
                   end if
-               else if ( trim(name_var_info(i)) == 'longitude' ) then
+               else if ( trim(name_var_info(i)%str) == 'longitude' ) then
                   if ( plink%each%lon > missing_r ) then  ! drift
                      xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%each%lon
                   else
                      xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%lon
                   end if
-               else if ( trim(name_var_info(i)) == 'height' ) then
+               else if ( trim(name_var_info(i)%str) == 'height' ) then
                   xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%each%h%val
-               else if ( trim(name_var_info(i)) == trim(var_prs) ) then
+               else if ( trim(name_var_info(i)%str) == trim(var_prs) ) then
                   xdata(ityp,itim)%xinfo_float(iloc(ityp,itim),i) = plink%each%p%val
                end if
             else if ( type_var_info(i) == nf90_char ) then
-               if ( trim(name_var_info(i)) == 'datetime' ) then
+               if ( trim(name_var_info(i)%str) == 'datetime' ) then
                   if ( plink%each%dhr > missing_r ) then  ! time drift
                      xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = plink%each%datetime
                   else
                      xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = plink%datetime
                   end if
-               else if ( trim(name_var_info(i)) == 'station_id' ) then
+               else if ( trim(name_var_info(i)%str) == 'station_id' ) then
                   xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = plink%stid
                end if
             else if ( type_var_info(i) == nf90_int64 ) then
-               if ( trim(name_var_info(i)) == 'dateTime' ) then
+               if ( trim(name_var_info(i)%str) == 'dateTime' ) then
                   if ( plink%each%dhr > missing_r ) then  ! time drift
                      xdata(ityp,itim)%xinfo_int64(iloc(ityp,itim),i) = plink%each%epochtime
                   else
@@ -841,31 +841,31 @@ subroutine sort_obs_conv(filedate, nfgat)
 
          do i = 1, nvars(ityp)
             ivar = xdata(ityp,itim)%var_idx(i)
-            if ( name_var_met(ivar) == trim(var_prs) ) then
+            if ( name_var_met(ivar)%str == trim(var_prs) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%each%p%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%each%p%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%each%p%err
-            else if ( name_var_met(ivar) == trim(var_u) ) then
+            else if ( name_var_met(ivar)%str == trim(var_u) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%each%u%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%each%u%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%each%u%err
-            else if ( name_var_met(ivar) == trim(var_v) ) then
+            else if ( name_var_met(ivar)%str == trim(var_v) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%each%v%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%each%v%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%each%v%err
-            else if ( name_var_met(ivar) == trim(var_ts) ) then
+            else if ( name_var_met(ivar)%str == trim(var_ts) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%each%t%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%each%t%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%each%t%err
-            else if ( name_var_met(ivar) == trim(var_tv) ) then
+            else if ( name_var_met(ivar)%str == trim(var_tv) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%each%tv%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%each%tv%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%each%tv%err
-            else if ( name_var_met(ivar) == trim(var_q) ) then
+            else if ( name_var_met(ivar)%str == trim(var_q) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%each%q%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%each%q%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%each%q%err
-            else if ( name_var_met(ivar) == trim(var_ps) ) then
+            else if ( name_var_met(ivar)%str == trim(var_ps) ) then
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%val = plink%ps%val
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%qm  = plink%ps%qm
                xdata(ityp,itim)%xfield(iloc(ityp,itim),i)%err = plink%ps%err

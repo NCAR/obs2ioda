@@ -2,6 +2,7 @@ module netcdf_mod
 
 use netcdf
 use define_mod, only: missing_r, missing_i, nstring
+use kinds, only: str_t
 
 implicit none
 
@@ -28,6 +29,7 @@ interface put_netcdf_var
    module procedure put_netcdf_var_integer
    module procedure put_netcdf_var_integer64
    module procedure put_netcdf_var_char
+   module procedure put_netcdf_var_str_t
 end interface
 
 contains
@@ -377,5 +379,30 @@ subroutine put_netcdf_var_char(fileid,variable,input)
 
    return
 end subroutine put_netcdf_var_char
+
+subroutine put_netcdf_var_str_t(fileid,variable,input)
+
+   integer,                        intent(in) :: fileid
+   character(len=*),               intent(in) :: variable
+   type(str_t), dimension(:), intent(in) :: input
+
+   integer :: ncvarid, ierr, i
+
+   ierr = 0
+   ncstatus = nf90_inq_varid(fileid,trim(adjustl(variable)),ncvarid)
+   ierr = ierr + ncstatus
+   do i = 1, size(input)
+      ncstatus = nf90_put_var(fileid,ncvarid,input(i)%str)
+   end do
+   ierr = ierr + ncstatus
+
+   if ( ierr /= 0 ) then
+      write(0,*) 'Error writing data for '//trim(adjustl(variable))
+      write(0,*) 'ierr = ',ierr
+      stop
+   endif
+
+   return
+end subroutine put_netcdf_var_str_t
 
 end module netcdf_mod
