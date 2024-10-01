@@ -17,6 +17,11 @@ public :: put_netcdf_var
 ! variables visible to this module only
 integer :: ncstatus
 
+interface def_netcdf_dims
+   module procedure def_netcdf_dims_char
+   module procedure def_netcdf_dims_str_t
+end interface
+
 interface get_netcdf_var_1d
    module procedure get_netcdf_var_1d_real
    module procedure get_netcdf_var_1d_integer
@@ -74,10 +79,8 @@ subroutine get_netcdf_dims(fileid,variable,output)
       write(0,*) 'ierr = ',ierr
       stop
    endif
-!  write(*,fmt='(a,i8)')variable//' = ', output ! print out dimensions for the variable
-
+   !  write(*,fmt='(a,i8)')variable//' = ', output ! print out dimensions for the variable
    return
-
 end subroutine get_netcdf_dims
 
 subroutine def_netcdf_grp(fileid,variable,output)
@@ -184,7 +187,7 @@ subroutine open_netcdf_for_write(fname,ncfileid)
    return
 end subroutine open_netcdf_for_write
 
-subroutine def_netcdf_dims(fileid,variable,input,output)
+subroutine def_netcdf_dims_char(fileid,variable,input,output)
    integer, intent(in) :: fileid
    character(len=*), intent(in)  :: variable ! name of this dimension
    integer,          intent(in)  :: input    ! size of this dimension
@@ -203,11 +206,33 @@ subroutine def_netcdf_dims(fileid,variable,input,output)
       write(0,*) 'ncstatus = ', ierr
       stop
    endif
-
    output = ncdimid
-
    return
-end subroutine def_netcdf_dims
+end subroutine def_netcdf_dims_char
+
+subroutine def_netcdf_dims_str_t(fileid,variable,input,output)
+   integer, intent(in) :: fileid
+   type(str_t), intent(in)  :: variable ! name of this dimension
+   integer,          intent(in)  :: input    ! size of this dimension
+   integer,          intent(out) :: output   ! ncid of this dimension
+
+   integer :: ncdimid, ierr
+
+   ierr = 0
+   ncstatus = nf90_def_dim(fileid,trim(adjustl(variable%str)),input,ncdimid)
+   ierr = ierr + ncstatus
+   ncstatus = nf90_put_att(fileid, NF90_GLOBAL, variable%str, input)
+   ierr = ierr + ncstatus
+
+   if ( ierr /= 0 ) then
+      write(0,*) 'Error defining dimension for '//trim(adjustl(variable%str))
+      write(0,*) 'ncstatus = ', ierr
+      stop
+   endif
+   output = ncdimid
+   return
+end subroutine def_netcdf_dims_str_t
+
 
 subroutine def_netcdf_var(fileid,variable,dimids,nctype,attrib_name,attrib)
 

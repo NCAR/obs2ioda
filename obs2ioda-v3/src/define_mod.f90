@@ -16,7 +16,7 @@ integer(i_kind), parameter :: ifalse            = 0
 integer(i_kind), parameter :: nstring           = 50
 integer(i_kind), parameter :: ndatetime         = 20
 integer(i_kind), parameter :: nobtype           = 7  ! number of ob types
-integer(i_kind), parameter :: n_ncdim           = 3  ! total numner of nc dimensions
+integer(i_kind), parameter :: n_ncdim           = 2  ! total numner of nc dimensions
 integer(i_kind), parameter :: n_ncgrp           = 5  ! total numner of nc groups
 integer(i_kind), parameter :: nvar_met          = 6
 integer(i_kind), parameter :: nvar_info         = 9  ! number of metadata
@@ -43,6 +43,16 @@ type(str_t), dimension(ninst) :: inst_list
 
 type(str_t), dimension(ninst_geo) :: geoinst_list
 
+type(str_t), dimension(n_ncdim) :: name_ncdim
+
+type(str_t), dimension(2, nvar_info) :: dim_var_info
+
+type(str_t), dimension(2,nsen_info) :: dim_sen_info
+
+type(str_t), dimension(nvar_met) :: dim_var_met
+
+type(str_t), dimension(n_ncgrp) :: name_ncgrp
+
 
 ! variable flags for var_u, var_v, var_ts, var_tv, var_q, var_ps
 integer(i_kind), dimension(nvar_met,nobtype) :: vflag = reshape ( &
@@ -55,24 +65,6 @@ integer(i_kind), dimension(nvar_met,nobtype) :: vflag = reshape ( &
       itrue, itrue, ifalse, ifalse, ifalse, ifalse, & ! profiler
       itrue, itrue, ifalse, ifalse, ifalse, ifalse  & ! ascat
    /), (/nvar_met,nobtype/) )
-
-
-! variables for outputing netcdf files
-character(len=nstring), dimension(n_ncdim) :: name_ncdim = &
-   (/               &
-      'nvars     '  &
-    , 'nlocs     '  &
-    , 'nstring   '  &
-!    , 'ndatetime '  &
-   /)
-character(len=nstring), dimension(n_ncgrp) :: name_ncgrp = &
-   (/               &
-      'MetaData  ', &
-      'ObsValue  ', &
-      'ObsError  ', &
-      'PreQC     ', &
-      'ObsType   '  &
-   /)
 
 ! conv info flags for name_var_info
 ! air_pressure, height, station_elevation, latitude, longitude, dateTime, datetime, station_id, variable_names
@@ -102,42 +94,21 @@ integer(i_kind), dimension(nvar_info) :: type_var_info = &
       nf90_float, &
       nf90_float, &
       nf90_int64, &
-      nf90_char,  &
+      nf90_string,  &
       nf90_string,  &
       nf90_string   &
    /)
-character(len=nstring), dimension(2,nvar_info) :: dim_var_info = reshape ( &
-   (/                             &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'ndatetime ', 'nlocs     ', &
-      'nstring   ', 'nlocs     ', &
-      'nstring   ', 'nvars     '  &
-   /), (/2, nvar_info/) )
+
 integer(i_kind), dimension(nsen_info) :: type_sen_info = &
    (/             &
       nf90_float, &
-      nf90_float, &
+      nf90_int, &
       nf90_float, &
       nf90_float, &
       nf90_float, &
       nf90_float, &
       nf90_int    &
    /)
-character(len=nstring), dimension(2,nsen_info) :: dim_sen_info = reshape ( &
-   (/                             &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
-      'nvars     ', 'null      '  &
-   /), (/2,nsen_info/) )
 
 ! variables for storing data
 type xfield_type
@@ -384,6 +355,8 @@ subroutine set_ahi_obserr(name_inst, nchan, obserrors)
 end subroutine set_ahi_obserr
 
 subroutine init_name_var_met()
+   implicit none
+
    name_var_met(1)%str = var_u
    name_var_met(2)%str = var_v
    name_var_met(3)%str = var_ts
@@ -393,6 +366,8 @@ subroutine init_name_var_met()
 end subroutine init_name_var_met
 
 subroutine init_obtype_list()
+   implicit none
+
    obtype_list(1)%str = 'sondes'
    obtype_list(2)%str = 'aircraft'
    obtype_list(3)%str = 'sfc'
@@ -403,6 +378,8 @@ subroutine init_obtype_list()
 end subroutine init_obtype_list
 
 subroutine init_name_sen_info()
+   implicit none
+
    name_sen_info(1)%str = 'solar_azimuth_angle'
    name_sen_info(2)%str = 'scan_position'
    name_sen_info(3)%str = 'sensor_azimuth_angle'
@@ -413,7 +390,9 @@ subroutine init_name_sen_info()
 end subroutine init_name_sen_info
 
 subroutine init_unit_var_met()
-    unit_var_met(1)%str = 'm/s'
+   implicit none
+
+   unit_var_met(1)%str = 'm/s'
     unit_var_met(2)%str = 'm/s'
     unit_var_met(3)%str = 'K'
     unit_var_met(4)%str = 'K'
@@ -422,6 +401,8 @@ subroutine init_unit_var_met()
 end subroutine init_unit_var_met
 
 subroutine init_name_var_info()
+   implicit none
+
    name_var_info(1)%str = 'air_pressure'
    name_var_info(2)%str = 'height'
    name_var_info(3)%str = 'station_elevation'
@@ -434,7 +415,9 @@ subroutine init_name_var_info()
 end subroutine init_name_var_info
 
 subroutine init_inst_list()
-  inst_list(1)%str = 'amsua_n15'
+   implicit none
+
+   inst_list(1)%str = 'amsua_n15'
   inst_list(2)%str = 'amsua_n18'
   inst_list(3)%str = 'amsua_n19'
   inst_list(4)%str = 'amsua_metop-a'
@@ -454,8 +437,68 @@ subroutine init_inst_list()
 end subroutine init_inst_list
 
 subroutine init_geoinst_list()
+   implicit none
+
   geoinst_list(1)%str = 'ahi_himawari8'
 end subroutine init_geoinst_list
 
+subroutine init_name_ncdim()
+   implicit none
+
+   name_ncdim(1)%str = 'nvars'
+   name_ncdim(2)%str = 'nlocs'
+!   name_ncdim(3)%str = 'nstring'
+   ! name_ncdim(4) = 'ndatetime '
+end subroutine init_name_ncdim
+
+subroutine init_dim_var_info()
+   implicit none
+
+   dim_var_info(1, 1)%str = 'nlocs'
+   dim_var_info(2, 1)%str = 'null'
+   dim_var_info(1, 2)%str = 'nlocs'
+   dim_var_info(2, 2)%str = 'null'
+   dim_var_info(1, 3)%str = 'nlocs'
+   dim_var_info(2, 3)%str = 'null'
+   dim_var_info(1, 4)%str = 'nlocs'
+   dim_var_info(2, 4)%str = 'null'
+   dim_var_info(1, 5)%str = 'nlocs'
+   dim_var_info(2, 5)%str = 'null'
+   dim_var_info(1, 6)%str = 'nlocs'
+   dim_var_info(2, 6)%str = 'null'
+   dim_var_info(1, 7)%str = 'ndatetime'
+   dim_var_info(2, 7)%str = 'nlocs'
+   dim_var_info(1, 8)%str = 'nlocs'
+   dim_var_info(2, 8)%str = 'null'
+   dim_var_info(1, 9)%str = 'nvars'
+   dim_var_info(2, 9)%str = 'null'
+end subroutine init_dim_var_info
+
+subroutine init_dim_sen_info()
+   implicit none
+   dim_sen_info(1, 1)%str = 'nlocs'
+   dim_sen_info(2, 1)%str = 'null'
+   dim_sen_info(1, 2)%str = 'nlocs'
+   dim_sen_info(2, 2)%str = 'null'
+   dim_sen_info(1, 3)%str = 'nlocs'
+   dim_sen_info(2, 3)%str = 'null'
+   dim_sen_info(1, 4)%str = 'nlocs'
+   dim_sen_info(2, 4)%str = 'null'
+   dim_sen_info(1, 5)%str = 'nlocs'
+   dim_sen_info(2, 5)%str = 'null'
+   dim_sen_info(1, 6)%str = 'nlocs'
+   dim_sen_info(2, 6)%str = 'null'
+   dim_sen_info(1, 7)%str = 'nvars'
+   dim_sen_info(2, 7)%str = 'null'
+end subroutine init_dim_sen_info
+
+subroutine init_name_ncgrp()
+   implicit none
+   name_ncgrp(1)%str = 'MetaData'
+   name_ncgrp(2)%str = 'ObsValue'
+   name_ncgrp(3)%str = 'ObsError'
+   name_ncgrp(4)%str = 'PreQC'
+   name_ncgrp(5)%str = 'ObsType'
+end subroutine init_name_ncgrp
 
 end module define_mod

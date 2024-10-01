@@ -61,8 +61,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       return
    end if
 
-   iv = ufo_vars_getindex(name_ncdim, 'nstring')
-   if ( iv > 0 ) val_ncdim(iv) = nstring
+!   iv = ufo_vars_getindex(name_ncdim, 'nstring')
+!   if ( iv > 0 ) val_ncdim(iv) = nstring
    iv = ufo_vars_getindex(name_ncdim, 'ndatetime')
    if ( iv > 0 ) val_ncdim(iv) = ndatetime
 
@@ -114,8 +114,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          call def_netcdf_var(ncfileid,trim(ncname),(/ncid_ncdim(1)/),NF90_INT)
       end if
       do i = 2, n_ncdim
-         call def_netcdf_dims(ncfileid,trim(name_ncdim(i)),val_ncdim(i),ncid_ncdim(i))
-         !call def_netcdf_var(ncfileid,trim(name_ncdim(i)),(/ncid_ncdim(i)/),NF90_INT)
+         call def_netcdf_dims(ncfileid,trim(name_ncdim(i)%str),val_ncdim(i),ncid_ncdim(i))
       end do
 
       ! define global attributes
@@ -131,9 +130,9 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       ! define netcdf groups
       do i = 1, n_ncgrp
          if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
-            if ( trim(name_ncgrp(i)) == 'ObsType' ) cycle
+            if ( trim(name_ncgrp(i)%str) == 'ObsType' ) cycle
          end if
-         call def_netcdf_grp(ncfileid,trim(name_ncgrp(i)),ncid_ncgrp(i))
+         call def_netcdf_grp(ncfileid,trim(name_ncgrp(i)%str),ncid_ncgrp(i))
       end do
       if ( has_wavenumber == itrue ) then
          ! use deprecated VarMetaData group for wavenumber before related code in UFO is updated
@@ -178,10 +177,10 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          if ( iflag /= itrue ) cycle var_info_def_loop
          ncname = trim(name_var_info(i)%str)
          igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
-         idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i))
+         idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i)%str)
          dim1 = ncid_ncdim(idim)
-         if ( ufo_vars_getindex(name_ncdim, dim_var_info(2,i)) > 0 ) then
-            idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i))
+         if ( ufo_vars_getindex(name_ncdim, dim_var_info(2,i)%str) > 0 ) then
+            idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i)%str)
             dim2 = ncid_ncdim(idim)
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),type_var_info(i))
          else
@@ -198,10 +197,10 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          do i = 1, nsen_info
             ncname = trim(name_sen_info(i)%str)
             igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
-            idim = ufo_vars_getindex(name_ncdim, dim_sen_info(1,i))
+            idim = ufo_vars_getindex(name_ncdim, dim_sen_info(1,i)%str)
             dim1 = ncid_ncdim(idim)
-            if ( ufo_vars_getindex(name_ncdim, dim_sen_info(2,i)) > 0 ) then
-               idim = ufo_vars_getindex(name_ncdim, dim_sen_info(2,i))
+            if ( ufo_vars_getindex(name_ncdim, dim_sen_info(2,i)%str) > 0 ) then
+               idim = ufo_vars_getindex(name_ncdim, dim_sen_info(2,i)%str)
                dim2 = ncid_ncdim(idim)
                call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),type_sen_info(i))
             else
