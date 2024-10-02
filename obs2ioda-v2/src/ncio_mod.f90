@@ -4,10 +4,10 @@ use netcdf
 use kinds, only: i_kind, r_single, r_kind
 use define_mod, only: nobtype, nvar_info, n_ncdim, n_ncgrp, nstring, ndatetime, &
    obtype_list, name_ncdim, name_ncgrp, name_var_met, name_var_info, name_sen_info, &
-   xdata, itrue, ifalse, vflag, ninst, inst_list, write_nc_conv, write_nc_radiance, &
+   itrue, ifalse, vflag, ninst, inst_list, write_nc_conv, write_nc_radiance, &
    write_nc_radiance_geo, ninst_geo, geoinst_list, &
    var_tb, nsen_info, type_var_info, type_sen_info, dim_var_info, dim_sen_info, &
-   unit_var_met, iflag_conv, iflag_radiance, set_brit_obserr, set_ahi_obserr
+   unit_var_met, iflag_conv, iflag_radiance, set_brit_obserr, set_ahi_obserr, xdata_type
 use netcdf_mod, only: open_netcdf_for_write, close_netcdf, &
    def_netcdf_dims, def_netcdf_grp, def_netcdf_var, def_netcdf_end, &
    put_netcdf_var, get_netcdf_dims
@@ -20,7 +20,7 @@ public :: write_obs
 
 contains
 
-subroutine write_obs (filedate, write_opt, outdir, itim)
+subroutine write_obs (filedate, write_opt, outdir, itim, xdata)
 
    implicit none
 
@@ -28,6 +28,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    integer(i_kind),  intent(in)          :: write_opt
    character(len=*), intent(in)          :: outdir
    integer(i_kind),  intent(in)          :: itim
+   type(xdata_type), allocatable, dimension(:,:), intent(inout) :: xdata
+
 
    character(len=512)                    :: ncfname  ! netcdf file name
    integer(i_kind), dimension(n_ncdim)   :: ncid_ncdim

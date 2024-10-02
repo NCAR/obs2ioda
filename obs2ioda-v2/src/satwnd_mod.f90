@@ -1,19 +1,22 @@
 module satwnd_mod
 
 use kinds, only: r_kind, i_kind, r_double, i_llong
-use define_mod, only: nobtype, set_obtype_conv, obtype_list, xdata, &
+use define_mod, only: nobtype, set_obtype_conv, obtype_list, &
    nvar_met, nvar_info, type_var_info, name_var_met, name_var_info, &
    missing_r, missing_i, vflag, itrue, ifalse, nstring, ndatetime,  &
-   dtime_min, dtime_max
+   dtime_min, dtime_max, xdata_type
 use ufo_vars_mod, only: ufo_vars_getindex, var_prs, var_u, var_v
 use utils_mod, only: get_julian_time, da_advance_time, da_get_time_slots
 use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_int64
+use core_mod, only: obs2ioda_args_t
+use ncio_mod, only: write_obs
 
 implicit none
 private
 public  :: read_satwnd
 public  :: filter_obs_satwnd
 public  :: sort_obs_satwnd
+public  :: handle_satwnd
 
 type datalink_satwnd
    character(len=nstring)    :: msg_type   ! BUFR message type name
@@ -49,6 +52,38 @@ type(datalink_satwnd), pointer :: rhead=>null(), rlink=>null()
 contains
 
 !--------------------------------------------------------------
+subroutine handle_satwnd( &
+      obs2ioda_args &
+   )
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+   integer :: itime
+   character (len=obs2ioda_args%DateLen14) :: dtime, datetmp
+   character(len=obs2ioda_args%DateLen) :: filedate_out
+
+   write(*,*) '--- processing '//trim(obs2ioda_args%filename)//' ---'
+   call read_satwnd(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), obs2ioda_args%filedate)
+   if ( obs2ioda_args%apply_gsi_qc ) then
+      write(*,*) '--- applying some additional QC as in GSI read_satwnd.f90 for the global model ---'
+      call filter_obs_satwnd
+   end if
+
+   ! transfer info from limked list to arrays grouped by obs/variable types
+   call sort_obs_satwnd(obs2ioda_args%filedate, obs2ioda_args%nfgat, obs2ioda_args%xdata)
+
+   ! write out netcdf obs2ioda_args%files
+   if ( obs2ioda_args%nfgat > 1 ) then
+      do itime = 1, obs2ioda_args%nfgat
+         ! corresponding to dtime_min='-3h' and dtime_max='+3h'
+         write(dtime,'(i2,a)')  obs2ioda_args%hour_fgat*(itime-1)-3, 'h'
+         call da_advance_time(obs2ioda_args%filedate, trim(dtime), datetmp)
+         filedate_out = datetmp(1:10)
+         call write_obs(filedate_out, obs2ioda_args%write_nc_conv, obs2ioda_args%outdir, itime, obs2ioda_args%xdata)
+      end do
+   else
+      call write_obs(obs2ioda_args%filedate, obs2ioda_args%write_nc_conv, obs2ioda_args%outdir, 1, obs2ioda_args%xdata)
+   end if
+   if ( allocated(obs2ioda_args%xdata) ) deallocate(obs2ioda_args%xdata)
+end subroutine handle_satwnd
 
 subroutine read_satwnd(filename, filedate)
 
@@ -359,12 +394,13 @@ end subroutine filter_obs_satwnd
 
 !--------------------------------------------------------------
 
-subroutine sort_obs_satwnd(filedate, nfgat)
+subroutine sort_obs_satwnd(filedate, nfgat, xdata)
 
    implicit none
 
    character(len=*), intent(in) :: filedate
    integer(i_kind),  intent(in) :: nfgat
+   type(xdata_type), allocatable, dimension(:,:), intent(inout) :: xdata
 
    integer(i_kind)                       :: i, iv, k, ii
    integer(i_kind)                       :: ityp, irec, ivar, itim

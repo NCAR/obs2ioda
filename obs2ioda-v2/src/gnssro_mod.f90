@@ -7,6 +7,7 @@
 
 module gnssro_bufr2ioda
 use netcdf
+use core_mod, only: obs2ioda_args_t
 implicit none
 
 integer, parameter :: i_kind  = selected_int_kind(8)    !4
@@ -17,6 +18,12 @@ integer(i_kind) :: said
 logical :: verbose = .false.
 
 contains
+
+subroutine handle_gnssro(obs2ioda_args)
+    implicit none
+    type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+    call read_write_gnssro(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), trim(obs2ioda_args%outdir))
+end subroutine handle_gnssro
 
 subroutine read_write_gnssro(infile, outdir)
 

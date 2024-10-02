@@ -3,12 +3,14 @@ module utils_mod
 ! adapated from WRFDA/var/da/da_tools/da_advance_time.inc
 
 use kinds, only: r_kind,i_kind,r_double, i_llong
+use core_mod, only: obs2ioda_args_t
 
 implicit none
 private
 public :: da_advance_time
 public :: get_julian_time
 public :: da_get_time_slots
+
 
 contains
 

@@ -16,11 +16,14 @@ module ahi_HSD_mod
 
 use kinds, only: i_byte, i_short, i_long, i_llong, i_kind, r_single, r_double, r_kind
 use define_mod, only: missing_r, missing_i, nstring, ndatetime, &
-   ninst, inst_list, set_name_satellite, set_name_sensor, xdata, name_sen_info, &
-   nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, set_brit_obserr, strlen
+   ninst, inst_list, set_name_satellite, set_name_sensor, name_sen_info, &
+   nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, set_brit_obserr, strlen,&
+        xdata_type, write_nc_radiance_geo
 use ufo_vars_mod, only: ufo_vars_getindex
 use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
 use utils_mod, only: get_julian_time
+use core_mod, only: obs2ioda_args_t
+use ncio_mod, only: write_obs
 
 implicit none
 
@@ -223,7 +226,28 @@ real(r_double), parameter :: rad2deg = 180.0/pi
 
 contains
 
-subroutine read_HSD(ccyymmddhhnn, inpdir, do_superob, superob_halfwidth)
+subroutine handle_do_ahi( &
+        obs2ioda_args &
+        )
+    implicit none
+    type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+
+    if ( len_trim(obs2ioda_args%cdatetime) /= 12 ) then
+        write(*,*) 'Error: -t ccyymmddhhnn not specified for -ahi'
+        stop
+    end if
+    call read_HSD( &
+            obs2ioda_args%cdatetime, obs2ioda_args%inpdir, &
+            obs2ioda_args%do_superob, obs2ioda_args%superob_halfwidth, &
+            obs2ioda_args%subsample, obs2ioda_args%xdata)
+    obs2ioda_args%filedate = obs2ioda_args%cdatetime(1:10)
+    call write_obs(obs2ioda_args%filedate, &
+            obs2ioda_args%write_nc_radiance_geo, &
+            obs2ioda_args%outdir, 1, obs2ioda_args%xdata)
+    if ( allocated(obs2ioda_args%xdata) ) deallocate(obs2ioda_args%xdata)
+end subroutine handle_do_ahi
+
+subroutine read_HSD(ccyymmddhhnn, inpdir, do_superob, superob_halfwidth, subsample, xdata)
 
 implicit none
 
@@ -231,6 +255,9 @@ character(len=12), intent(in) :: ccyymmddhhnn
 character(len=*),  intent(in) :: inpdir
 logical,           intent(in) :: do_superob
 integer(i_kind),   intent(in) :: superob_halfwidth
+integer(i_kind),   intent(in) :: subsample
+type(xdata_type), allocatable, dimension(:,:), intent(inout) :: xdata
+
 
 character(len=1051) :: dummy1051
 character(len=1)    :: dummy1

@@ -1,3 +1,6 @@
-
+*.sh
+*.o
+*.x
+*.mod
 .DS_Store
 .DS_Store

@@ -2,15 +2,24 @@ module radiance_mod
 
 use kinds, only: r_kind,i_kind,r_double,i_llong
 use define_mod, only: missing_r, missing_i, nstring, ndatetime, &
-   ninst, inst_list, set_name_satellite, set_name_sensor, xdata, name_sen_info, &
+   ninst, inst_list, set_name_satellite, set_name_sensor, name_sen_info, &
    nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, &
-   dtime_min, dtime_max, strlen
+   dtime_min, dtime_max, strlen, xdata_type
 use ufo_vars_mod, only: ufo_vars_getindex
 use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
 use utils_mod, only: get_julian_time, da_advance_time, da_get_time_slots
+use core_mod, only: obs2ioda_args_t
+use ncio_mod, only: write_obs
 
 implicit none
 private
+public :: handle_amsua
+public :: handle_airs
+public :: handle_mhs
+public :: handle_iasi
+public :: handle_cris
+public :: handle_do_radiance
+public :: handle_do_radiance_hyper_ir
 public  :: read_amsua_amsub_mhs
 public  :: read_airs_colocate_amsua
 public  :: read_iasi
@@ -50,6 +59,113 @@ end type datalink_radiance
 type(datalink_radiance), pointer :: rhead=>null(), rlink=>null()
 
 contains
+
+subroutine handle_amsua(obs2ioda_args)
+   implicit none
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+
+   write(*,*) '--- processing '//trim(obs2ioda_args%filename)//' ---'
+   obs2ioda_args%do_radiance = .true.
+   ! read bufr obs2ioda_args%file and store data in sequential linked list for radiances
+   call read_amsua_amsub_mhs(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), obs2ioda_args%filedate)
+end subroutine handle_amsua
+
+subroutine handle_airs(obs2ioda_args)
+   implicit none
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+
+   write(*,*) '--- processing '//trim(obs2ioda_args%filename)//' ---'
+   obs2ioda_args%do_radiance = .true.
+   ! read bufr file and store data in sequential linked list for radiances
+   call read_amsua_amsub_mhs(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), obs2ioda_args%filedate)
+end subroutine handle_airs
+
+subroutine handle_mhs(obs2ioda_args)
+   implicit none
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+
+   write(*,*) '--- processing '//trim(obs2ioda_args%filename)//' ---'
+   obs2ioda_args%do_radiance = .true.
+   ! read bufr obs2ioda_args%file and store data in sequential linked list for radiances
+   call read_amsua_amsub_mhs(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), obs2ioda_args%filedate)
+end subroutine handle_mhs
+
+subroutine handle_iasi(obs2ioda_args)
+   implicit none
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+
+   write(*,*) '--- processing '//trim(obs2ioda_args%filename)//' ---'
+   obs2ioda_args%do_radiance_hyperIR = .true.
+   ! read bufr file and store data in sequential linked list for radiances
+   call read_iasi(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), obs2ioda_args%filedate)
+end subroutine handle_iasi
+
+subroutine handle_cris(obs2ioda_args)
+   implicit none
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+
+   write(*,*) '--- processing '//trim(obs2ioda_args%filename)//' ---'
+   obs2ioda_args%do_radiance_hyperIR = .true.
+   ! read bufr obs2ioda_args%file and store data in sequential linked list for radiances
+   call read_cris(trim(obs2ioda_args%inpdir)//trim(obs2ioda_args%filename), obs2ioda_args%filedate)
+end subroutine handle_cris
+
+subroutine handle_do_radiance( &
+        obs2ioda_args &
+     )
+    implicit none
+    type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+    character (len=obs2ioda_args%DateLen14) :: dtime, datetmp
+    character (len=obs2ioda_args%DateLen) :: filedate_out
+    integer(i_kind) :: itime
+
+    ! transfer info linked list to arrays grouped by satellite instrument types
+   call sort_obs_radiance(obs2ioda_args%filedate, obs2ioda_args%nfgat, obs2ioda_args%xdata)
+
+   ! write out netcdf obs2ioda_args%files
+   if ( obs2ioda_args%nfgat > 1 ) then
+      do itime = 1, obs2ioda_args%nfgat
+         ! corresponding to dtime_min='-3h' and dtime_max='+3h'
+         write(dtime,'(i2,a)')  obs2ioda_args%hour_fgat*(itime-1)-3, 'h'
+         call da_advance_time(obs2ioda_args%filedate, trim(dtime), datetmp)
+         obs2ioda_args%filedate_out = datetmp(1:10)
+         call write_obs(filedate_out, obs2ioda_args%write_nc_radiance, obs2ioda_args%outdir, itime, obs2ioda_args%xdata)
+      end do
+   else
+      call write_obs(obs2ioda_args%filedate, obs2ioda_args%write_nc_radiance, obs2ioda_args%outdir, 1, obs2ioda_args%xdata)
+   end if
+   if ( allocated(obs2ioda_args%xdata) ) deallocate(obs2ioda_args%xdata)
+
+end subroutine handle_do_radiance
+
+subroutine handle_do_radiance_hyper_ir( &
+        obs2ioda_args &
+        )
+   implicit none
+   type(obs2ioda_args_t), intent(inout) :: obs2ioda_args
+   character (len=obs2ioda_args%DateLen14) :: dtime, datetmp
+   character (len=obs2ioda_args%DateLen) :: filedate_out
+   integer(i_kind) :: itime
+
+   ! transfer info from linked list to arrays grouped by satellite instrument types
+   call sort_obs_radiance(obs2ioda_args%filedate, obs2ioda_args%nfgat, obs2ioda_args%xdata)
+
+   call radiance_to_temperature(ninst, obs2ioda_args%nfgat, obs2ioda_args%xdata)
+
+   ! write out netcdf obs2ioda_args%files
+   if ( obs2ioda_args%nfgat > 1 ) then
+      do itime = 1, obs2ioda_args%nfgat
+         ! corresponding to dtime_min='-3h' and dtime_max='+3h'
+         write(dtime,'(i2,a)')  obs2ioda_args%hour_fgat*(itime-1)-3, 'h'
+         call da_advance_time(obs2ioda_args%filedate, trim(dtime), datetmp)
+         filedate_out = datetmp(1:10)
+         call write_obs(filedate_out, obs2ioda_args%write_nc_radiance, obs2ioda_args%outdir, itime, obs2ioda_args%xdata)
+      end do
+   else
+      call write_obs(obs2ioda_args%filedate, obs2ioda_args%write_nc_radiance, obs2ioda_args%outdir, 1, obs2ioda_args%xdata)
+   end if
+   if ( allocated(obs2ioda_args%xdata) ) deallocate(obs2ioda_args%xdata)
+end subroutine handle_do_radiance_hyper_ir
 
 !--------------------------------------------------------------
 
@@ -966,12 +1082,13 @@ end subroutine read_cris
 
 !--------------------------------------------------------------
 
-subroutine sort_obs_radiance(filedate, nfgat)
+subroutine sort_obs_radiance(filedate, nfgat, xdata)
 
    implicit none
 
    character(len=*), intent(in) :: filedate
    integer(i_kind),  intent(in) :: nfgat
+   type(xdata_type), allocatable, dimension(:,:), intent(inout) :: xdata
 
    integer(i_kind)                   :: i, iv, k, ii
    integer(i_kind)                   :: ityp, irec, itim
@@ -1254,11 +1371,12 @@ subroutine calc_sensor_view_angle(name_inst, ifov, view_angle)
 
 end subroutine calc_sensor_view_angle
 
-subroutine radiance_to_temperature(ninst, nfgat)
+subroutine radiance_to_temperature(ninst, nfgat, xdata)
 
 implicit none
 integer(i_kind),  intent(in) :: ninst ! first dim of xdata
 integer(i_kind),  intent(in) :: nfgat ! second dim of xdata
+type(xdata_type), allocatable, dimension(:,:), intent(inout) :: xdata
 real(r_double), allocatable :: planck_c1(:)
 real(r_double), allocatable :: planck_c2(:)
 real(r_double), allocatable :: band_c1(:)

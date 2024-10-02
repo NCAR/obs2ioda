@@ -230,8 +230,6 @@ type xdata_type
    real(r_kind),           allocatable, dimension(:)   :: wavenumber
 end type xdata_type
 
-type(xdata_type), allocatable, dimension(:,:) :: xdata  ! dim 1: number of ob types
-                                                        ! dim 2: number of time slots
 
 contains
 
