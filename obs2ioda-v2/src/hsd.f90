@@ -238,7 +238,7 @@ character(len=16)   :: dummy16
 character(len=8)    :: ccyymmdd
 character(len=4)    :: ccyy, hhnn
 character(len=2)    :: mm, dd, hh, nn
-character(len=3)    :: satellite = 'H08'
+character(len=3)    :: satellite = 'H09'                          ! MRI -- changed from H08 to H09
 character(len=4)    :: region = 'FLDK'
 character(len=3)    :: resolution = 'R20'
 character(len=5)    :: segment ! S0110, S0210, etc
@@ -664,7 +664,7 @@ if ( do_superob ) then
               if ( trim(name_var_info(i)) == 'datetime' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = datetime
               else if ( trim(name_var_info(i)) == 'station_id' ) then
-                 xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
+                 xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari9'                 ! MRI -- changed from ahi_himawari8 to ahi_himawari9
               end if
            else if ( type_var_info(i) == nf90_int64 ) then
               if ( trim(name_var_info(i)) == 'dateTime' ) then
@@ -768,7 +768,7 @@ else
               if ( trim(name_var_info(i)) == 'datetime' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = datetime
               else if ( trim(name_var_info(i)) == 'station_id' ) then
-                 xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
+                 xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari9'                 ! MRI -- changed from ahi_himawari8 to ahi_himawari9
               end if
            else if ( type_var_info(i) == nf90_int64 ) then
               if ( trim(name_var_info(i)) == 'dateTime' ) then
