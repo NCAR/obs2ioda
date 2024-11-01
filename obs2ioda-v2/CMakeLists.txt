@@ -13,6 +13,8 @@ set(v2_SOURCES
     ncio_mod.f90
     netcdf_mod.f90
     prepbufr_mod.f90
+    core_mod.f90
+    setup_mod.f90
     radiance_mod.f90
     ufo_variables_mod.F90
     utils_mod.f90
