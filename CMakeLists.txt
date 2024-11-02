@@ -17,11 +17,12 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 
 
 # Set the Fortran compiler and flags
-set(NCEP_BUFR_LIB CACHE STRING "")
+set(NCEP_BUFR_ROOT CACHE STRING "")
 option(BUILD_TESTS "Build unit tests" ON)
 
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C)
+find_package(NCEPBUFR REQUIRED)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 if (BUILD_TESTS)

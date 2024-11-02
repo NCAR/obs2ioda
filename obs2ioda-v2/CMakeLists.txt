@@ -24,7 +24,7 @@ set(v2_MAIN_SOURCE
     main.f90
 )
 list(TRANSFORM v2_MAIN_SOURCE PREPEND "src/")
-set(v2_PUBLIC_LINK_LIBRARIES "${NetCDF_LIBRARIES}" "${NCEP_BUFR_LIB}")
+set(v2_PUBLIC_LINK_LIBRARIES "${NetCDF_LIBRARIES}" NCEPBUFR::libbufr)
 add_library(v2 SHARED ${v2_SOURCES})
 obs2ioda_fortran_target(v2 ${v2_MAIN_SOURCE})
 

@@ -18,13 +18,13 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    mkdir build && cd build
    ```
-3. Locate the NCEP BUFR library by executing the following command in the `NCEP BUFR` library's build directory:
+3. Set the environment variable `NCEPBUFR_ROOT` to the root directory where the NCEP BUFR library is installed.
    ```bash
-   find . -name *libbufr*
+    export NCEPBUFR_ROOT=<NCEP_BUFR_ROOT_DIR>
    ```
 4. Next, run CMake to configure the build. Remember to specify the path to the NCEP BUFR library:
    ```bash
-   cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>
+   cmake <OBS2IODA_ROOT_DIR> -DNCEPBUFR_ROOT=<NCEPBUFR_ROOT>
    ```
 5. Finally, build the project using this command:
    ```bash
