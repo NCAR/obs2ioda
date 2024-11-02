@@ -1,7 +1,7 @@
 # Check CMake version
 cmake_minimum_required(VERSION 3.20)
 enable_language(Fortran)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Functions/Obs2Ioda_Functions.cmake")
 # Define the project
