@@ -35,7 +35,6 @@ allocate(command_line_args(arg_count))
 call set_command_line_arguments(command_line_args)
 
 call handle_user_input(obs2ioda_args,flist, ftype, nfile, command_line_args)
-stop
 call parse_files_to_convert(obs2ioda_args, flist, ftype, nfile)
 
 call set_nfgat(obs2ioda_args)
