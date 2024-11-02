@@ -1,11 +1,14 @@
 # Check CMake version
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
+enable_language(Fortran)
+set(CMAKE_BUILD_TYPE Debug)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Functions/Obs2Ioda_Functions.cmake")
 # Define the project
 project(obs2ioda LANGUAGES Fortran C CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Fortran module output directory for build interface
 set(OBS2IODA_MODULE_DIR ${PROJECT_NAME}/module/${CMAKE_Fortran_COMPILER_ID}/${CMAKE_Fortran_COMPILER_VERSION})
@@ -15,18 +18,14 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 
 # Set the Fortran compiler and flags
 set(NCEP_BUFR_LIB CACHE STRING "")
-option(BUILD_TESTS "Build unit tests" OFF)
+option(BUILD_TESTS "Build unit tests" ON)
 
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C)
-
-enable_testing()
-find_package(PFUNIT REQUIRED)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 if (BUILD_TESTS)
     enable_testing()
     find_package(PFUNIT REQUIRED)
     add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
-endif ()
-
+endif()
