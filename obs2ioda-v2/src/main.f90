@@ -1,7 +1,7 @@
 program obs2ioda
 
 use define_mod, only: write_nc_conv, write_nc_radiance, &
-        write_nc_radiance_geo, xdata_type
+        write_nc_radiance_geo, xdata_type, StrLen
 use kinds, only: i_kind
 use prepbufr_mod, only: handle_prepbufr
 use radiance_mod, only: handle_amsua, handle_airs, &
@@ -14,7 +14,7 @@ use satwnd_mod, only: handle_satwnd
 use utils_mod, only: da_advance_time
 use setup_mod, only: &
         parse_files_to_convert, handle_user_input,&
-        set_nfgat, input_file_exists
+        set_nfgat, input_file_exists, set_command_line_arguments
 use core_mod, only: obs2ioda_args_t
 
 implicit none
@@ -24,12 +24,18 @@ type(obs2ioda_args_t), target :: obs2ioda_args
 character(len=1024) :: arg, cmd_line  ! adjust char len as per maximum expected cmd line length
 integer :: i, num
 integer, dimension(:), allocatable :: cmd_arg_indicies
+character(len=StrLen), dimension(:), allocatable :: command_line_args
 
 character (len=64) :: flist(8)  ! file names to be read in from command line arguments
-integer(i_kind)         :: nfile, ifile
+integer(i_kind)         :: nfile, ifile, arg_count
 
+arg_count = command_argument_count()
+allocate(command_line_args(arg_count))
 
-call handle_user_input(obs2ioda_args,flist, ftype, nfile)
+call set_command_line_arguments(command_line_args)
+
+call handle_user_input(obs2ioda_args,flist, ftype, nfile, command_line_args)
+stop
 call parse_files_to_convert(obs2ioda_args, flist, ftype, nfile)
 
 call set_nfgat(obs2ioda_args)

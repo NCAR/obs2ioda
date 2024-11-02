@@ -1,0 +1,39 @@
+module Test_handle_user_input_mod
+    use funit
+    use setup_mod, only: handle_user_input
+    use core_mod, only: obs2ioda_args_t
+    use define_mod, only: StrLen
+    use kinds, only: i_kind
+    implicit none
+
+contains
+
+    @Test
+    subroutine test_handle_user_input()
+        character(len=StrLen), dimension(:), allocatable :: command_line_args
+        type(obs2ioda_args_t) :: obs2ioda_args
+        character (len=64) :: flist(8)  ! file names to be read in from command line arguments
+        integer(i_kind)            :: ftype(8)
+        integer(i_kind)         :: nfile, flist_size
+        character(len=StrLen) :: tmp
+
+        allocate(command_line_args(4))
+        tmp = "-i "
+        command_line_args(1) = adjustl(tmp)
+        tmp = "./input/ "
+        command_line_args(2) = adjustl(tmp)
+        tmp = "-o "
+        command_line_args(3) = adjustl(tmp)
+        tmp = "./output/ "
+        command_line_args(4) = adjustl(tmp)
+
+
+        call handle_user_input(obs2ioda_args,flist, ftype, nfile, command_line_args)
+        flist_size = size(flist)
+        @assertEqual("./input/",trim(obs2ioda_args%inpdir))
+        @assertEqual("./output/",trim(obs2ioda_args%outdir))
+
+    end subroutine test_handle_user_input
+
+end module Test_handle_user_input_mod
+
