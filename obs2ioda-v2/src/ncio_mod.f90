@@ -16,9 +16,112 @@ use ufo_vars_mod, only: ufo_vars_getindex
 implicit none
 
 private
-public :: write_obs
+public :: write_obs, is_himawari, set_obserr
 
 contains
+
+   !> Checks whether the name at the specified index in `geo_inst` matches the provided Himawari satellite name.
+   !!
+   !! This function examines the `geo_inst` array at the `ityp` index. If `ityp` is within the bounds of the array and
+   !! the instrument name at `geo_inst(ityp)` matches `himawari_name`, the function returns `.true.`. If `ityp` is outside
+   !! the array bounds or the instrument name at `geo_inst(ityp)` does not align with `himawari_name`, the function
+   !! returns `.false.`. The `geo_inst` array may contain multiple Himawari satellite names.
+   !!
+   !! @param geo_inst (character(len=*), dimension(:), intent(in)):
+   !!   1D array of instrument names, each entry potentially representing a different Himawari satellite type.
+   !! @param himawari_name (character(len=*), intent(in)):
+   !!   The Himawari satellite name to compare with the name at the `ityp` index of the `geo_inst` array.
+   !! @param ityp (integer(i_kind), intent(in)):
+   !!   Index into the `geo_inst` array specifying the position of the satellite name to be checked.
+   !!
+   !! @return is_himawari (logical):
+   !!   Returns `.true.` if the name at `geo_inst(ityp)` matches `himawari_name`, else returns `.false.`.
+   function is_himawari(geo_inst, himawari_name, ityp)
+      character(len = *), dimension(:), intent(in) :: geo_inst
+      character(len = *), intent(in) :: himawari_name
+      integer(i_kind), intent(in) :: ityp
+      logical :: is_himawari
+
+      if (ityp <= ubound(geo_inst, DIM = 1)) then
+         if  (geo_inst(ityp) == himawari_name) then
+            is_himawari = .true.
+            return
+         end if
+      end if
+      is_himawari = .false.
+   end function is_himawari
+
+   !> Sets observation error values for a specified instrument type based on the instrument index.
+   !!
+   !! This subroutine assigns observation errors for satellite instruments based on the specified instrument type
+   !! (`geo_inst` or `brit_inst`). Depending on whether the instrument type is Himawari (identified by `geo_inst`
+   !! matching "ahi_himawari8"), it calls either `set_ahi_obserr_proc` or `set_brit_obserr_proc` to set the `obserr` array.
+   !! These procedures are passed as arguments to allow flexible handling of observation error settings for different
+   !! instrument types.
+   !!
+   !! @param geo_inst (character(len=*), dimension(:), intent(in)):
+   !!   Array containing the names of geostationary instruments, including Himawari.
+   !!
+   !! @param brit_inst (character(len=*), dimension(:), intent(in)):
+   !!   Array containing the names of other instrument types.
+   !!
+   !! @param obserr (real(r_kind), dimension(:), intent(out)):
+   !!   Array where observation error values are stored, as set by the appropriate observation error procedure.
+   !!
+   !! @param ityp (integer(i_kind), intent(in)):
+   !!   Index specifying the instrument position in `geo_inst` or `brit_inst` arrays.
+   !!
+   !! @param itim (integer(i_kind), intent(in)):
+   !!   Timestamp index; passed for context but not directly used in this subroutine.
+   !!
+   !! @param nvars (integer(i_kind), intent(in)):
+   !!   Number of variables (or channels) for which observation errors need to be set.
+   !!
+   !! @param set_ahi_obserr_proc (subroutine, intent(in)):
+   !!   Procedure for setting observation errors for Himawari instruments, passed as an argument for flexibility.
+   !!
+   !! @param set_brit_obserr_proc (subroutine, intent(in)):
+   !!   Procedure for setting observation errors for non-Himawari instruments, passed as an argument for flexibility.
+   !!
+   !! @param ierr (integer(i_kind), optional, intent(out)):
+   !!   Error code output. Set to 0 on success, or a negative value if an error occurs in setting observation errors.
+   !!
+   !! The subroutine uses `is_himawari` to check if `geo_inst(ityp)` is a Himawari instrument, calling
+   !! `set_ahi_obserr_proc` or `set_brit_obserr_proc` accordingly to populate `obserr`.
+   subroutine set_obserr (geo_inst, brit_inst, obserr, &
+           ityp, itim, nvars, set_ahi_obserr_proc, set_brit_obserr_proc, ierr)
+      character(len = *), dimension(:), intent(in) :: geo_inst
+      character(len = *), dimension(:), intent(in) :: brit_inst
+      real(r_kind), dimension(:), intent(out) :: obserr
+      integer(i_kind), intent(in) :: ityp
+      integer(i_kind), intent(in) :: itim
+      integer(i_kind), intent(in) :: nvars
+      integer(i_kind), optional, intent(out)  :: ierr
+      interface
+         subroutine set_ahi_obserr_proc(inst, nvars, obserr, ierr)
+            use define_mod, only : i_kind, r_kind
+            implicit none
+            character(len = *), intent(in) :: inst
+            integer(i_kind), intent(in) :: nvars
+            real(r_kind), dimension(nvars), intent(out) :: obserr
+            integer(i_kind), optional, intent(out)  :: ierr
+         end subroutine set_ahi_obserr_proc
+         subroutine set_brit_obserr_proc(inst, nvars, obserr, ierr)
+            use define_mod, only : i_kind, r_kind
+            implicit none
+            character(len = *), intent(in) :: inst
+            integer(i_kind), intent(in) :: nvars
+            real(r_kind), dimension(nvars), intent(out) :: obserr
+            integer(i_kind), intent(out), optional :: ierr
+         end subroutine set_brit_obserr_proc
+      end interface
+
+      if (is_himawari(geo_inst, "ahi_himawari8", ityp) .eqv. .true.) then
+         call set_ahi_obserr_proc(geo_inst(ityp), nvars, obserr, ierr)
+      else
+         call set_brit_obserr_proc(brit_inst(ityp), nvars, obserr, ierr)
+      end if
+   end subroutine set_obserr
 
 subroutine write_obs (filedate, write_opt, outdir, itim)
 
@@ -89,11 +192,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          allocate (ichan(xdata(ityp,itim)%nvars))
          ichan(:) = xdata(ityp,itim)%xseninfo_int(:,iv)
          allocate (obserr(xdata(ityp,itim)%nvars))
-         if  ( geoinst_list(ityp) == 'ahi_himawari8' ) then
-             call set_ahi_obserr(geoinst_list(ityp), xdata(ityp,itim)%nvars, obserr)
-         else
-             call set_brit_obserr(inst_list(ityp), xdata(ityp,itim)%nvars, obserr)
-         end if
+         call set_obserr(geoinst_list, inst_list, obserr, ityp, itim, &
+                 xdata(ityp, itim)%nvars,set_ahi_obserr, set_brit_obserr)
       end if
       write(*,*) '--- writing ', trim(ncfname)
       call open_netcdf_for_write(trim(ncfname),ncfileid)
