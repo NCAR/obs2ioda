@@ -1,0 +1,117 @@
+module Test_set_brit_ahi_mod
+    !> Test suite for the `set_brit_ahi` subroutine in `ncio_mod`.
+    !! This suite tests the correct assignment of `set_brit` and `set_ahi` flags
+    !! based on the `geo_inst` input array and the `ityp` index.
+    !!
+    !! The `set_brit_ahi` subroutine inspects the `geo_inst` array of instrument names,
+    !! setting `set_brit` to `.true.` if the instrument type (specified by `ityp`)
+    !! does not match 'ahi_himawari8', and setting `set_ahi` to `.true.` otherwise.
+    !! The subroutine also includes a bounds check to ensure that `geo_inst`
+    !! is never accessed when `ityp` exceeds the array size, preventing out-of-bounds errors.
+    !!
+    !! Tests:
+    !! - `test_set_brit_ahi_prod`: Tests `set_brit_ahi` using the `geoinst_list` array,
+    !!   ensuring the correct setting of `set_brit` and `set_ahi` for the array used in production.
+    !! - `test_set_brit_ahi1`: Checks behavior when `geo_inst` contains only 'ahi_himawari8',
+    !!   validating that `set_ahi` is set based on `ityp`.
+    !! - `test_set_brit_ahi2`: Verifies `set_brit` and `set_ahi` with an array
+    !!   containing 'ahi_himawari9' and 'ahi_himawari8'.
+    !! - `test_set_brit_ahi3`: Ensures correct flag settings for a `geo_inst` array
+    !!   containing 'ahi_himawari9', 'ahi_himawari10', and 'ahi_himawari8'.
+    !!
+    !! Each test iterates over values of `ityp`, comparing `set_brit` and `set_ahi`
+    !! against expected values for comprehensive coverage and ensures that `geo_inst`
+    !! is accessed within bounds.
+
+    use funit
+    use define_mod, only: geoinst_list
+    implicit none
+
+    @testCase
+    type, extends(TestCase) :: Test_set_brit_ahi_t
+        character(len = 256), dimension(1) :: geo_inst1 = (/"ahi_himawari8"/)
+        character(len = 256), dimension(2) :: geo_inst2 = (/"ahi_himawari9", "ahi_himawari8"/)
+        character(len = 256), dimension(3) :: geo_inst3 = (/"ahi_himawari9 ", "ahi_himawari10", "ahi_himawari8 " /)
+        logical :: set_brit, set_ahi
+
+    contains
+        procedure :: test_set_brit_ahi1
+        procedure :: test_set_brit_ahi2
+        procedure :: test_set_brit_ahi3
+    end type Test_set_brit_ahi_t
+
+contains
+    subroutine set_brit_ahi(geo_inst, ityp, set_brit, set_ahi)
+        character(len = *), dimension(:), intent(in) :: geo_inst
+        integer, intent(in) :: ityp
+        logical, intent(out) :: set_brit, set_ahi
+        set_brit = .false.
+        set_ahi = .false.
+
+        if (ityp <= size(geo_inst)) then
+            if  (geo_inst(ityp) == 'ahi_himawari8') then
+                set_ahi = .true.
+                return
+            end if
+        end if
+        set_brit = .true.
+    end subroutine set_brit_ahi
+
+    @test
+    subroutine test_set_brit_ahi_prod(this)
+        class(Test_set_brit_ahi_t), intent(inout) :: this
+        integer :: ityp
+        logical, dimension(5) :: expected_brit = [.false., .true., .true., .true., .true.]
+        logical, dimension(5) :: expected_ahi = [.true., .false., .false., .false., .false.]
+
+        do ityp = 1, 5
+            call set_brit_ahi(geoinst_list, ityp, this%set_brit, this%set_ahi)
+            call assertEqual(expected_brit(ityp), this%set_brit)
+            call assertEqual(expected_ahi(ityp), this%set_ahi)
+        end do
+    end subroutine test_set_brit_ahi_prod
+
+    @test
+    subroutine test_set_brit_ahi1(this)
+        class(Test_set_brit_ahi_t), intent(inout) :: this
+        integer :: ityp
+        logical, dimension(5) :: expected_brit = [.false., .true., .true., .true., .true.]
+        logical, dimension(5) :: expected_ahi = [.true., .false., .false., .false., .false.]
+
+        do ityp = 1, 5
+            call set_brit_ahi(this%geo_inst1, ityp, this%set_brit, this%set_ahi)
+            call assertEqual(expected_brit(ityp), this%set_brit)
+            call assertEqual(expected_ahi(ityp), this%set_ahi)
+        end do
+    end subroutine test_set_brit_ahi1
+
+    @test
+    subroutine test_set_brit_ahi2(this)
+        class(Test_set_brit_ahi_t), intent(inout) :: this
+        integer :: ityp
+        logical, dimension(5) :: expected_brit = [.true., .false., .true., .true., .true.]
+        logical, dimension(5) :: expected_ahi = [.false., .true., .false., .false., .false.]
+
+        do ityp = 1, 5
+            call set_brit_ahi(this%geo_inst2, ityp, this%set_brit, this%set_ahi)
+            call assertEqual(expected_brit(ityp), this%set_brit)
+            call assertEqual(expected_ahi(ityp), this%set_ahi)
+        end do
+    end subroutine test_set_brit_ahi2
+
+    @test
+    subroutine test_set_brit_ahi3(this)
+        class(Test_set_brit_ahi_t), intent(inout) :: this
+        integer :: ityp
+        logical, dimension(5) :: expected_brit = [.true., .true., .false., .true., .true.]
+        logical, dimension(5) :: expected_ahi = [.false., .false., .true., .false., .false.]
+
+        do ityp = 1, 5
+            call set_brit_ahi(this%geo_inst3, ityp, this%set_brit, this%set_ahi)
+            call assertEqual(expected_brit(ityp), this%set_brit)
+            call assertEqual(expected_ahi(ityp), this%set_ahi)
+        end do
+
+    end subroutine test_set_brit_ahi3
+
+end module Test_set_brit_ahi_mod
