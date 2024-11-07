@@ -146,6 +146,12 @@ The following steps guide you through the PFUNIT installation:
 The PFUNIT library is now installed and ready for use.
 ---
 
+## Writing Unit Tests
+### pFUnit
+`pFUnit` is a Fortran testing framework that allows you to write and run unit tests for your Fortran code. The framework
+uses a interface that is looks like a mix of the `googletest` and `pytest` testing frameworks. Tests are are marked with
+`@Test` and can be run with the `pfunit.x` executable.
+
 ## caveate
 
 NetCDF-Fortran interface does not allow reading/writing NF90_STRING, so ``station_id`` and ``variable_names`` are still
