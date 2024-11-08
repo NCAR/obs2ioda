@@ -363,7 +363,6 @@ subroutine set_brit_obserr(name_inst, nchan, obserrors)
    character(len=*), intent(in)  :: name_inst  ! instrument name eg. amsua_n15
    integer(i_kind),  intent(in)  :: nchan      ! channel number
    real(r_kind),     intent(out) :: obserrors(nchan)
-
    obserrors(:) = missing_r
    if ( name_inst(1:5) == 'amsua' ) then
       select case ( trim(name_inst) )

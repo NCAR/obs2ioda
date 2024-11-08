@@ -16,7 +16,7 @@ use ufo_vars_mod, only: ufo_vars_getindex
 implicit none
 
 private
-public :: write_obs, is_himawari, set_obserr
+public :: write_obs, is_himawari
 
 contains
 
