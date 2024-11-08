@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Functions/Obs2Ioda_Functions.cmake")
 # Define the project
-project(obs2ioda LANGUAGES Fortran)
+project(obs2ioda LANGUAGES Fortran C)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -16,7 +16,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 # Set the Fortran compiler and flags
 set(NCEP_BUFR_LIB CACHE STRING "")
 #option(BUILD_TESTS "Build tests" OFF)
-# Required if BUILD_TESTS is ON
+## Required if BUILD_TESTS is ON
 #set(PFUNIT_DIR CACHE STRING "")
 
 # Find required packages
