@@ -46,8 +46,9 @@ Here are the steps to build the project:
 5. Enable unit testing (Optional) by adding:
 
    ```bash
-    export OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DBUILD_TESTS=ON -DPFUNIT_DIR"
+    export OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DBUILD_TESTS=ON -DPFUNIT_DIR=${PFUNIT_DIR}"
    ```
+   where `${PFUNIT_DIR}` is the path to the `pFUnit` installation directory.
 
 6. Configure the build with CMake:
 
