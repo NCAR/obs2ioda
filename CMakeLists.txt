@@ -1,5 +1,5 @@
 # Check CMake version
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Functions/Obs2Ioda_Functions.cmake")
 # Define the project
