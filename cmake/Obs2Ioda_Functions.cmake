@@ -12,25 +12,23 @@ function(obs2ioda_fortran_target target target_main)
     set_target_properties(${target} PROPERTIES Fortran_FORMAT FREE)
 
     # Compiler-specific options and flags
-    set(OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE
-        ${FORTRAN_COMMON_FLAGS}
-    )
+    set(OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE "")
     if (CMAKE_Fortran_COMPILER_ID MATCHES GNU)
         list(APPEND OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE
-             ${FORTRAN_GNU_FLAGS}
+             ${FORTRAN_COMPILER_GNU_FLAGS}
         )
         if (CMAKE_BUILD_TYPE MATCHES Debug)
             list(APPEND OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE
-                 ${FORTRAN_GNU_DEBUG_FLAGS}
+                 ${FORTRAN_COMPILER_GNU_DEBUG_FLAGS}
             )
         endif ()
     elseif (CMAKE_Fortran_COMPILER_ID MATCHES Intel)
         list(APPEND OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE
-             ${FORTRAN_INTEL_FLAGS}
+             ${FORTRAN_COMPILER_INTEL_FLAGS}
         )
         if (CMAKE_BUILD_TYPE MATCHES Debug)
             list(APPEND OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE
-                 ${FORTRAN_INTEL_DEBUG_FLAGS}
+                 ${FORTRAN_COMPILER_INTEL_DEBUG_FLAGS}
             )
         endif ()
     endif ()
