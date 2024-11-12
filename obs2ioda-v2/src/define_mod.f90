@@ -204,33 +204,106 @@ character(len=nstring), dimension(2,nsen_info) :: dim_sen_info = reshape ( &
       'nvars     ', 'null      '  &
    /), (/2,nsen_info/) )
 
-! variables for storing data
-type xfield_type
-   real(r_kind)       :: val          ! observation value
-   integer(i_kind)    :: qm           ! observation quality marker
-   real(r_kind)       :: err          ! observational error
-   integer(i_kind)    :: rptype       ! report type
-end type xfield_type
+! Type for storing individual observation data fields
+type f_xfield_t
+   real(r_kind) :: val          ! Observation value
+   integer(i_kind) :: qm        ! Observation quality marker
+   real(r_kind) :: err          ! Observational error
+   integer(i_kind) :: rptype    ! Report type identifier
+end type f_xfield_t
 
-type xdata_type
-   integer(i_kind)                                     :: nvars
-   integer(i_kind)                                     :: nrecs
-   integer(i_kind)                                     :: nlocs
-   character(len=ndatetime)                            :: min_datetime
-   character(len=ndatetime)                            :: max_datetime
-   integer(i_kind),        allocatable, dimension(:)   :: var_idx
-   type (xfield_type),     allocatable, dimension(:,:) :: xfield
-   real(r_kind),           allocatable, dimension(:,:) :: xinfo_float
-   integer(i_kind),        allocatable, dimension(:,:) :: xinfo_int
-   integer(i_llong),       allocatable, dimension(:,:) :: xinfo_int64
-   character(len=nstring), allocatable, dimension(:,:) :: xinfo_char
-   real(r_kind),           allocatable, dimension(:,:) :: xseninfo_float
-   integer(i_kind),        allocatable, dimension(:,:) :: xseninfo_int
-   character(len=nstring), allocatable, dimension(:,:) :: xseninfo_char
-   real(r_kind),           allocatable, dimension(:)   :: wavenumber
-end type xdata_type
+! C-compatible type for storing individual observation data fields
+type, bind(C) :: c_xfield_t
+   real(c_float) :: val          ! Observation value
+   integer(c_int) :: qm          ! Observation quality marker
+   real(c_float) :: err          ! Observational error
+   integer(c_int) :: rptype      ! Report type identifier
+end type c_xfield_t
 
-type(xdata_type), allocatable, dimension(:,:) :: xdata  ! dim 1: number of ob types
+! Type for storing metadata and multiple observation data fields
+type f_xdata_t
+   integer(i_kind) :: nvars                    ! Number of variables in the dataset
+   integer(i_kind) :: nrecs                    ! Number of records in the dataset
+   integer(i_kind) :: nlocs                    ! Number of locations in the dataset
+   character(len = ndatetime) :: min_datetime  ! Earliest datetime in the dataset
+   character(len = ndatetime) :: max_datetime  ! Latest datetime in the dataset
+   integer(i_kind), allocatable, dimension(:) :: var_idx          ! Array of variable indices
+   type(f_xfield_t), allocatable, dimension(:, :) :: xfield       ! Array of field data for observations
+   real(r_kind), allocatable, dimension(:, :) :: xinfo_float      ! Floating-point informational data
+   integer(i_kind), allocatable, dimension(:, :) :: xinfo_int     ! Integer informational data
+   integer(i_llong), allocatable, dimension(:, :) :: xinfo_int64  ! 64-bit integer informational data
+   character(len = nstring), allocatable, dimension(:, :) :: xinfo_char ! Character informational data
+   real(r_kind), allocatable, dimension(:, :) :: xseninfo_float   ! Sensor-specific float data
+   integer(i_kind), allocatable, dimension(:, :) :: xseninfo_int  ! Sensor-specific integer data
+   character(len = nstring), allocatable, dimension(:, :) :: xseninfo_char ! Sensor-specific character data
+   real(r_kind), allocatable, dimension(:) :: wavenumber          ! Array of wavenumbers for observations
+
+   ! C-compatible fields for ISO_C_BINDING
+   integer(c_int) :: c_nvars                    ! Number of variables (C-compatible)
+   integer(c_int) :: c_nrecs                    ! Number of records (C-compatible)
+   integer(c_int) :: c_nlocs                    ! Number of locations (C-compatible)
+   character(len = ndatetime, kind=c_char) :: c_min_datetime  ! Earliest datetime (C-compatible)
+   character(len = ndatetime, kind=c_char) :: c_max_datetime  ! Latest datetime (C-compatible)
+   integer(c_int), allocatable, dimension(:) :: c_var_idx     ! Array of variable indices (C-compatible)
+   type(f_xfield_t), allocatable, dimension(:) :: c_xfield    ! Array of field data for observations (C-compatible)
+   real(c_float), allocatable, dimension(:) :: c_xinfo_float  ! Float informational data (C-compatible)
+   integer(c_int), allocatable, dimension(:) :: c_xinfo_int   ! Integer informational data (C-compatible)
+   integer(c_long), allocatable, dimension(:) :: c_xinfo_int64 ! 64-bit integer data (C-compatible)
+   character(len = nstring, kind=c_char), allocatable, dimension(:) :: c_xinfo_char ! Character data (C-compatible)
+   real(c_float), allocatable, dimension(:) :: c_xseninfo_float ! Sensor float data (C-compatible)
+   integer(c_int), allocatable, dimension(:) :: c_xseninfo_int ! Sensor integer data (C-compatible)
+   character(len=nstring, kind=c_char), allocatable, dimension(:) :: c_xseninfo_char ! Sensor char data (C-compatible)
+   real(c_float), allocatable, dimension(:) :: c_wavenumber    ! Array of wavenumbers (C-compatible)
+end type f_xdata_t
+
+! C-compatible data structure for holding observation data as pointers for C bindings
+type, bind(C) :: c_xdata_t
+   type(c_ptr) :: xinfo_int64       ! Pointer to 64-bit integer data
+   type(c_ptr) :: xinfo_float       ! Pointer to floating-point information
+   type(c_ptr) :: xseninfo_float    ! Pointer to sensor-specific float data
+   type(c_ptr) :: wavenumber        ! Pointer to wavenumber array
+   type(c_ptr) :: min_datetime      ! Pointer to minimum datetime
+   type(c_ptr) :: max_datetime      ! Pointer to maximum datetime
+   type(c_ptr) :: xseninfo_char     ! Pointer to sensor-specific character data
+   type(c_ptr) :: xinfo_char        ! Pointer to character information
+   type(c_ptr) :: var_idx           ! Pointer to variable indices
+   type(c_ptr) :: xinfo_int         ! Pointer to integer information
+   type(c_ptr) :: xseninfo_int      ! Pointer to sensor-specific integer data
+   type(c_ptr) :: xfield            ! Pointer to field data for observations
+   type(c_ptr) :: xdata             ! Pointer to observation data
+   integer(c_int) :: nvars          ! Number of variables
+   integer(c_int) :: nrecs          ! Number of records
+   integer(c_int) :: nlocs          ! Number of locations
+   integer(c_int) :: var_idx_m      ! Length of variable index array
+   integer(c_int) :: xfield_m       ! Number of rows in xfield array
+   integer(c_int) :: xfield_n       ! Number of columns in xfield array
+   integer(c_int) :: xinfo_float_m  ! Number of rows in xinfo_float array
+   integer(c_int) :: xinfo_float_n  ! Number of columns in xinfo_float array
+   integer(c_int) :: xinfo_int_m    ! Number of rows in xinfo_int array
+   integer(c_int) :: xinfo_int_n    ! Number of columns in xinfo_int array
+   integer(c_int) :: xinfo_int64_m  ! Number of rows in xinfo_int64 array
+   integer(c_int) :: xinfo_int64_n  ! Number of columns in xinfo_int64 array
+   integer(c_int) :: xinfo_char_m   ! Number of rows in xinfo_char array
+   integer(c_int) :: xinfo_char_n   ! Number of columns in xinfo_char array
+   integer(c_int) :: xinfo_char_k   ! Character length for xinfo_char
+   integer(c_int) :: xseninfo_float_m ! Number of rows in xseninfo_float array
+   integer(c_int) :: xseninfo_float_n ! Number of columns in xseninfo_float array
+   integer(c_int) :: xseninfo_int_m ! Number of rows in xseninfo_int array
+   integer(c_int) :: xseninfo_int_n ! Number of columns in xseninfo_int array
+   integer(c_int) :: xseninfo_char_m ! Number of rows in xseninfo_char array
+   integer(c_int) :: xseninfo_char_n ! Number of columns in xseninfo_char array
+   integer(c_int) :: xseninfo_char_k ! Character length for xseninfo_char
+   integer(c_int) :: wavenumber_m   ! Length of wavenumber array
+end type c_xdata_t
+
+! Combined type for managing Fortran and C-compatible versions of observation data structures
+type xdata_t
+   type(c_xdata_t) :: c_xdata       ! C-compatible observation data structure
+   type(f_xdata_t) :: f_xdata       ! Fortran observation data structure
+end type xdata_t
+
+
+type(f_xdata_t), allocatable, dimension(:,:) :: xdata  ! dim 1: number of ob types
                                                         ! dim 2: number of time slots
 
 contains
