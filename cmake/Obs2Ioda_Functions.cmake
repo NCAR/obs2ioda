@@ -1,5 +1,21 @@
 include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_CompilerFlags.cmake")
 
+# This CMake function, `obs2ioda_fortran_target`, configures Fortran targets for obs2ioda.
+#
+# Its arguments are:
+# - target: the name of the target to configure
+# - target_main: the main source file for the executable
+#
+# The function sets the following properties for the target:
+# - The directory for Fortran module files
+# - The include directories for the target (both build and install interfaces)
+# - The install RPATH to enable finding shared libraries at runtime
+# - Fortran format as FREE
+# - Compiler-specific options and flags, depending on whether the GNU Fortran or Intel Fortran compiler is used,
+#   and whether the build type is Debug or not
+#
+# The function also links the public libraries to the target and creates an executable `obs2ioda_${target}` linked
+# to the original target.
 function(obs2ioda_fortran_target target target_main)
     set_target_properties(${target} PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR})
     target_include_directories(${target} INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}>
