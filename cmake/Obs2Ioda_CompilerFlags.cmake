@@ -1,23 +1,23 @@
 # Set Fortran compiler flags specific to the GNU Compiler
-# -cpp: Enable the C preprocessor
 # -ffree-line-length-none: Remove the limit on the length of lines in the source file
 # -mcmodel=medium: Allow for larger datasets in memory
 set(FORTRAN_COMPILER_GNU_FLAGS
-    $<$<COMPILE_LANGUAGE:Fortran>:-std=f2008 -mcmodel=medium>
+    $<$<COMPILE_LANGUAGE:Fortran>:-ffree-line-length-none -mcmodel=medium>
 )
 
 # Set Debugging Fortran compiler flags specific to the GNU Compiler
 # -fbacktrace: Provide a backtrace when an error occurs
 # -ffpe-trap=invalid,zero,overflow: Trap floating point exceptions (invalid calculation, divide by zero, overflow)
 # -fcheck=all: Execute all types of runtime checks
+# -g: Produce debugging information
 set(FORTRAN_COMPILER_GNU_DEBUG_FLAGS
     $<$<COMPILE_LANGUAGE:Fortran>:-g -fbacktrace -ffpe-trap=invalid,zero,overflow -fcheck=all>
 )
 
 # Set Fortran compiler flags for the Intel Compiler
-# -fpp: Enable the preprocessing stage
+# -mcmodel=medium: Allow for larger datasets in memory
 set(FORTRAN_COMPILER_INTEL_FLAGS
-    $<$<COMPILE_LANGUAGE:Fortran>:-stand f08 -mcmodel=medium>
+    $<$<COMPILE_LANGUAGE:Fortran>:-mcmodel=medium>
 )
 
 # Set Debugging Fortran compiler flags for the Intel Compiler
