@@ -69,7 +69,7 @@ To install the NCEP BUFR library, follow these steps:
    ```
 5. To locate the NCEP BUFR library, run:
    ```bash
-   find . -name *libbufr*
+   bash -c "find . -name *libbufr*"
    ```
 Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the build process of `obs2ioda-v2`.
 
