@@ -17,11 +17,11 @@ File types that obs2ioda can handle:
 * HS_H08_YYYYMMDD_HH00_BNN_FLDK_R20_S0210.DAT  
 * OR_ABI-L1b-Rad nc files  
 
-## See [obs2ioda-v1/README.md](https://github.com/jamiebresch/obs2ioda/blob/main/obs2ioda-v1/README.md) for compilation and usage.
+## See [obs2ioda-v1/README.md](https://github.com/NCAR/obs2ioda/blob/main/obs2ioda-v1/README.md) for compilation and usage.
 
-## See [obs2ioda-v2/README.md](https://github.com/jamiebresch/obs2ioda/blob/main/obs2ioda-v2/README.md) for compilation and usage.
+## See [obs2ioda-v2/README.md](https://github.com/NCAR/obs2ioda/blob/main/obs2ioda-v2/README.md) for compilation and usage.
 
-## See [goes_abi/README.md](https://github.com/jamiebresch/obs2ioda/blob/main/goes_abi/README.md) for compilation and usage.
+## See [goes_abi/README.md](https://github.com/NCAR/obs2ioda/blob/main/goes_abi/README.md) for compilation and usage.
 
 ## Observation data sources:
 * https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/

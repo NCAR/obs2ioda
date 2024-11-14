@@ -3,46 +3,62 @@
 obs2ioda-v2 utilizes CMake as its primary build system. Follow the steps below to build the project:
 
 ### Prerequisites
-Please make sure the following libraries are installed:
-- NetCDF
-- NCEP BUFR library. (Instructions for installing the NCEP BUFR library are provided in a subsequent section)
 
-If you have an environment preconfigured for `mpas-jedi`, simply source that environment prior to building `obs2ioda`.
+Prior to building `obs2ioda`, ensure that you have installed the following libraries:
+
+- **CMake**: Required (version 3.12 or higher).
+- **NetCDF**: Required.
+- **NCEP BUFR Library**: Required.
+
+For instructions on how to install the `NCEP BUFR` library , please refer to the respective sections:
+
+- [Installing NCEP BUFR Library](#installing-ncep-bufr-library)
+
+If you have an environment preconfigured for `mpas-jedi` or `mpas-bundle`, simply source that environment prior to building `obs2ioda`.
 
 ### Build Instructions
 1. First, clone the repository into your preferred directory (`<OBS2IODA_ROOT_DIR>`):
    ```bash
    git clone https://github.com/NCAR/obs2ioda.git <OBS2IODA_ROOT_DIR>
    ```
-2. Create a new directory `build` and navigate into it:
+1. Create a new directory `<OBS2IODA_BUILD_DIR>` and navigate into it:
    ```bash
-   mkdir build && cd build
+    mkdir <OBS2IODA_BUILD_DIR> && cd <OBS2IODA_BUILD_DIR>
    ```
-3. Locate the NCEP BUFR library by executing the following command in the `NCEP BUFR` library's build directory:
+1. Set the variable OBS2IODA_CMAKE_ARGS to include the `obs2ioda` root directory and the absolute path of the `NCEP BUFR` library:
+    ```bash
+    OBS2IODA_CMAKE_ARGS="<OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>"
+    ```
+1. If building in `Debug` mode, append the following to `OBS2IODA_CMAKE_ARGS`:
+    ```bash
+    OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Debug"
+    ```
+1. If building unit tests, append the following to `OBS2IODA_CMAKE_ARGS`:
+    ```bash
+    OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DBUILD_TESTS=ON"
+    ```
+
+1. Next, run CMake to configure the build. 
    ```bash
-   find . -name *libbufr*
+   cmake <OBS2IODA_ROOT_DIR> 'echo ${OBS2IODA_CMAKE_ARGS}' 
    ```
-4. Next, run CMake to configure the build. Specify the `CMAKE_BUILD_TYPE` option to set the build type. Currently, the supported types are `Release`, `RelWithDebInfo`, and `Debug`. Don't forget to include the path to the NCEP BUFR library:
-   ```bash
-   cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH> -DCMAKE_BUILD_TYPE=<BUILD_TYPE>
-   ```
-5. Finally, build `obs2ioda` using `CMake`'s build tool. In this case, we use `GNU Make`, but other build tools supported by `CMake` can be used:
+1. Finally, build `obs2ioda` using `CMake`'s build tool. In this case, we use `GNU Make`, but other build tools supported by `CMake` can be used:
    ```bash
    make
    ```
 The `obs2ioda-v2` executable will reside in the `bin` directory within the build directory.
 
 ---
-## Installing NCEP BUFR Library
+### Installing NCEP BUFR Library
 To install the NCEP BUFR library, follow these steps:
 
 1. Clone the NCEP BUFR repository into a directory of your choice (`<NCEP_BUFR_ROOT_DIR>`):
    ```bash
    git clone https://github.com/NOAA-EMC/NCEPLIBS-bufr.git <NCEP_BUFR_ROOT_DIR>
    ```
-2. Create a new directory `build` and navigate into it:
+2. Create a new directory `<NCEP_BUFR_BUILD_DIR>` and navigate into it:
    ```bash
-   mkdir build && cd build
+   mkdir <NCEP_BUFR_BUILD_DIR> && cd <NCEP_BUFR_BUILD_DIR> 
    ```
 3. Run CMake to configure the build (Ensure NetCDF is installed):
    ```bash
@@ -54,9 +70,12 @@ To install the NCEP BUFR library, follow these steps:
    ```
 5. To locate the NCEP BUFR library, run:
    ```bash
-   find . -name *libbufr*
+   bash -c "find . -name *libbufr*"
    ```
 Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the build process of `obs2ioda-v2`.
+
+---
+
 ## caveate
 NetCDF-Fortran interface does not allow reading/writing NF90_STRING, so ``station_id`` and ``variable_names`` are still written out as  
 ``char station_id(nlocs, nstring)``  

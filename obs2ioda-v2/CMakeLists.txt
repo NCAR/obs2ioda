@@ -14,15 +14,26 @@ set(v2_SOURCES
     netcdf_mod.f90
     prepbufr_mod.f90
     radiance_mod.f90
-    ufo_variables_mod.F90
+    ufo_variables_mod.f90
     utils_mod.f90
+    f_c_string_t_mod.f90
+    f_c_string_1D_t_mod.f90
 )
-list(TRANSFORM v2_SOURCES PREPEND "src/")
+list(TRANSFORM v2_SOURCES PREPEND "src/fortran/")
 set(v2_MAIN_SOURCE
     main.f90
 )
-list(TRANSFORM v2_MAIN_SOURCE PREPEND "src/")
-set(v2_PUBLIC_LINK_LIBRARIES "${NetCDF_LIBRARIES}" "${NCEP_BUFR_LIB}")
+list(TRANSFORM v2_MAIN_SOURCE PREPEND "src/fortran/")
+set(fortran_test_framework_SOURCES
+    fortran_test_framework_mod.f90
+)
+list(TRANSFORM fortran_test_framework_SOURCES PREPEND "src/test/")
+set(v2_PUBLIC_LINK_LIBRARIES "${NCEP_BUFR_LIB}" NetCDF::NetCDF_C NetCDF::NetCDF_Fortran)
 add_library(v2 SHARED ${v2_SOURCES})
-obs2ioda_fortran_target(v2 ${v2_MAIN_SOURCE})
-
+target_include_directories(v2 PUBLIC ${NetCDF_INCLUDE_DIRS})
+obs2ioda_fortran_library(v2)
+add_executable(obs2ioda_v2 ${v2_MAIN_SOURCE})
+set(obs2ioda_v2_PUBLIC_LINK_LIBRARIES v2)
+obs2ioda_fortran_executable(obs2ioda_v2)
+add_library(fortran_test_framework ${fortran_test_framework_SOURCES})
+obs2ioda_fortran_library(fortran_test_framework)
