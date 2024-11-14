@@ -1,11 +1,27 @@
 module Test_foo_mod
     use funit
+    use iso_c_binding, only: c_ptr, c_loc, c_f_pointer, c_float, c_double
+    use kinds, only: r_double, r_kind
     implicit none
 
     contains
+
+    subroutine foo(a, b)
+        real(r_double), target, intent(in) :: a
+        real(r_double), intent(out) :: b
+        type(c_ptr) :: b_cptr
+!        real(c_double), pointer :: b_pointer ! Corrected code.
+        real, pointer :: b_pointer ! Purposeful mistake to illistrate the importance of unit testing.
+        b_cptr = c_loc(a)
+        call c_f_pointer(b_cptr, b_pointer)
+        b = b_pointer
+    end subroutine foo
+
     @Test
     subroutine test_foo()
-        character(len=3) :: bar = "bar"
-        call assertEqual("bar", bar)
+        real(r_double) :: a, b
+        a = 1.0973737849094303238823
+        call foo(a, b)
+        call assertEqual(a, b)
     end subroutine test_foo
 end module Test_foo_mod
