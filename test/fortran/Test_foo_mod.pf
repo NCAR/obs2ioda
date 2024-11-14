@@ -17,11 +17,19 @@ module Test_foo_mod
         b = b_pointer
     end subroutine foo
 
+    function acos_foo(val)
+        real(r_double), intent(in) :: val
+        real(r_double) :: acos_foo
+        acos_foo = acos(val / 10)
+    end function acos_foo
+
     @Test
     subroutine test_foo()
-        real(r_double) :: a, b
-        a = 1.0973737849094303238823
+        real(r_double) :: a, b, c
+        a = 1.3
         call foo(a, b)
+        c = acos_foo(b) ! Example of how this bug would not cause obs2ioda to crash, but rather would cause a bug in the middle of the program.
+        print *, c
         call assertEqual(a, b)
     end subroutine test_foo
 end module Test_foo_mod
