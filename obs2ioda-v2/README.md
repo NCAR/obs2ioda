@@ -37,7 +37,7 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
     ```
 1. If building unit tests, append the following to `OBS2IODA_CMAKE_ARGS`:
     ```bash
-    OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DBUILD_TESTS=ON -DPFUNIT=<PFUNIT_DIR>"
+    OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DBUILD_TESTS=ON -DPFUNIT_DIR=<PFUNIT_DIR>"
     ```
     where `<PFUNIT_DIR>` is the directory of the `pFUnit` installation.
 
