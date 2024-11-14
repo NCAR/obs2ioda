@@ -39,7 +39,7 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
 
 1. Next, run `CMake` to configure the build. 
    ```bash
-   cmake <OBS2IODA_ROOT_DIR> <OBS2IODA_CMAKE_ARGS> 
+   cmake <OBS2IODA_ROOT_DIR> $(echo ${OBS2IODA_CMAKE_ARGS}) 
    ```
    where `<OBS2IODA_ROOT_DIR>` is the directory where the repository was cloned.
 1. Finally, build `obs2ioda` using this command:
