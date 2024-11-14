@@ -1,5 +1,5 @@
 # Check CMake version
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_Functions.cmake")
 # Define the project
@@ -15,9 +15,21 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 
 # Set the Fortran compiler and flags
 set(NCEP_BUFR_LIB CACHE STRING "" )
+# Set to ON to build tests. Default is OFF. If testing is enabled,
+# pFUnit is required to be installed.
+set(BUILD_TESTS CACHE BOOL OFF)
+# Set the path to the pFUnit installation directory if BUILD_TESTS is ON
+set(PFUNIT_DIR CACHE STRING "" )
 
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
+
+if (BUILD_TESTS)
+    enable_testing()
+    set(CMAKE_PREFIX_PATH ${PFUNIT_DIR})
+    find_package(PFUNIT REQUIRED)
+    add_subdirectory("${CMAKE_SOURCE_DIR}/test")
+endif()
 
