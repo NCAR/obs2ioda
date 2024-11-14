@@ -1,0 +1,11 @@
+module Test_foo_mod
+    use funit
+    implicit none
+
+    contains
+    @Test
+    subroutine test_foo()
+        character(len=3) :: bar = "bar"
+        call assertEqual("bar", bar)
+    end subroutine test_foo
+end module Test_foo_mod

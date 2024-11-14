@@ -42,9 +42,13 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    cmake <OBS2IODA_ROOT_DIR> $(echo ${OBS2IODA_CMAKE_ARGS}) 
    ```
    where `<OBS2IODA_ROOT_DIR>` is the directory where the repository was cloned.
-1. Finally, build `obs2ioda` using this command:
+1. Build `obs2ioda` using this command:
    ```bash
    make
+   ```
+1. If testing is enabled, run the tests with `ctest`:
+   ```bash
+   ctest
    ```
 The `obs2ioda-v2` executable will reside in the `bin` directory within the build directory.
 
