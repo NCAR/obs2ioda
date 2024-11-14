@@ -23,9 +23,9 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    git clone https://github.com/NCAR/obs2ioda.git <OBS2IODA_ROOT_DIR>
    ```
-1. Create a new directory `build` and navigate into it:
+1. Create a new directory `<OBS2IODA_BUILD_DIR>` and navigate into it:
    ```bash
-   mkdir build && cd build
+    mkdir <OBS2IODA_BUILD_DIR> && cd <OBS2IODA_BUILD_DIR>
    ```
 1. Set the variable OBS2IODA_CMAKE_ARGS to include the `obs2ioda` root directory and the absolute path of the `NCEP BUFR` library:
     ```bash
@@ -59,9 +59,9 @@ To install the NCEP BUFR library, follow these steps:
    ```bash
    git clone https://github.com/NOAA-EMC/NCEPLIBS-bufr.git <NCEP_BUFR_ROOT_DIR>
    ```
-2. Create a new directory `build` and navigate into it:
+2. Create a new directory `<NCEP_BUFR_BUILD_DIR>` and navigate into it:
    ```bash
-   mkdir build && cd build
+   mkdir <NCEP_BUFR_BUILD_DIR> && cd <NCEP_BUFR_BUILD_DIR> 
    ```
 3. Run CMake to configure the build (Ensure NetCDF is installed):
    ```bash
