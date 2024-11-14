@@ -27,9 +27,9 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    mkdir build && cd build
    ```
-1. Set the variable OBS2IODA_CMAKE_ARGS to include the `obs2ioda` root directory and the absolute path of the `NCEP BUFR` library:
+1. Set the variable OBS2IODA_CMAKE_ARGS to include the absolute path of the `NCEP BUFR` library:
     ```bash
-    OBS2IODA_CMAKE_ARGS="<OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>"
+    OBS2IODA_CMAKE_ARGS="-DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>"
     ```
 1. If building unit tests, append the following to `OBS2IODA_CMAKE_ARGS`:
     ```bash
@@ -39,9 +39,10 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
 
 1. Next, run `CMake` to configure the build. 
    ```bash
-   cmake <OBS2IODA_CMAKE_ARGS> 
+   cmake <OBS2IODA_ROOT_DIR> <OBS2IODA_CMAKE_ARGS> 
    ```
-1. Finally, build the project using this command:
+   where `<OBS2IODA_ROOT_DIR>` is the directory where the repository was cloned.
+1. Finally, build `obs2ioda` using this command:
    ```bash
    make
    ```
