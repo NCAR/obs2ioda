@@ -26,7 +26,7 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH> -DCMAKE_BUILD_TYPE=<BUILD_TYPE>
    ```
-5. Finally, build the project using this command:
+5. Finally, build `obs2ioda` using `CMake`'s build tool. In this case, we use `GNU Make`, but other build tools supported by `CMake` can be used:
    ```bash
    make
    ```
