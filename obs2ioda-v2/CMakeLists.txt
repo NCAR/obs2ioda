@@ -17,11 +17,11 @@ set(v2_SOURCES
     ufo_variables_mod.F90
     utils_mod.f90
 )
-list(TRANSFORM v2_SOURCES PREPEND "src/")
+list(TRANSFORM v2_SOURCES PREPEND "src/fortran/")
 set(v2_MAIN_SOURCE
     main.f90
 )
-list(TRANSFORM v2_MAIN_SOURCE PREPEND "src/")
+list(TRANSFORM v2_MAIN_SOURCE PREPEND "src/fortran/")
 set(v2_PUBLIC_LINK_LIBRARIES "${NetCDF_LIBRARIES}" "${NCEP_BUFR_LIB}")
 add_library(v2 SHARED ${v2_SOURCES})
 obs2ioda_fortran_target(v2 ${v2_MAIN_SOURCE})
