@@ -3,9 +3,18 @@
 obs2ioda-v2 utilizes CMake as its primary build system. Follow the steps below to build the project:
 
 ### Prerequisites
-Please make sure the following libraries are installed:
-- NetCDF
-- NCEP BUFR library. (Instructions for installing the NCEP BUFR library are provided in a subsequent section)
+
+Prior to building `obs2ioda`, ensure that you have installed the following libraries:
+
+- **CMake**: Required (version 3.20 or higher).
+- **NetCDF**: Required.
+- **NCEP BUFR Library**: Required.
+- **pFUnit**: Optional (Needed for testing).
+
+For instructions on how to install `pFUnit` and the `NCEP BUFR` library , please refer to the respective sections:
+
+- [Installing NCEP BUFR Library](#installing-ncep-bufr-library)
+- [Installing pFUnit](#installing-pfunit)
 
 If you have an environment preconfigured for `mpas-jedi`, simply source that environment prior to building `obs2ioda`.
 
@@ -14,35 +23,46 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    git clone https://github.com/NCAR/obs2ioda.git <OBS2IODA_ROOT_DIR>
    ```
-2. Create a new directory `build` and navigate into it:
+1. Create a new directory `<OBS2IODA_BUILD_DIR>` and navigate into it:
    ```bash
-   mkdir build && cd build
+    mkdir <OBS2IODA_BUILD_DIR> && cd <OBS2IODA_BUILD_DIR>
    ```
-3. Locate the NCEP BUFR library by executing the following command in the `NCEP BUFR` library's build directory:
+1. Set the variable OBS2IODA_CMAKE_ARGS to include the absolute path of the `NCEP BUFR` library:
+    ```bash
+    OBS2IODA_CMAKE_ARGS="-DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>"
+    ```
+1. If building unit tests, append the following to `OBS2IODA_CMAKE_ARGS`:
+    ```bash
+    OBS2IODA_CMAKE_ARGS="${OBS2IODA_CMAKE_ARGS} -DBUILD_TESTS=ON -DPFUNIT_DIR=<PFUNIT_DIR>"
+    ```
+    where `<PFUNIT_DIR>` is the directory of the `pFUnit` installation.
+
+1. Next, run `CMake` to configure the build. 
    ```bash
-   find . -name *libbufr*
+   cmake <OBS2IODA_ROOT_DIR> $(echo ${OBS2IODA_CMAKE_ARGS}) 
    ```
-4. Next, run CMake to configure the build. Remember to specify the path to the NCEP BUFR library:
-   ```bash
-   cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH>
-   ```
-5. Finally, build the project using this command:
+   where `<OBS2IODA_ROOT_DIR>` is the directory where the repository was cloned.
+1. Build `obs2ioda` using this command:
    ```bash
    make
+   ```
+1. If testing is enabled, run the tests with `ctest`:
+   ```bash
+   ctest
    ```
 The `obs2ioda-v2` executable will reside in the `bin` directory within the build directory.
 
 ---
-## Installing NCEP BUFR Library
+### Installing NCEP BUFR Library
 To install the NCEP BUFR library, follow these steps:
 
 1. Clone the NCEP BUFR repository into a directory of your choice (`<NCEP_BUFR_ROOT_DIR>`):
    ```bash
    git clone https://github.com/NOAA-EMC/NCEPLIBS-bufr.git <NCEP_BUFR_ROOT_DIR>
    ```
-2. Create a new directory `build` and navigate into it:
+2. Create a new directory `<NCEP_BUFR_BUILD_DIR>` and navigate into it:
    ```bash
-   mkdir build && cd build
+   mkdir <NCEP_BUFR_BUILD_DIR> && cd <NCEP_BUFR_BUILD_DIR> 
    ```
 3. Run CMake to configure the build (Ensure NetCDF is installed):
    ```bash
@@ -54,9 +74,17 @@ To install the NCEP BUFR library, follow these steps:
    ```
 5. To locate the NCEP BUFR library, run:
    ```bash
-   find . -name *libbufr*
+   bash -c "find . -name *libbufr*"
    ```
 Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the build process of `obs2ioda-v2`.
+
+---
+
+### Installing pFUnit
+To install `pFUnit`, follow the instructions for building it with `CMake` on the [pFUnit GitHub page](https://github.com/Goddard-Fortran-Ecosystem/pFUnit?tab=readme-ov-file#building-and-installing-pfunit)
+
+---
+
 ## caveate
 NetCDF-Fortran interface does not allow reading/writing NF90_STRING, so ``station_id`` and ``variable_names`` are still written out as  
 ``char station_id(nlocs, nstring)``  
