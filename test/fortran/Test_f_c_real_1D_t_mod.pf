@@ -1,0 +1,26 @@
+module Test_f_c_real_1D_t_mod
+    use funit
+    use f_c_real_1D_t_mod, only : f_c_real_1D_t
+    use kinds, only : r_kind
+    implicit none
+
+contains
+    @Test
+    subroutine Test_f_c_real_1D_t()
+        type(f_c_real_1D_t) :: f_c_real_1D_1
+        type(f_c_real_1D_t) :: f_c_real_1D_2
+        real(r_kind) :: f_real_1D(3)
+        integer :: i
+
+        f_real_1D = [1.298792789, 2.230948230, 3.89987998]
+        f_c_real_1D_1%f_real_1D = f_real_1D
+        f_c_real_1D_2%n = size(f_c_real_1D_1%f_real_1D)
+        call f_c_real_1D_1%to_c()
+        f_c_real_1D_2%c_real_1D = f_c_real_1D_1%c_real_1D
+        call f_c_real_1D_2%to_f()
+        do i = 1, f_c_real_1D_2%n
+            call assertEqual(f_real_1D(i), f_c_real_1D_2%f_real_1D(i))
+        end do
+    end subroutine Test_f_c_real_1D_t
+
+end module Test_f_c_real_1D_t_mod

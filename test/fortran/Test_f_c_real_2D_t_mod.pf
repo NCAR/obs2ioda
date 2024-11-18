@@ -1,0 +1,32 @@
+module Test_f_c_real_2D_t_mod
+    use funit
+    use f_c_real_2D_t_mod, only : f_c_real_2D_t
+    use kinds, only : r_kind
+    implicit none
+
+contains
+    @Test
+    subroutine Test_f_c_real_2D_t()
+        type(f_c_real_2D_t) :: f_c_real_2D_1
+        type(f_c_real_2D_t) :: f_c_real_2D_2
+        real(r_kind), dimension(:,:), allocatable :: f_real_2D
+        integer :: i, j
+        allocate(f_real_2D(3,3))
+        f_real_2D = reshape([1.298792789, 2.230948230, 3.89987998, &
+                4.298792789, 5.230948230, 6.89987998, &
+                7.298792789, 8.230948230, 9.89987998], &
+                [3, 3])
+        f_c_real_2D_1%f_real_2D = f_real_2D
+        call f_c_real_2D_1%to_c()
+        f_c_real_2D_2%n = f_c_real_2D_1%n
+        f_c_real_2D_2%m = f_c_real_2D_1%m
+        f_c_real_2D_2%c_real_2D = f_c_real_2D_1%c_real_2D
+        call f_c_real_2D_2%to_f()
+        do i = 1, 3
+            do j = 1, 3
+                call assertEqual(f_c_real_2D_1%f_real_2D(i, j), f_c_real_2D_2%f_real_2D(i, j))
+            end do
+        end do
+    end subroutine Test_f_c_real_2D_t
+
+end module Test_f_c_real_2D_t_mod

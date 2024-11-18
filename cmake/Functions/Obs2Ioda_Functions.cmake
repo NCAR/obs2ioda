@@ -26,5 +26,19 @@ function(obs2ioda_fortran_target target target_main)
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
     add_executable(obs2ioda_${target} ${target_main})
     target_link_libraries(obs2ioda_${target} PUBLIC ${target})
+endfunction()
 
+function(add_memcheck_ctest target)
+    add_test(NAME ${target}_memcheck
+             COMMAND ${CMAKE_COMMAND} -E env
+             CTEST_OUTPUT_ON_FAILURE=1
+             ASAN_OPTIONS=detect_leaks=1
+             ${CMAKE_CTEST_COMMAND} -T memcheck --output-on-failure -C $<CONFIG> --test-action ${target}
+    )
+endfunction()
+
+function(add_memcheck_ctest target)
+    set(VALGRIND_COMMAND valgrind --leak-check=full --error-exitcode=1 --track-origins=yes)
+    add_test(NAME ${target}_memcheck
+             COMMAND ${VALGRIND_COMMAND} $<TARGET_FILE:${target}>)
 endfunction()

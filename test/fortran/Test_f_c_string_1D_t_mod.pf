@@ -1,0 +1,28 @@
+module Test_f_c_string_1D_t_mod
+    use funit
+    use iso_c_binding, only : c_ptr, c_f_pointer, c_char, c_null_char
+    use f_c_string_1D_t_mod, only : f_c_string_1D_t
+    implicit none
+
+contains
+    @Test
+    subroutine Test_f_c_string_1D_t()
+        type(f_c_string_1D_t) :: f_c_string_1D_1
+        type(f_c_string_1D_t) :: f_c_string_1D_2
+        character(len=3) :: f_string_1D(3)
+        integer :: i
+
+        f_string_1D = ["abc", "def", "ghi"]
+        f_c_string_1D_1%f_string_1D = f_string_1D
+        f_c_string_1D_2%m = size(f_c_string_1D_1%f_string_1D)
+        f_c_string_1D_2%n = len(f_c_string_1D_1%f_string_1D(1))
+        call f_c_string_1D_1%to_c()
+        f_c_string_1D_2%c_string_1D = f_c_string_1D_1%c_string_1D
+        call f_c_string_1D_2%to_f()
+        do i = 1, f_c_string_1D_2%m
+            call assertEqual(f_string_1D(i), f_c_string_1D_2%f_string_1D(i))
+        end do
+    end subroutine Test_f_c_string_1D_t
+
+
+end module Test_f_c_string_1D_t_mod
