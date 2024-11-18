@@ -80,7 +80,24 @@ Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the
 ---
 
 ### Installing pFUnit
-To install `pFUnit`, follow the instructions for building it with `CMake` on the [pFUnit GitHub page](https://github.com/Goddard-Fortran-Ecosystem/pFUnit?tab=readme-ov-file#building-and-installing-pfunit)
+
+To install `pFUnit` version 4.10.0, follow these steps:
+
+1. Clone the `pFUnit` repository into your desired directory (`<PFUNIT_ROOT_DIR>`):
+   ```bash
+   git clone https://github.com/Goddard-Fortran-Ecosystem/pFUnit.git -b v4.10.0 <PFUNIT_ROOT_DIR>
+   ```
+
+2. Navigate to the `pFUnit` directory:
+   ```bash
+   cd <PFUNIT_ROOT_DIR>
+   ```  
+   Follow the instructions for building version 4.10.0 with `CMake`, provided on the [pFUnit GitHub page](https://github.com/Goddard-Fortran-Ecosystem/pFUnit?tab=readme-ov-file#building-and-installing-pfunit).
+
+**Note:** If you do not intend to use this installation of `pFUnit` for testing `MPI` or `OpenMP` libraries, pass the following options to `CMake` during the build process:
+   ```bash
+   -DUSE_MPI=OFF -DUSE_OPENMP=OFF
+   ```
 
 ---
 
