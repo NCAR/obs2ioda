@@ -37,8 +37,38 @@ function(add_memcheck_ctest target)
     )
 endfunction()
 
+# Function: add_memcheck_ctest
+#
+# Description:
+#   This function adds a memory check command as a test case in CTest
+#   for the given target, using the Valgrind tool. If the Valgrind
+#   tool is not found, it will print a message specifying that the
+#   memory check could not be added for the given target.
+#
+#   The Valgrind command executed as part of the test includes options
+#   for full leak checking (--leak-check=full), exiting with error status
+#   if any leaks are detected (--error-exitcode=1), and keeping track of
+#   the origin of uninitialized values (--track-origins=yes).
+#
+# Arguments:
+#   target: The name of the target for which the memory check will be added.
+#
+# Usage:
+#   add_memcheck_ctest(my_target)
+#
+# Example:
+#   add_memcheck_ctest(my_executable)
+#
 function(add_memcheck_ctest target)
-    set(VALGRIND_COMMAND valgrind --leak-check=full --error-exitcode=1 --track-origins=yes)
-    add_test(NAME ${target}_memcheck
-             COMMAND ${VALGRIND_COMMAND} $<TARGET_FILE:${target}>)
+    find_program(VALGRIND "valgrind")
+    if(VALGRIND)
+        message(STATUS "Valgrind found: ${VALGRIND}")
+        message(STATUS "Adding memory check for test: ${target}")
+        set(VALGRIND_COMMAND valgrind --leak-check=full --error-exitcode=1 --track-origins=yes)
+        add_test(NAME ${target}_memcheck
+                 COMMAND ${VALGRIND_COMMAND} $<TARGET_FILE:${target}>)
+    else()
+        message(STATUS "Valgrind not found")
+        message(STATUS "Memory check for test: ${target} will not be added")
+    endif()
 endfunction()
