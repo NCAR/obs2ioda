@@ -26,11 +26,20 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH> -DCMAKE_BUILD_TYPE=<BUILD_TYPE>
    ```
+   For a detailed comparison of the supported build types, refer to the [Build Types Table.](#cmake-build-types-table)
 5. Finally, build `obs2ioda` using `CMake`'s build tool. In this case, we use `GNU Make`, but other build tools supported by `CMake` can be used:
    ```bash
    make
    ```
 The `obs2ioda-v2` executable will reside in the `bin` directory within the build directory.
+
+### CMake Build Types Table
+
+| **Build Type**     | **Purpose**                                                  | **Optimization Level** | **Debugging Capability** | **Binary Size**       | **Use Cases**                                                                                    |
+|--------------------|--------------------------------------------------------------|------------------------|--------------------------|-----------------------|--------------------------------------------------------------------------------------------------|
+| **Release**        | Maximize performance and minimize binary size for production | High                   | None or minimal          | Small                 | Final production builds.                                                                         |
+| **RelWithDebInfo** | Combine performance with debugging capabilities              | High                   | Includes debug symbols   | Larger than `Release` | Profiling, debugging optimized code, internal testing.                                           |
+| **Debug**          | Provide full debugging information with no optimizations     | None                   | Full                     | Large                 | Development, troubleshooting, debugging crashes or logic errors, and step-by-step code analysis. |
 
 ---
 ## Installing NCEP BUFR Library
