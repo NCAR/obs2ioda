@@ -2,6 +2,11 @@ module netcdf_mod
 
 use netcdf
 use define_mod, only: missing_r, missing_i, nstring
+use f_c_real_1D_t_mod, only: f_c_real_1D_t
+use f_c_real_2D_t_mod, only: f_c_real_2D_t
+use f_c_string_t_mod, only: f_c_string_t
+use f_c_string_1D_t_mod, only: f_c_string_1D_t
+use f_c_int_1D_t_mod, only: f_c_int_1D_t
 
 implicit none
 
@@ -270,9 +275,17 @@ subroutine put_netcdf_var_real(fileid,variable,input)
    real, dimension(:), intent(in) :: input
 
    integer :: ncvarid, ierr
+   type(f_c_real_1D_t) :: f_c_real_1D_1
+   type(f_c_real_1D_t) :: f_c_real_1D_2
 
    ierr = 0
    ncstatus = nf90_inq_varid(fileid,trim(adjustl(variable)),ncvarid)
+   f_c_real_1D_1%f_real_1D = input
+   call f_c_real_1D_1%to_c()
+   f_c_real_1D_2%c_real_1D = f_c_real_1D_1%c_real_1D
+   f_c_real_1D_2%n = f_c_real_1D_1%n
+   call f_c_real_1D_2%to_f()
+
    ierr = ierr + ncstatus
    ncstatus = nf90_put_var(fileid,ncvarid,input)
    ierr = ierr + ncstatus
@@ -294,10 +307,18 @@ subroutine put_netcdf_var_real_2d(fileid,variable,input)
 
    integer :: ncvarid, ierr
 
+   type(f_c_real_2D_t) :: f_c_real_2D_1
+   type(f_c_real_2D_t) :: f_c_real_2D_2
    ierr = 0
    ncstatus = nf90_inq_varid(fileid,trim(adjustl(variable)),ncvarid)
    ierr = ierr + ncstatus
-   ncstatus = nf90_put_var(fileid,ncvarid,input)
+    f_c_real_2D_1%f_real_2D = input
+    call f_c_real_2D_1%to_c()
+    f_c_real_2D_2%c_real_2D = f_c_real_2D_1%c_real_2D
+    f_c_real_2D_2%n = f_c_real_2D_1%n
+   f_c_real_2D_2%m = f_c_real_2D_1%m
+   call f_c_real_2D_2%to_f()
+   ncstatus = nf90_put_var(fileid,ncvarid,f_c_real_2D_2%f_real_2D)
    ierr = ierr + ncstatus
 
    if ( ierr /= 0 ) then
@@ -314,13 +335,20 @@ subroutine put_netcdf_var_integer(fileid,variable,input)
    integer,               intent(in) :: fileid
    character(len=*),      intent(in) :: variable
    integer, dimension(:), intent(in) :: input
+   type(f_c_int_1D_t) :: f_c_int_1D_1
+    type(f_c_int_1D_t) :: f_c_int_1D_2
 
    integer :: ncvarid, ierr
 
    ierr = 0
    ncstatus = nf90_inq_varid(fileid,trim(adjustl(variable)),ncvarid)
+    f_c_int_1D_1%f_int_1D = input
+    call f_c_int_1D_1%to_c()
+    f_c_int_1D_2%c_int_1D = f_c_int_1D_1%c_int_1D
+    f_c_int_1D_2%n = f_c_int_1D_1%n
+    call f_c_int_1D_2%to_f()
    ierr = ierr + ncstatus
-   ncstatus = nf90_put_var(fileid,ncvarid,input)
+   ncstatus = nf90_put_var(fileid,ncvarid, f_c_int_1D_2%f_int_1D)
    ierr = ierr + ncstatus
 
    if ( ierr /= 0 ) then
@@ -362,11 +390,19 @@ subroutine put_netcdf_var_char(fileid,variable,input)
    character(len=*), dimension(:), intent(in) :: input
 
    integer :: ncvarid, ierr
+   type(f_c_string_1D_t) :: f_c_string_1D_1
+   type(f_c_string_1D_t) :: f_c_string_1D_2
 
    ierr = 0
    ncstatus = nf90_inq_varid(fileid,trim(adjustl(variable)),ncvarid)
    ierr = ierr + ncstatus
-   ncstatus = nf90_put_var(fileid,ncvarid,input)
+    f_c_string_1D_1%f_string_1D = input
+    call f_c_string_1D_1%to_c()
+    f_c_string_1D_2%c_string_1D = f_c_string_1D_1%c_string_1D
+    f_c_string_1D_2%n = f_c_string_1D_1%n
+   f_c_string_1D_2%m = f_c_string_1D_1%m
+    call f_c_string_1D_2%to_f()
+   ncstatus = nf90_put_var(fileid,ncvarid,f_c_string_1D_2%f_string_1D)
    ierr = ierr + ncstatus
 
    if ( ierr /= 0 ) then

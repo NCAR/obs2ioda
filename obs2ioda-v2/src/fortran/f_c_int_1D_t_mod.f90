@@ -37,6 +37,7 @@ contains
 
         ! Allocate and convert the C-compatible array back to Fortran integers
         allocate(this%f_int_1D(this%n))
+        print *, "this%n = ", this%n
         call c_f_pointer(this%c_int_1D, fc_int_1D_pointer, [this%n])
         this%f_int_1D = fc_int_1D_pointer
     end subroutine to_f
