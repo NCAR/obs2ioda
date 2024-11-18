@@ -16,6 +16,7 @@ set(v2_SOURCES
     radiance_mod.f90
     ufo_variables_mod.F90
     utils_mod.f90
+    test/fortran_test_framework_mod.f90
 )
 list(TRANSFORM v2_SOURCES PREPEND "src/")
 set(v2_MAIN_SOURCE
