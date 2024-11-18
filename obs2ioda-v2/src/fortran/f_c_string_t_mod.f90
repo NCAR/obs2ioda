@@ -10,7 +10,7 @@ module f_c_string_t_mod
         ! C pointer to the null-terminated string
         type(c_ptr) :: c_string
         ! Length of the Fortran string
-        integer :: n
+        integer :: n=-1
 
         contains
         ! Type-bound procedures
@@ -33,7 +33,9 @@ contains
     subroutine to_f(this)
         class(f_c_string_t), intent(inout) :: this
         character(len=1, kind=c_char), pointer :: fc_string_pointer(:)
-
+        if (this%n < 0) then
+            return
+        end if
         allocate(character(len=this%n) :: this%f_string)
         call c_f_pointer(this%c_string, fc_string_pointer, [this%n + 1])
         this%f_string = transfer(fc_string_pointer(1:this%n), this%f_string)

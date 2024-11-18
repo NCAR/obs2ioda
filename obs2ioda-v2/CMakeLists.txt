@@ -30,5 +30,6 @@ set(v2_MAIN_SOURCE
 list(TRANSFORM v2_MAIN_SOURCE PREPEND "src/fortran/")
 set(v2_PUBLIC_LINK_LIBRARIES "${NetCDF_LIBRARIES}" "${NCEP_BUFR_LIB}")
 add_library(v2 SHARED ${v2_SOURCES})
+target_include_directories(v2 PUBLIC ${NetCDF_INCLUDE_DIRS})
 obs2ioda_fortran_target(v2 ${v2_MAIN_SOURCE})
 

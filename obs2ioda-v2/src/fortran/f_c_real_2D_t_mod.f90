@@ -8,7 +8,7 @@ module f_c_real_2D_t_mod
         real(r_kind), allocatable, dimension(:, :) :: f_real_2D
         real(kind=c_float), allocatable, dimension(:) :: fc_real_2D
         type(c_ptr) :: c_real_2D
-        integer :: m, n
+        integer :: m = -1, n = -1
     contains
         procedure :: to_c
         procedure :: to_f
@@ -25,6 +25,12 @@ contains
     subroutine to_f(this)
         class(f_c_real_2D_t), intent(inout) :: this
         real(kind = c_float), pointer :: fc_real_2D_pointer(:)
+        if (this%m < 0) then
+            return
+        end if
+        if (this%n < 0) then
+            return
+        end if
         allocate(real(kind = c_float) :: this%fc_real_2D(this%n))
         call c_f_pointer(this%c_real_2D, fc_real_2D_pointer, [this%m*this%n])
         this%f_real_2D = reshape(fc_real_2D_pointer, [this%m, this%n])

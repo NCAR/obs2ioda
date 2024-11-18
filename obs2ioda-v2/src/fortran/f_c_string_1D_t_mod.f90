@@ -12,7 +12,7 @@ module f_c_string_1D_t_mod
         ! C pointer to the null-terminated string
         type(c_ptr) :: c_string_1D
         ! Length of the Fortran string
-        integer :: m, n
+        integer :: m=-1, n=-1
 
     contains
         ! Type-bound procedures
@@ -44,6 +44,12 @@ contains
         class(f_c_string_1D_t), intent(inout) :: this
         type(c_ptr), pointer :: fc_string_1D_pointer(:)
         integer :: i
+        if (this%m < 0) then
+            return
+        end if
+        if (this%n < 0) then
+            return
+        end if
         allocate(character(len=this%n) :: this%f_string_1D(1:this%m))
         allocate(this%f_c_string_t_array(this%m))
         allocate(this%fc_string_1D(this%m))
