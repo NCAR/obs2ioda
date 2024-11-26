@@ -1,5 +1,5 @@
 module f_c_string_t_mod
-    use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer
+    use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer, c_null_ptr
     implicit none
 
     type :: f_c_string_t
@@ -16,6 +16,7 @@ module f_c_string_t_mod
         ! Type-bound procedures
         procedure :: to_c => to_c
         procedure :: to_f => to_f
+        procedure :: cleanup => cleanup
     end type f_c_string_t
 
 contains
@@ -40,6 +41,21 @@ contains
         call c_f_pointer(this%c_string, fc_string_pointer, [this%n + 1])
         this%f_string = transfer(fc_string_pointer(1:this%n), this%f_string)
     end subroutine to_f
+
+    ! Cleanup method to deallocate allocated resources.
+    subroutine cleanup(this)
+        class(f_c_string_t), intent(inout) :: this
+
+        if (allocated(this%fc_string)) then
+            deallocate(this%fc_string)
+        end if
+        if (allocated(this%f_string)) then
+            deallocate(this%f_string)
+        end if
+
+        this%c_string = c_null_ptr
+        this%n = -1
+    end subroutine cleanup
 
 end module f_c_string_t_mod
 

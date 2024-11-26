@@ -2,6 +2,9 @@ module netcdf_mod
 
 use netcdf
 use define_mod, only: missing_r, missing_i, nstring
+use f_c_string_1D_t_mod, only: f_c_string_1D_t
+use netcdf_c_i_mod, only: create
+use iso_c_binding, only: c_ptr, c_null_char
 
 implicit none
 
@@ -169,6 +172,7 @@ end subroutine get_netcdf_var_1d_char
 subroutine open_netcdf_for_write(fname,ncfileid)
    character(len=*), intent(in) :: fname
    integer, intent(out) :: ncfileid
+   integer :: c_ncid, retval
 
    ! create nc file
    !ncstatus = nf90_create(path=trim(adjustl(fname)),cmode=nf90_clobber,ncid=ncfileid)

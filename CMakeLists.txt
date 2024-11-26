@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Functions/Obs2Ioda_Functions.cmake")
 # Define the project
-project(obs2ioda LANGUAGES Fortran)
+project(obs2ioda LANGUAGES Fortran C CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -14,22 +14,26 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 
 
 # Set the Fortran compiler and flags
-set(NCEP_BUFR_LIB CACHE STRING "" )
+set(NCEP_BUFR_LIB CACHE STRING "")
 # Set to ON to build tests. Default is OFF. If testing is enabled,
 # pFUnit is required to be installed.
 set(BUILD_TESTS CACHE BOOL OFF)
 # Set the path to the pFUnit installation directory if BUILD_TESTS is ON
-set(PFUNIT_DIR CACHE STRING "" )
+set(PFUNIT_DIR CACHE STRING "")
 
 # Find required packages
-find_package(NetCDF REQUIRED COMPONENTS Fortran C)
+find_package(NetCDF REQUIRED COMPONENTS Fortran CXX C)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 
-if (BUILD_TESTS)
-    enable_testing()
-    set(CMAKE_PREFIX_PATH ${PFUNIT_DIR})
-    find_package(PFUNIT REQUIRED)
-    add_subdirectory("${CMAKE_SOURCE_DIR}/test")
-endif()
+enable_testing()
+set(CMAKE_PREFIX_PATH ${PFUNIT_DIR})
+find_package(PFUNIT REQUIRED)
+INCLUDE(FetchContent)
+FETCHCONTENT_DECLARE(
+        googletest
+        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+FETCHCONTENT_MAKEAVAILABLE(googletest)
+add_subdirectory("${CMAKE_SOURCE_DIR}/test")
 
