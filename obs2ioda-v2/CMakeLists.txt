@@ -31,6 +31,7 @@ set(v2_SOURCES
     f_c_string_1D_t_mod.f90
     f_c_numeric_mod.f90
     netcdf_c_i_mod.f90
+    netcdf_c_mod.f90
 )
 list(TRANSFORM v2_SOURCES PREPEND "src/fortran/")
 set(v2_MAIN_SOURCE

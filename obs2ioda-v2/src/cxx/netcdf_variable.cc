@@ -1,4 +1,5 @@
-#include "netcdf_c.h"
+#include "netcdf_variable.h"
+#include "netcdf_utils.h"
 #include "ioda_names.h"
 #include <algorithm>
 #include <mutex>
@@ -33,6 +34,7 @@ namespace Obs2Ioda {
             int,
             int
     );
+
     template int netcdfSetFill<float>(
             int,
             const char *,
@@ -40,6 +42,7 @@ namespace Obs2Ioda {
             int,
             float
     );
+
     template int netcdfSetFill<long long>(
             int,
             const char *,
@@ -47,6 +50,7 @@ namespace Obs2Ioda {
             int,
             long long
     );
+
     template int netcdfSetFill<const char *>(
             int,
             const char *,
@@ -54,12 +58,14 @@ namespace Obs2Ioda {
             int,
             const char *
     );
+
     template int netcdfPutVar<int>(
             int,
             const char *,
             const char *,
             const int *
     );
+
     template int netcdfPutVar<float>(
             int,
             const char *,
@@ -134,6 +140,62 @@ namespace Obs2Ioda {
         }
     }
 
+    int netcdfPutVarInt(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const int *data
+    ) {
+        return netcdfPutVar(
+                netcdfID,
+                groupName,
+                varName,
+                data
+        );
+    }
+
+    int netcdfPutVarInt64(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const long long *data
+    ) {
+        return netcdfPutVar(
+                netcdfID,
+                groupName,
+                varName,
+                data
+        );
+    }
+
+    int netcdfPutVarReal(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const float *data
+    ) {
+        return netcdfPutVar(
+                netcdfID,
+                groupName,
+                varName,
+                data
+        );
+    }
+
+    int netcdfPutVarString(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const char **data
+    ) {
+        return netcdfPutVar(
+                netcdfID,
+                groupName,
+                varName,
+                data
+        );
+    }
+
 
     template<typename T>
     int netcdfGetVar(
@@ -145,11 +207,15 @@ namespace Obs2Ioda {
         try {
             std::lock_guard<std::mutex> lock(map_mutex);
             auto file = NETCDF_FILE_MAP[netcdfID];
+            auto group = getRootGroup(
+                    netcdfID,
+                    groupName
+            );
             std::string ioda3Name = getIodaName(
                     varName,
                     IODA_VARIABLE_NAMES
             );
-            auto var = file->getVar(ioda3Name);
+            auto var = group->getVar(ioda3Name);
             const std::vector<size_t> start = {0};
             const std::vector<size_t> count = {var.getDim(0).getSize()};
             var.getVar(
@@ -173,7 +239,7 @@ namespace Obs2Ioda {
             const char *varName,
             int fillMode,
             T fillValue
-            ) {
+    ) {
         try {
             std::lock_guard<std::mutex> lock(map_mutex);
             auto file = NETCDF_FILE_MAP[netcdfID];
@@ -186,7 +252,10 @@ namespace Obs2Ioda {
                     groupName
             );
             auto var = group->getVar(ioda3Name);
-            var.setFill(fillMode, fillValue);
+            var.setFill(
+                    fillMode,
+                    fillValue
+            );
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
@@ -210,9 +279,8 @@ namespace Obs2Ioda {
         auto dims = file->getVar(ioda3Name).getDims();
         auto var = file->getVar(ioda3Name);
         size_t numStrings = dims[0].getSize();
-        size_t bufferSize = numStrings * sizeof(char *);
-        char **buffer = (char **) malloc(bufferSize);
-        int  retval = netcdfGetVar(
+        char **buffer = new char *[numStrings];
+        int retval = netcdfGetVar(
                 netcdfID,
                 groupName,
                 varName,
@@ -228,7 +296,7 @@ namespace Obs2Ioda {
             (*data)[i][tmpStr.size()] = '\0';
         }
         var.freeString(
-                5,
+                numStrings,
                 (char **) buffer
         );
         free(buffer);

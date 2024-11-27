@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 #include <vector>
+#include "netcdf_group.h"
+#include "netcdf_file.h"
+#include "netcdf_variable.h"
+#include "netcdf_attribute.h"
+#include "netcdf_dimension.h"
 
-#include "netcdf_c.h"
 
 
 class TestNetcdfSatwindFixture : public ::testing::Test {
@@ -84,7 +88,6 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    "2018-04-14T22:00:00Z";
     result = Obs2Ioda::netcdfPutAtt(
             netcdfID,
             nullptr,
@@ -239,7 +242,7 @@ TEST_F(TestNetcdfSatwindFixture,
               0);
     result = Obs2Ioda::netcdfAddVar(
             netcdfID,
-            nullptr,
+            "MetaData",
             "variable_names",
             NC_STRING,
             1,
@@ -251,7 +254,7 @@ TEST_F(TestNetcdfSatwindFixture,
               0);
     result = Obs2Ioda::netcdfSetFill(
             netcdfID,
-            nullptr,
+            "MetaData",
             "variable_names",
             1,
             ""
@@ -259,23 +262,13 @@ TEST_F(TestNetcdfSatwindFixture,
     EXPECT_EQ(result,
               0);
 
-    /*
-     * group: ObsValue {
-  variables:
-        float eastward_wind(nlocs) ;
-                eastward_wind:_FillValue = -999.f ;
-                eastward_wind:units = "m/s" ;
-        float northward_wind(nlocs) ;
-                northward_wind:_FillValue = -999.f ;
-                northward_wind:units = "m/s" ;
-  } // group ObsValue
-
-     */
     result = Obs2Ioda::netcdfAddGroup(
             netcdfID,
             nullptr,
             "ObsValue"
     );
+    EXPECT_EQ(result,
+              0);
     result = Obs2Ioda::netcdfAddVar(
             netcdfID,
             "ObsValue",
@@ -300,23 +293,131 @@ TEST_F(TestNetcdfSatwindFixture,
     result = Obs2Ioda::netcdfPutAtt(
             netcdfID,
             "ObsValue",
-            "windNorthward",
+            "northward_wind",
             "units",
             "m/s"
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutVar(
+    result = Obs2Ioda::netcdfAddVar(
             netcdfID,
             "ObsValue",
-            "northward_wind",
-            std::vector<float>(
-                    10,
-                    1.0f
+            "eastward_wind",
+            NC_FLOAT,
+            1,
+            std::vector<const char *>(
+                    {"nlocs"}
             ).data()
     );
     EXPECT_EQ(result,
               0);
+    result = Obs2Ioda::netcdfSetFill(
+            netcdfID,
+            "ObsValue",
+            "eastward_wind",
+            1,
+            -999.f
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfPutAtt(
+            netcdfID,
+            "ObsValue",
+            "eastward_wind",
+            "units",
+            "m/s"
+    );
+    EXPECT_EQ(result,
+              0);
+
+    result = Obs2Ioda::netcdfAddGroup(
+            netcdfID,
+            nullptr,
+            "ObsError"
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfAddVar(
+            netcdfID,
+            "ObsError",
+            "northward_wind",
+            NC_FLOAT,
+            1,
+            std::vector<const char *>(
+                    {"nlocs"}
+            ).data()
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfSetFill(
+            netcdfID,
+            "ObsError",
+            "northward_wind",
+            1,
+            -999.f
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfPutAtt(
+            netcdfID,
+            "ObsError",
+            "northward_wind",
+            "units",
+            "m/s"
+    );
+    EXPECT_EQ(result,
+              0);
+
+    result = Obs2Ioda::netcdfAddGroup(
+            netcdfID,
+            nullptr,
+            "PreQC"
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfAddVar(
+            netcdfID,
+            "PreQC",
+            "eastward_wind",
+            NC_INT,
+            1,
+            std::vector<const char *>(
+                    {"nlocs"}
+            ).data()
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfSetFill(
+            netcdfID,
+            "PreQC",
+            "eastward_wind",
+            1,
+            -999
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfAddVar(
+            netcdfID,
+            "PreQC",
+            "northward_wind",
+            NC_INT,
+            1,
+            std::vector<const char *>(
+                    {"nlocs"}
+            ).data()
+    );
+    EXPECT_EQ(result,
+              0);
+    result = Obs2Ioda::netcdfSetFill(
+            netcdfID,
+            "PreQC",
+            "northward_wind",
+            1,
+            -999
+    );
+    EXPECT_EQ(result,
+              0);
+
 
 
     result = Obs2Ioda::netcdfClose(

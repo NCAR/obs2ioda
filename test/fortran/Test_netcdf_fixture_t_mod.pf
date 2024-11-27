@@ -1,0 +1,82 @@
+module Test_netcdf_fixture_t_mod
+    use funit
+    use f_c_string_t_mod
+    use kinds, only: i_llong
+    use iso_c_binding, only : c_int, c_float, c_long
+    implicit none
+    !Define NetCDF type constants
+    integer, parameter :: NC_BYTE    = 1    ! 1-byte signed integer
+    integer, parameter :: NC_CHAR    = 2    ! 1-byte character
+    integer, parameter :: NC_SHORT   = 3    ! 2-byte signed integer
+    integer, parameter :: NC_INT     = 4    ! 4-byte signed integer
+    integer, parameter :: NC_LONG    = 4    ! Alias for NC_INT
+    integer, parameter :: NC_FLOAT   = 5    ! 4-byte IEEE floating-point
+    integer, parameter :: NC_DOUBLE  = 6    ! 8-byte IEEE floating-point
+    integer, parameter :: NC_UBYTE   = 7    ! 1-byte unsigned integer
+    integer, parameter :: NC_USHORT  = 8    ! 2-byte unsigned integer
+    integer, parameter :: NC_UINT    = 9    ! 4-byte unsigned integer
+    integer, parameter :: NC_INT64   = 10   ! 8-byte signed integer
+    integer, parameter :: NC_UINT64  = 11   ! 8-byte unsigned integer
+    integer, parameter :: NC_STRING  = 12   ! Variable-length string
+    @TestCase
+    type, extends(TestCase) :: Test_netcdf_fixture_t
+        character(len=:), allocatable :: test_file_path
+        character(len=:), allocatable :: test_group_path
+        character(len=:), allocatable :: test_dim_path
+        character(len=:), allocatable :: test_var_path
+
+        character(len=:), allocatable :: test_group_name
+        character(len=:), allocatable :: test_nested_group_name
+
+        character(len=:), allocatable :: test_dim_name
+        character(len=:), allocatable :: test_global_dim_name
+        integer(c_int) :: test_dim_len
+        integer(c_int) :: test_global_dim_len
+
+        character(len=:), allocatable :: test_int_var_name
+        character(len=:), allocatable :: test_int64_var_name
+        character(len=:), allocatable :: test_real_var_name
+        character(len=:), allocatable :: test_string_var_name
+        integer(c_int), allocatable, dimension(:) :: test_int_var_data
+        integer(i_llong), allocatable, dimension(:) :: test_int64_var_data
+        real(c_float), allocatable, dimension(:) :: test_real_var_data
+        character(len=:), allocatable, dimension(:) :: test_string_var_data
+
+
+    contains
+        procedure :: setUp => setUp
+        procedure :: tearDown => tearDown
+    end type Test_netcdf_fixture_t
+
+    contains
+    subroutine setUp(this)
+        class(Test_netcdf_fixture_t), intent(inout) :: this
+        this%test_file_path = "test_file.nc"
+        this%test_group_path = "test_group.nc"
+        this%test_dim_path = "test_dim.nc"
+        this%test_var_path = "test_var.nc"
+
+        this%test_group_name = "group"
+        this%test_nested_group_name = "nested_group"
+
+        this%test_global_dim_name = "global_dim"
+        this%test_dim_name = "dim"
+        this%test_dim_len = 5
+        this%test_global_dim_len = 5
+
+        this%test_int_var_name = "int_var"
+        this%test_int64_var_name = "int64_var"
+        this%test_real_var_name = "real_var"
+        this%test_string_var_name = "string_var"
+        this%test_int_var_data = [1, 2, 3, 4, 5]
+        this%test_int64_var_data = [11111, 22222, &
+                33333, 44444, 55555]
+        this%test_real_var_data = [1.1, 2.2, 3.3, 4.4, 5.5]
+        this%test_string_var_data = ["one  ", "two  ", "three", "four ", "five "]
+    end subroutine setUp
+
+    subroutine tearDown(this)
+        class(Test_netcdf_fixture_t), intent(inout) :: this
+    end subroutine tearDown
+
+end module Test_netcdf_fixture_t_mod

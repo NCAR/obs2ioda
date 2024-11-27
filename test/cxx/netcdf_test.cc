@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 #include <vector>
-
-#include "netcdf_c.h"
+#include "netcdf_group.h"
+#include "netcdf_file.h"
+#include "netcdf_variable.h"
+#include "netcdf_attribute.h"
+#include "netcdf_dimension.h"
+#include "netcdf_utils.h"
 
 
 class NetcdfFunctionalTests : public ::testing::Test {

@@ -1,4 +1,5 @@
-#include "netcdf_c.h"
+#include "netcdf_attribute.h"
+#include "netcdf_utils.h"
 #include "ioda_names.h"
 #include <mutex>
 #include <memory>
@@ -73,22 +74,22 @@ namespace Obs2Ioda {
             const char *groupName,
             const char *varName,
             const char *attName,
-            const std::string& value
+            const char *value
     ) {
         try {
             std::lock_guard<std::mutex> lock(map_mutex);
             auto file = NETCDF_FILE_MAP[netcdfID];
             netCDF::NcVar var;
-            std::string ioda3Name = getIodaName(
-                    attName,
-                    IODA_VARIABLE_NAMES
-            );
             std::shared_ptr<netCDF::NcGroup> group = getRootGroup(
                     netcdfID,
                     groupName
             );
             if (varName != nullptr) {
-                var = group->getVar(varName);
+                auto ioda3Name = getIodaName(
+                        varName,
+                        IODA_VARIABLE_NAMES
+                );
+                var = group->getVar(ioda3Name);
                 var.putAtt(
                         ioda3Name,
                         value
@@ -96,7 +97,7 @@ namespace Obs2Ioda {
             }
             else {
                 group->putAtt(
-                        ioda3Name,
+                        attName,
                         value
                 );
             }

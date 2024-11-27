@@ -1,4 +1,5 @@
-#include "netcdf_c.h"
+#include "netcdf_file.h"
+#include "netcdf_utils.h"
 #include <mutex>
 #include <memory>
 
