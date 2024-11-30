@@ -105,6 +105,32 @@ module netcdf_c_i_mod
             type(c_ptr), value, intent(in) :: data
             integer(c_int) :: c_netcdfPutVarString
         end function c_netcdfPutVarString
+
+        function c_netcdfPutAttInt(&
+                netcdfID, groupName, varName, attName, data) &
+                bind(C, name = "netcdfPutAttInt")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: attName
+            type(c_ptr), value, intent(in) :: data
+            integer(c_int) :: c_netcdfPutAttInt
+        end function c_netcdfPutAttInt
+
+        function c_netcdfPutAttString(&
+                netcdfID, groupName, varName, attName, data) &
+                bind(C, name = "netcdfPutAttString")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: attName
+            type(c_ptr), value, intent(in) :: data
+            integer(c_int) :: c_netcdfPutAttString
+        end function c_netcdfPutAttString
     end interface
 
 end module netcdf_c_i_mod

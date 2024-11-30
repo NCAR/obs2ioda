@@ -1,5 +1,6 @@
 #ifndef OBS2IODA_NETCDF_ATTRIBUTE_H
 #define OBS2IODA_NETCDF_ATTRIBUTE_H
+
 #include <netcdf>
 #include <map>
 #include <unordered_map>
@@ -19,12 +20,22 @@ namespace Obs2Ioda {
             T value
     );
 
-    int netcdfPutAtt(
+    extern "C" {
+
+    int netcdfPutAttString(
             int netcdfID,
             const char *groupName,
             const char *varName,
             const char *attName,
-            const char *value
+            const char *data
     );
+    int netcdfPutAttInt(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const char *attName,
+            const int *data
+    );
+    }
 }
 #endif //OBS2IODA_NETCDF_ATTRIBUTE_H

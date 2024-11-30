@@ -24,6 +24,7 @@ module Test_netcdf_fixture_t_mod
         character(len=:), allocatable :: test_group_path
         character(len=:), allocatable :: test_dim_path
         character(len=:), allocatable :: test_var_path
+        character(len=:), allocatable :: test_att_path
 
         character(len=:), allocatable :: test_group_name
         character(len=:), allocatable :: test_nested_group_name
@@ -42,6 +43,12 @@ module Test_netcdf_fixture_t_mod
         real(c_float), allocatable, dimension(:) :: test_real_var_data
         character(len=:), allocatable, dimension(:) :: test_string_var_data
 
+        character(len=:), allocatable :: test_int_att_name
+        character(len=:), allocatable :: test_string_att_name
+        character(len=:), allocatable :: test_string_att_data
+        integer(c_int) :: test_int_att_data
+
+
 
     contains
         procedure :: setUp => setUp
@@ -55,6 +62,7 @@ module Test_netcdf_fixture_t_mod
         this%test_group_path = "test_group.nc"
         this%test_dim_path = "test_dim.nc"
         this%test_var_path = "test_var.nc"
+        this%test_att_path = "test_att.nc"
 
         this%test_group_name = "group"
         this%test_nested_group_name = "nested_group"
@@ -73,6 +81,11 @@ module Test_netcdf_fixture_t_mod
                 33333, 44444, 55555]
         this%test_real_var_data = [1.1, 2.2, 3.3, 4.4, 5.5]
         this%test_string_var_data = ["one  ", "two  ", "three", "four ", "five "]
+
+        this%test_int_att_name = "int_var"
+        this%test_string_att_name = "string_att"
+        this%test_int_att_data = 2
+        this%test_string_att_data = "string"
     end subroutine setUp
 
     subroutine tearDown(this)

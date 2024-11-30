@@ -1,0 +1,24 @@
+module Test_netcdf_create_mod
+    use funit
+    use netcdf_c_mod
+    use netcdf_c_i_mod
+    use Test_netcdf_fixture_t_mod
+    implicit none
+    @TestCase
+    type, extends(Test_netcdf_fixture_t) :: Test_netcdf_create_t
+    contains
+        procedure :: test_netcdfCreate => test_netcdfCreate
+    end type
+contains
+    @Test
+    subroutine test_netcdfCreate(this)
+        class(Test_netcdf_create_t), intent(inout) :: this
+        integer(c_int) :: netcdfID
+        integer(c_int) :: status
+        status = netcdfCreate(this%test_file_path, netcdfID)
+        call assertEqual(0, status)
+        status = netcdfClose(netcdfID)
+        call assertEqual(0, status)
+    end subroutine test_netcdfCreate
+
+end module Test_netcdf_create_mod

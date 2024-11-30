@@ -1,5 +1,6 @@
 include_directories(${GTEST_INCLUDE_DIRS} )
 set(NETCDF_TEST_SOURCES
+    ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test_fixture.cc
     ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test.cc
         )
 
@@ -20,8 +21,9 @@ target_link_libraries(
 
 add_test(
         NAME Netcdf_test
-        COMMAND NetcdfTest --gtest_filter=NetcdfTest
+        COMMAND NetcdfTest --gtest_filter=*
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cxx)
+add_memcheck_ctest(NetcdfTest)
 
 add_executable(
         NetcdfSatwindTest
@@ -37,4 +39,5 @@ add_test(
         NAME Netcdf_satwind_test
         COMMAND NetcdfSatwindTest --gtest_filter=*
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cxx)
+add_memcheck_ctest(NetcdfSatwindTest)
 

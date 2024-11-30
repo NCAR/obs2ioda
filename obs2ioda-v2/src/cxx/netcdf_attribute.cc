@@ -69,12 +69,12 @@ namespace Obs2Ioda {
             );
         }
     }
-    int netcdfPutAtt(
+    int netcdfPutAttString(
             int netcdfID,
             const char *groupName,
             const char *varName,
             const char *attName,
-            const char *value
+            const char *data
     ) {
         try {
             std::lock_guard<std::mutex> lock(map_mutex);
@@ -92,13 +92,13 @@ namespace Obs2Ioda {
                 var = group->getVar(ioda3Name);
                 var.putAtt(
                         ioda3Name,
-                        value
+                        data
                 );
             }
             else {
                 group->putAtt(
                         attName,
-                        value
+                        data
                 );
             }
             return 0;
@@ -108,6 +108,22 @@ namespace Obs2Ioda {
                     1
             );
         }
+    }
+    int netcdfPutAttInt(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const char *attName,
+            const int *data
+    ) {
+        return netcdfPutAtt<int>(
+                netcdfID,
+                groupName,
+                varName,
+                attName,
+                netCDF::ncInt,
+                *data
+        );
     }
 }
 

@@ -88,7 +88,7 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutAtt(
+    result = Obs2Ioda::netcdfPutAttString(
             netcdfID,
             nullptr,
             nullptr,
@@ -97,7 +97,7 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutAtt(
+    result = Obs2Ioda::netcdfPutAttString(
             netcdfID,
             nullptr,
             nullptr,
@@ -210,7 +210,7 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutAtt(
+    result = Obs2Ioda::netcdfPutAttString(
             netcdfID,
             "MetaData",
             "dateTime",
@@ -290,7 +290,7 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutAtt(
+    result = Obs2Ioda::netcdfPutAttString(
             netcdfID,
             "ObsValue",
             "northward_wind",
@@ -320,7 +320,7 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutAtt(
+    result = Obs2Ioda::netcdfPutAttString(
             netcdfID,
             "ObsValue",
             "eastward_wind",
@@ -358,7 +358,7 @@ TEST_F(TestNetcdfSatwindFixture,
     );
     EXPECT_EQ(result,
               0);
-    result = Obs2Ioda::netcdfPutAtt(
+    result = Obs2Ioda::netcdfPutAttString(
             netcdfID,
             "ObsError",
             "northward_wind",
