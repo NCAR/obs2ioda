@@ -11,7 +11,9 @@ use define_mod, only: nobtype, nvar_info, n_ncdim, n_ncgrp, nstring, ndatetime, 
 use netcdf_mod, only: open_netcdf_for_write, close_netcdf, &
    def_netcdf_dims, def_netcdf_grp, def_netcdf_var, def_netcdf_end, &
    put_netcdf_var, get_netcdf_dims
+use netcdf, only: nf90_string
 use ufo_vars_mod, only: ufo_vars_getindex
+use netcdf_c_mod
 
 implicit none
 
@@ -49,6 +51,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    integer(i_kind) :: ncstatus
    integer(i_kind) :: has_wavenumber
    integer(i_kind) :: ncid_ncgrp_wn
+   integer(i_kind) :: status, netcdfID
 
    if ( write_opt == write_nc_conv ) then
       ntype = nobtype
@@ -97,6 +100,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       end if
       write(*,*) '--- writing ', trim(ncfname)
       call open_netcdf_for_write(trim(ncfname),ncfileid)
+      status = netcdfCreate("test.nc", netcdfID)
 
       iv = ufo_vars_getindex(name_ncdim, 'nvars')
       val_ncdim(iv) = xdata(ityp,itim)%nvars
@@ -110,17 +114,24 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          ncname = 'nchans'
       end if
       call def_netcdf_dims(ncfileid,trim(ncname),val_ncdim(1),ncid_ncdim(1))
+!      status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1))
+!      status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(1))
       if ( trim(ncname) == 'nchans' ) then
          call def_netcdf_var(ncfileid,trim(ncname),(/ncid_ncdim(1)/),NF90_INT)
+!         status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(name_ncdim(ncid_ncdim(1)))])
       end if
       do i = 2, n_ncdim
          call def_netcdf_dims(ncfileid,trim(name_ncdim(i)),val_ncdim(i),ncid_ncdim(i))
+!         status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
+!         status = netcdfPutAtt(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
          !call def_netcdf_var(ncfileid,trim(name_ncdim(i)),(/ncid_ncdim(i)/),NF90_INT)
       end do
 
       ! define global attributes
       ncstatus = nf90_put_att(ncfileid, NF90_GLOBAL, 'min_datetime', xdata(ityp,itim)%min_datetime)
+!      status = netcdfPutAtt(netcdfID, "min_datetime", xdata(ityp,itim)%min_datetime)
       ncstatus = nf90_put_att(ncfileid, NF90_GLOBAL, 'max_datetime', xdata(ityp,itim)%max_datetime)
+!      status = netcdfPutAtt(netcdfID, "max_datetime", xdata(ityp,itim)%max_datetime)
 
       if ( allocated(xdata(ityp,itim)%wavenumber) ) then
          has_wavenumber = itrue
@@ -134,10 +145,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             if ( trim(name_ncgrp(i)) == 'ObsType' ) cycle
          end if
          call def_netcdf_grp(ncfileid,trim(name_ncgrp(i)),ncid_ncgrp(i))
+!         status = netcdfAddGroup(netcdfID, trim(name_ncgrp(i)))
       end do
       if ( has_wavenumber == itrue ) then
          ! use deprecated VarMetaData group for wavenumber before related code in UFO is updated
          call def_netcdf_grp(ncfileid,'VarMetaData',ncid_ncgrp_wn)
+!         status = netcdfAddGroup(netcdfID, 'VarMetaData')
       end if
 
       ! define netcdf variables
@@ -147,12 +160,16 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             ncname = trim(name_var_met(ivar))
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_FLOAT,'units',unit_var_met(ivar))
+!            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [trim(name_ncdim(ncid_ncdim(2)))], "ObsValue")
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_FLOAT,'units',unit_var_met(ivar))
+!            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [trim(name_ncdim(ncid_ncdim(2)))], "ObsError")
             igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_INT)
+!            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [trim(name_ncdim(ncid_ncdim(2)))], "PreQC")
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/ncid_ncdim(2)/),NF90_INT)
+!            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [trim(name_ncdim(ncid_ncdim(2)))], "ObsType")
          end do
       else if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          ncname = trim(var_tb)
@@ -162,10 +179,16 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          dim2 = ncid_ncdim(idim)
          igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
          call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),NF90_FLOAT,'units','K')
+!         status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
+!                                 [trim(name_ncdim(ncid_ncdim(dim1))), trim(name_ncdim(ncid_ncdim(dim2)))], "ObsValue")
          igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
          call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),NF90_FLOAT,'units','K')
+!            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
+!                                    [trim(name_ncdim(ncid_ncdim(dim1))), trim(name_ncdim(ncid_ncdim(dim2)))], "ObsError")
          igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
          call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),NF90_INT)
+!            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 2, &
+!                                    [trim(name_ncdim(ncid_ncdim(dim1))), trim(name_ncdim(ncid_ncdim(dim2)))], "PreQC")
       end if
 
       var_info_def_loop: do i = 1, nvar_info
@@ -183,12 +206,18 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i))
             dim2 = ncid_ncdim(idim)
             call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),type_var_info(i))
+!            status = netcdfAddVar(netcdfID, ncname, NF90_STRING, 1, &
+!                                 [trim(name_ncdim(ncid_ncdim(dim2)))], "MetaData")
          else
             if ( ncname == 'dateTime' ) then
                call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1/),type_var_info(i), &
                   'units', 'seconds since 1970-01-01T00:00:00Z')
+!               status = netcdfAddVar(netcdfID, ncname, type_var_info(i), 1, &
+!                  [trim(name_ncdim(ncid_ncdim(dim1)))], "MetaData")
             else
                call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1/),type_var_info(i))
+!               status = netcdfAddVar(netcdfID, ncname, type_var_info(i), 1, &
+!                    [trim(name_ncdim(ncid_ncdim(dim1)))], "MetaData")
             end if
          end if
       end do var_info_def_loop ! nvar_info
@@ -203,8 +232,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                idim = ufo_vars_getindex(name_ncdim, dim_sen_info(2,i))
                dim2 = ncid_ncdim(idim)
                call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1,dim2/),type_sen_info(i))
+!               status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 2, &
+!                                    [trim(name_ncdim(ncid_ncdim(dim1))), trim(name_ncdim(ncid_ncdim(dim2)))], "MetaData")
             else
                call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1/),type_sen_info(i))
+!               status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
+!                                        [trim(name_ncdim(ncid_ncdim(dim1)))], "MetaData")
             end if
          end do ! nsen_info
          if ( has_wavenumber == itrue ) then
@@ -212,6 +245,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             dim1 = ncid_ncdim(idim)
             call def_netcdf_var(ncid_ncgrp_wn,'sensor_band_central_radiation_wavenumber', &
                                 (/dim1/),NF90_FLOAT)
+!            status = netcdfAddVar(netcdfID, 'sensor_band_central_radiation_wavenumber', NF90_FLOAT, 1, &
+!                                 [trim(name_ncdim(ncid_ncdim(dim1)))], "MetaData")
          end if
       end if ! write_nc_radiance
 
@@ -225,20 +260,25 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%val)
+!               status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xfield(:,i)%val, "ObsValue")
                ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%err)
+!               status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xfield(:,i)%err, "ObsError")
                ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%qm)
+!               status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xfield(:,i)%qm, "PreQC")
                ncname = trim(name_var_met(ivar))
                igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xfield(:,i)%rptype)
+!               status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xfield(:,i)%rptype, "ObsType")
             end if
          end do var_loop
       else if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          ncname = "nchans"
          call put_netcdf_var(ncfileid,ncname,ichan(:))
+!         status = netcdfPutVar(netcdfID, ncname, ichan(:))
          allocate(rtmp2d(xdata(ityp,itim)%nvars, xdata(ityp,itim)%nlocs))
          ncname = trim(var_tb)
          igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
@@ -248,11 +288,13 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             end do
          end do
          call put_netcdf_var(ncid_ncgrp(igrp),ncname,rtmp2d(:,:))
+!         status = netcdfPutVar(netcdfID, ncname, rtmp2d(:,:), "ObsValue")
          igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
          do ii = 1, xdata(ityp,itim)%nlocs
             rtmp2d(:,ii) = obserr(:)
          end do
          call put_netcdf_var(ncid_ncgrp(igrp),ncname,rtmp2d(:,:))
+!         status = netcdfPutVar(netcdfID, ncname, rtmp2d(:,:), "ObsError")
          igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
          do jj = 1, xdata(ityp,itim)%nvars
             do ii = 1, xdata(ityp,itim)%nlocs
@@ -260,6 +302,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             end do
          end do
          call put_netcdf_var(ncid_ncgrp(igrp),ncname,rtmp2d(:,:))
+!         status = netcdfPutVar(netcdfID, ncname, rtmp2d(:,:), "PreQC")
          deallocate(rtmp2d)
       end if
 
@@ -274,17 +317,21 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
          if ( type_var_info(i) == nf90_int ) then
             call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xinfo_int(:,i))
+!            status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xinfo_int(:,i), "MetaData")
          else if ( type_var_info(i) == nf90_float ) then
             call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xinfo_float(:,i))
+!            status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xinfo_float(:,i), "MetaData")
          else if ( type_var_info(i) == nf90_char ) then
             if ( trim(name_var_info(i)) == 'variable_names' ) then
                if ( write_opt == write_nc_conv ) then
                   call put_netcdf_var(ncid_ncgrp(igrp),ncname,name_var_met(xdata(ityp,itim)%var_idx(:)))
+!                  status = netcdfPutVar(netcdfID, ncname, name_var_met(xdata(ityp,itim)%var_idx(:)), "MetaData")
                end if
             else if ( trim(name_var_info(i)) == 'station_id' ) then
                allocate(str_nstring(xdata(ityp,itim)%nlocs))
                str_nstring(:) = xdata(ityp,itim)%xinfo_char(:,i)
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,str_nstring)
+!               status = netcdfPutVar(netcdfID, ncname, str_nstring, "MetaData")
                deallocate(str_nstring)
             else if ( trim(name_var_info(i)) == 'datetime' ) then
                allocate(str_ndatetime(xdata(ityp,itim)%nlocs))
@@ -293,10 +340,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                   str_ndatetime(ii) = str_tmp(1:ndatetime)
                end do
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,str_ndatetime)
+!                status = netcdfPutVar(netcdfID, ncname, str_ndatetime, "MetaData")
                deallocate(str_ndatetime)
             end if
          else if ( type_var_info(i) == nf90_int64 ) then
             call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xinfo_int64(:,i))
+!            status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xinfo_int64(:,i), "MetaData")
          end if
       end do var_info_loop
 
@@ -306,21 +355,27 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
             if ( type_sen_info(i) == nf90_int ) then
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xseninfo_int(:,i))
+!               status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xseninfo_int(:,i), "MetaData")
             else if ( type_sen_info(i) == nf90_float ) then
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xseninfo_float(:,i))
+!                status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xseninfo_float(:,i), "MetaData")
             else if ( type_sen_info(i) == nf90_char ) then
                call put_netcdf_var(ncid_ncgrp(igrp),ncname,xdata(ityp,itim)%xseninfo_char(:,i))
+!                status = netcdfPutVar(netcdfID, ncname, xdata(ityp,itim)%xseninfo_char(:,i), "MetaData")
             end if
          end do
          if ( has_wavenumber == itrue ) then
             call put_netcdf_var(ncid_ncgrp_wn, 'sensor_band_central_radiation_wavenumber', &
                                 xdata(ityp,itim)%wavenumber(:))
+!            status = netcdfPutVar(netcdfID, 'sensor_band_central_radiation_wavenumber', &
+!                                xdata(ityp,itim)%wavenumber(:), "MetaData")
          end if
          deallocate (ichan)
          deallocate (obserr)
       end if ! write_nc_radiance
 
       call close_netcdf(trim(ncfname),ncfileid)
+!      status = netcdfClose(netcdfID)
 
    end do obtype_loop
 

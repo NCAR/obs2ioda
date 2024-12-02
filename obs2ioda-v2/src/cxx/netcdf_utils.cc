@@ -1,4 +1,4 @@
-#include "netcdf_c.h"
+#include "netcdf_utils.h"
 #include "ioda_names.h"
 #include <algorithm>
 #include <iostream>
@@ -21,6 +21,22 @@ namespace Obs2Ioda {
         return file;
     }
 
+    std::string removeWhiteSpace(
+            const std::string &name
+    ) {
+        std::string strippedName = name;
+
+        strippedName.erase(
+                std::remove_if(
+                        strippedName.begin(),
+                        strippedName.end(),
+                        [](unsigned char x) { return std::isspace(x); }
+                ),
+                strippedName.end()
+        );
+        return strippedName;
+    }
+
 
     std::string getIodaName(
             const char *name,
@@ -30,15 +46,7 @@ namespace Obs2Ioda {
             > &iodaNameMap
     ) {
         // Remove white spaces from the name
-        std::string iodaName = name;
-        iodaName.erase(
-                std::remove_if(
-                        iodaName.begin(),
-                        iodaName.end(),
-                        [](unsigned char x) { return std::isspace(x); }
-                ),
-                iodaName.end()
-        );
+        std::string iodaName = removeWhiteSpace(name);
 
         // Check if the name exists in the map
         if (iodaNameMap.find(iodaName) != iodaNameMap.end()) {

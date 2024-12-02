@@ -35,6 +35,10 @@ namespace Obs2Ioda {
             const char *groupName
     );
 
+    std::string removeWhiteSpace(
+            const std::string &name
+    );
+
 }
 
 
