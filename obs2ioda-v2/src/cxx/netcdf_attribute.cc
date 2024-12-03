@@ -91,7 +91,7 @@ namespace Obs2Ioda {
                 );
                 var = group->getVar(ioda3Name);
                 var.putAtt(
-                        ioda3Name,
+                        attName,
                         data
                 );
             }

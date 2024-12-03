@@ -79,6 +79,38 @@ namespace Obs2Ioda {
             char ***data
     );
 
+    int netcdfSetFillInt(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            int fillValue
+    );
+
+    int netcdfSetFillReal(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            float fillValue
+    );
+
+    int netcdfSetFillInt64(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            long long fillValue
+    );
+
+    int netcdfSetFillString(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            const char *fillValue
+    );
+
     }
 
 }

@@ -7,11 +7,6 @@ module netcdf_c_mod
     implicit none
     public
 
-    interface netcdfPutVar
-        module procedure netcdfPutVar1D
-        module procedure netcdfPutVar2D
-    end interface
-
 contains
     ! Helper to handle optional groupName initialization
     subroutine init_optional_string(input_string, c_string)
@@ -101,12 +96,12 @@ contains
         call c_dimNames%cleanup()
     end function netcdfAddVar
 
-    function netcdfPutVar1D(netcdfID, varName, data, groupName)
+    function netcdfPutVar(netcdfID, varName, data, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: varName
         class(*), dimension(:), intent(in) :: data
         character(len = *), optional, intent(in) :: groupName
-        integer(c_int) :: netcdfPutVar1D
+        integer(c_int) :: netcdfPutVar
         type(f_c_string_t) :: c_groupName
         type(f_c_string_t) :: c_varName
         type(c_ptr) :: c_data
@@ -122,23 +117,23 @@ contains
         select type (data)
         type is (integer(c_int))
             c_data = c_loc(data)
-            netcdfPutVar1D = c_netcdfPutVarInt(netcdfID, c_groupName%c_string, &
+            netcdfPutVar = c_netcdfPutVarInt(netcdfID, c_groupName%c_string, &
                     c_varName%c_string, c_data)
 
         type is (integer(c_long))
             c_data = c_loc(data)
-            netcdfPutVar1D = c_netcdfPutVarInt64(netcdfID, c_groupName%c_string, &
+            netcdfPutVar = c_netcdfPutVarInt64(netcdfID, c_groupName%c_string, &
                     c_varName%c_string, c_data)
 
         type is (real(c_float))
             c_data = c_loc(data)
-            netcdfPutVar1D = c_netcdfPutVarReal(netcdfID, c_groupName%c_string, &
+            netcdfPutVar = c_netcdfPutVarReal(netcdfID, c_groupName%c_string, &
                     c_varName%c_string, c_data)
 
         type is (character(len = *))
             c_string_data%f_string_1D = data
             call c_string_data%to_c()
-            netcdfPutVar1D = c_netcdfPutVarString(netcdfID, c_groupName%c_string, &
+            netcdfPutVar = c_netcdfPutVarString(netcdfID, c_groupName%c_string, &
                     c_varName%c_string, c_string_data%c_string_1D)
             call c_string_data%cleanup()
         end select
@@ -146,50 +141,7 @@ contains
         ! Cleanup allocated strings
         call c_groupName%cleanup()
         call c_varName%cleanup()
-    end function netcdfPutVar1D
-
-    function netcdfPutVar2D(netcdfID, varName, data, groupName)
-        integer(c_int), value, intent(in) :: netcdfID
-        character(len = *), intent(in) :: varName
-        class(*), dimension(:,:), target, intent(in) :: data
-        character(len = *), optional, intent(in) :: groupName
-        integer(c_int) :: netcdfPutVar2D
-        type(f_c_string_t) :: c_groupName
-        type(f_c_string_t) :: c_varName
-        type(c_ptr) :: c_data
-        type(f_c_string_1D_t) :: c_string_data
-        integer(c_int) :: m, n
-
-        ! Helper to init the optional groupName
-        call init_optional_string(groupName, c_groupName)
-
-        ! Convert variable name to C-compatible string
-        c_varName%f_string = varName
-        call c_varName%to_c()
-
-        select type (data)
-        type is (integer(c_int))
-            c_data = c_loc(data)
-            netcdfPutVar2D = c_netcdfPutVarInt(netcdfID, c_groupName%c_string, &
-                    c_varName%c_string, c_data)
-
-        type is (integer(c_long))
-            data = reshape(data, [m, n])
-            c_data = c_loc(data)
-            netcdfPutVar2D = c_netcdfPutVarInt64(netcdfID, c_groupName%c_string, &
-                    c_varName%c_string, c_data)
-
-        type is (real(c_float))
-            c_data = c_loc(data)
-            netcdfPutVar2D = c_netcdfPutVarReal(netcdfID, c_groupName%c_string, &
-                    c_varName%c_string, c_data)
-        end select
-
-        ! Cleanup allocated strings
-        call c_groupName%cleanup()
-        call c_varName%cleanup()
-    end function netcdfPutVar2D
-
+    end function netcdfPutVar
 
     function netcdfPutAtt(&
             netcdfID, attName, data, varName, groupName)
@@ -222,8 +174,49 @@ contains
                     c_varName%c_string, c_attName%c_string, c_string_data%c_string)
             call c_string_data%cleanup()
         end select
-
+        call c_attName%cleanup()
+        call c_varName%cleanup()
+        call c_groupName%cleanup()
     end function netcdfPutAtt
+
+    function netcdfSetFill(netcdfID, varName, fillMode, fillValue, groupName)
+        integer(c_int), value, intent(in) :: netcdfID
+        character(len = *), intent(in) :: varName
+        integer(c_int), value, intent(in) :: fillMode
+        class(*), intent(in) :: fillValue
+        character(len = *), intent(in), optional :: groupName
+        integer(c_int) :: netcdfSetFill
+        type(f_c_string_t) :: c_groupName
+        type(f_c_string_t) :: c_varName
+        type(f_c_string_t) :: c_string_data
+
+        ! Helper to init the optional groupName
+        call init_optional_string(groupName, c_groupName)
+
+        ! Convert variable name to C-compatible string
+        c_varName%f_string = varName
+        call c_varName%to_c()
+        select type (fillValue)
+        type is (integer(c_int))
+            netcdfSetFill = c_netcdfSetFillInt(netcdfID, c_groupName%c_string, &
+                    c_varName%c_string, fillMode, fillValue)
+
+        type is (integer(c_long))
+            netcdfSetFill = c_netcdfSetFillInt64(netcdfID, c_groupName%c_string, &
+                    c_varName%c_string, fillMode, fillValue)
+
+        type is (real(c_float))
+            netcdfSetFill = c_netcdfSetFillReal(netcdfID, c_groupName%c_string, &
+                    c_varName%c_string, fillMode, fillValue)
+        type is (character(len = *))
+            netcdfSetFill = c_netcdfSetFillString(netcdfID, c_groupName%c_string, &
+                    c_varName%c_string, fillMode, c_null_ptr)
+        end select
+
+        ! Cleanup allocated strings
+        call c_groupName%cleanup()
+        call c_varName%cleanup()
+    end function netcdfSetFill
 
 
 end module netcdf_c_mod

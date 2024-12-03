@@ -48,7 +48,6 @@ contains
         status = netcdfPutVar(netcdfID, this%test_real_var_name, this%test_real_var_data, this%test_group_name)
         call assertEqual(0, status)
         status = netcdfPutVar(netcdfID, this%test_string_var_name, this%test_string_var_data, this%test_group_name)
-
         call assertEqual(0, status)
         status = netcdfClose(netcdfID)
         call assertEqual(0, status)

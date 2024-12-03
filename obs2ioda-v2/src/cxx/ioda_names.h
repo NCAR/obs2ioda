@@ -10,10 +10,6 @@ namespace Obs2Ioda {
             std::string
     > IODA_VARIABLE_NAMES;
 
-    extern std::unordered_map<
-            std::string,
-            std::string
-    > IODA_DIMENSION_NAMES;
 }
 
 #endif //OBS2IODA_IODA_NAMES_H

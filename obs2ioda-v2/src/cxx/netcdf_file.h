@@ -1,5 +1,6 @@
 #ifndef OBS2IODA_NETCDF_FILE_H
 #define OBS2IODA_NETCDF_FILE_H
+
 #include <netcdf>
 #include <map>
 #include <unordered_map>
@@ -14,8 +15,7 @@ namespace Obs2Ioda {
 
 // Wrapper for nc_create
     int netcdfCreate(
-            const char *path,
-            int *netcdfID
+            const char *path, int *netcdfID
     );
 
     int netcdfClose(int netcdfID);

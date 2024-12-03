@@ -339,9 +339,4 @@ std::unordered_map<
          {"percentConfidence",                               "percentConfidence"},
         };
 
-std::unordered_map<
-        std::string,
-        std::string> IODA_DIMENSION_NAMES = {
-        {"nvars", "nvars"}
-};
 }  // namespace Obs2Ioda

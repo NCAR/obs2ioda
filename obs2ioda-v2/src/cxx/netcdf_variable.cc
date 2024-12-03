@@ -59,6 +59,14 @@ namespace Obs2Ioda {
             const char *
     );
 
+    template int netcdfSetFill<const char>(
+            int,
+            const char *,
+            const char *,
+            int,
+            const char
+    );
+
     template int netcdfPutVar<int>(
             int,
             const char *,
@@ -95,10 +103,7 @@ namespace Obs2Ioda {
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
-                auto dimName = getIodaName(
-                        dimNames[i],
-                        IODA_DIMENSION_NAMES
-                );
+                auto dimName = removeWhiteSpace(dimNames[i]);
                 dims.push_back(file->getDim(dimName));
             }
             auto var = group->addVar(
@@ -267,6 +272,70 @@ namespace Obs2Ioda {
                     1
             );
         }
+    }
+
+    int netcdfSetFillInt(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            int fillValue
+    ) {
+        return netcdfSetFill(
+                netcdfID,
+                groupName,
+                varName,
+                fillMode,
+                fillValue
+        );
+    }
+
+    int netcdfSetFillReal(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            float fillValue
+    ) {
+        return netcdfSetFill(
+                netcdfID,
+                groupName,
+                varName,
+                fillMode,
+                fillValue
+        );
+    }
+
+    int netcdfSetFillInt64(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            long long fillValue
+    ) {
+        return netcdfSetFill(
+                netcdfID,
+                groupName,
+                varName,
+                fillMode,
+                fillValue
+        );
+    }
+
+    int netcdfSetFillString(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            int fillMode,
+            const char *fillValue
+    ) {
+        return netcdfSetFill(
+                netcdfID,
+                groupName,
+                varName,
+                fillMode,
+                ""
+        );
     }
 
     int netcdfGetVarString1D(
