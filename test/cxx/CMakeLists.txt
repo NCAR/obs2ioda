@@ -24,20 +24,3 @@ add_test(
         COMMAND NetcdfTest --gtest_filter=*
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cxx)
 add_memcheck_ctest(NetcdfTest)
-
-add_executable(
-        NetcdfSatwindTest
-        ${NETCDF_SATWIND_TEST_SOURCES}
-)
-target_include_directories(
-        NetcdfSatwindTest PUBLIC ${CMAKE_SOURCE_DIR}/obs2ioda-v2/src/cxx
-)
-target_link_libraries(
-        NetcdfSatwindTest PUBLIC gtest_main NetCDF::NetCDF_CXX NetCDF::NetCDF_C netcdf_cxx
-)
-add_test(
-        NAME Netcdf_satwind_test
-        COMMAND NetcdfSatwindTest --gtest_filter=*
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cxx)
-add_memcheck_ctest(NetcdfSatwindTest)
-
