@@ -19,7 +19,7 @@ namespace Obs2Ioda {
                     IODA_DIMENSION_NAMES
             );
             group->addDim(
-                    dimName,
+                    iodaDimName,
                     len
             );
             return 0;
