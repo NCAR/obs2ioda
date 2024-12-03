@@ -14,6 +14,10 @@ namespace Obs2Ioda {
             std::lock_guard<std::mutex> lock(map_mutex);
             auto file = NETCDF_FILE_MAP[netcdfID];
             auto group = getRootGroup(netcdfID, groupName);
+            auto iodaDimName = getIodaName(
+                    dimName,
+                    IODA_DIMENSION_NAMES
+            );
             group->addDim(
                     dimName,
                     len

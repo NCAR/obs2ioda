@@ -103,8 +103,11 @@ namespace Obs2Ioda {
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
-                auto dimName = removeWhiteSpace(dimNames[i]);
-                dims.push_back(file->getDim(dimName));
+                auto iodaDimName = getIodaName(
+                        dimNames[i],
+                        IODA_DIMENSION_NAMES
+                );
+                dims.push_back(file->getDim(iodaDimName));
             }
             auto var = group->addVar(
                     ioda3Name,

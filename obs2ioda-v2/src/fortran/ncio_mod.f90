@@ -249,7 +249,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             dim1_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, ncname, NF90_STRING, 1, &
                                  [dim1_name], "MetaData")
-!            status = netcdfSetFill(netcdfID, ncname, 1, nf90_string, "MetaData")
+            status = netcdfSetFill(netcdfID, ncname, 1, nf90_string, "MetaData")
          else
             if ( ncname == 'dateTime' ) then
                call def_netcdf_var(ncid_ncgrp(igrp),ncname,(/dim1/),type_var_info(i), &
