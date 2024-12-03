@@ -16,7 +16,7 @@ For instructions on how to install `pFUnit` and the `NCEP BUFR` library , please
 - [Installing NCEP BUFR Library](#installing-ncep-bufr-library)
 - [Installing pFUnit](#installing-pfunit)
 
-If you have an environment preconfigured for `mpas-jedi`, simply source that environment prior to building `obs2ioda`.
+If you have an environment preconfigured for `mpas-jedi` or `mpas-bundle`, simply source that environment prior to building `obs2ioda`.
 
 ### Build Instructions
 1. First, clone the repository into your preferred directory (`<OBS2IODA_ROOT_DIR>`):
@@ -43,7 +43,7 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
 
 1. Next, run CMake to configure the build. 
    ```bash
-   cmake <OBS2IODA_ROOT_DIR> ${OBS2IODA_CMAKE_ARGS} 
+   cmake <OBS2IODA_ROOT_DIR> 'echo ${OBS2IODA_CMAKE_ARGS}' 
    ```
 1. Finally, build `obs2ioda` using `CMake`'s build tool. In this case, we use `GNU Make`, but other build tools supported by `CMake` can be used:
    ```bash
