@@ -23,9 +23,17 @@ function(obs2ioda_fortran_target target target_main)
         )
     endif ()
     target_compile_options(${target} PRIVATE ${OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE})
-    target_link_libraries(${target} PUBLIC ${public_link_libraries} netcdf_c NetCDF::NetCDF_Fortran NetCDF::NetCDF_CXX NetCDF::NetCDF_C)
+    target_link_libraries(${target} PUBLIC ${public_link_libraries})
     add_executable(obs2ioda_${target} ${target_main})
     target_link_libraries(obs2ioda_${target} PUBLIC ${target})
+endfunction()
+
+function(obs2ioda_cxx_target target)
+    set_target_properties(${target} PROPERTIES INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+    set(public_link_libraries_name ${target}_PUBLIC_LINK_LIBRARIES)
+    set(public_link_libraries ${${public_link_libraries_name}})
+
+    target_link_libraries(${target} PUBLIC ${public_link_libraries})
 endfunction()
 
 # Function: add_memcheck_ctest

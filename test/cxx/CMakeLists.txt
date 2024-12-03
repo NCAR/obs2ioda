@@ -16,7 +16,7 @@ target_include_directories(
         NetcdfTest PUBLIC ${CMAKE_SOURCE_DIR}/obs2ioda-v2/src/cxx
 )
 target_link_libraries(
-        NetcdfTest PUBLIC gtest_main NetCDF::NetCDF_CXX NetCDF::NetCDF_C netcdf_c
+        NetcdfTest PUBLIC gtest_main NetCDF::NetCDF_CXX NetCDF::NetCDF_C netcdf_cxx
 )
 
 add_test(
@@ -33,7 +33,7 @@ target_include_directories(
         NetcdfSatwindTest PUBLIC ${CMAKE_SOURCE_DIR}/obs2ioda-v2/src/cxx
 )
 target_link_libraries(
-        NetcdfSatwindTest PUBLIC gtest_main NetCDF::NetCDF_CXX NetCDF::NetCDF_C netcdf_c
+        NetcdfSatwindTest PUBLIC gtest_main NetCDF::NetCDF_CXX NetCDF::NetCDF_C netcdf_cxx
 )
 add_test(
         NAME Netcdf_satwind_test

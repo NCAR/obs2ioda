@@ -26,14 +26,16 @@ find_package(NetCDF REQUIRED COMPONENTS Fortran CXX C)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 
-enable_testing()
-set(CMAKE_PREFIX_PATH ${PFUNIT_DIR})
-find_package(PFUNIT REQUIRED)
-INCLUDE(FetchContent)
-FETCHCONTENT_DECLARE(
-        googletest
-        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-FETCHCONTENT_MAKEAVAILABLE(googletest)
-add_subdirectory("${CMAKE_SOURCE_DIR}/test")
+if (BUILD_TESTS)
+    enable_testing()
+    set(CMAKE_PREFIX_PATH ${PFUNIT_DIR})
+    find_package(PFUNIT REQUIRED)
+    INCLUDE(FetchContent)
+    FETCHCONTENT_DECLARE(
+            googletest
+            URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+    )
+    FETCHCONTENT_MAKEAVAILABLE(googletest)
+    add_subdirectory("${CMAKE_SOURCE_DIR}/test")
+endif ()
 

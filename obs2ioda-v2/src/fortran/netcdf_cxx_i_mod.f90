@@ -1,4 +1,4 @@
-module netcdf_c_i_mod
+module netcdf_cxx_i_mod
     use iso_c_binding
     implicit none
     public
@@ -183,4 +183,4 @@ module netcdf_c_i_mod
         end function c_netcdfSetFillString
     end interface
 
-end module netcdf_c_i_mod
+end module netcdf_cxx_i_mod

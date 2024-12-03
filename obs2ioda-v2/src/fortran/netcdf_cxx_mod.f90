@@ -1,8 +1,8 @@
-module netcdf_c_mod
+module netcdf_cxx_mod
     use iso_c_binding, only : c_char, c_null_char, c_null_ptr, c_int
     use f_c_string_t_mod, only : f_c_string_t
     use f_c_string_1D_t_mod, only : f_c_string_1D_t
-    use netcdf_c_i_mod
+    use netcdf_cxx_i_mod
     use netcdf, only : NF90_INT, NF90_INT64, NF90_REAL
     implicit none
     public
@@ -219,4 +219,4 @@ contains
     end function netcdfSetFill
 
 
-end module netcdf_c_mod
+end module netcdf_cxx_mod

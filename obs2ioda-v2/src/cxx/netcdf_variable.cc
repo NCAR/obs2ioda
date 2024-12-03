@@ -337,7 +337,8 @@ namespace Obs2Ioda {
                 groupName,
                 varName,
                 fillMode,
-                ""
+                fillValue
+
         );
     }
 

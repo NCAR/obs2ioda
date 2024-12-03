@@ -13,7 +13,7 @@ use netcdf_mod, only: open_netcdf_for_write, close_netcdf, &
    put_netcdf_var, get_netcdf_dims
 use netcdf, only: nf90_string
 use ufo_vars_mod, only: ufo_vars_getindex
-use netcdf_c_mod
+use netcdf_cxx_mod
 
 implicit none
 

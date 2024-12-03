@@ -1,7 +1,7 @@
 module Test_netcdf_add_dim_mod
     use funit
-    use netcdf_c_mod
-    use netcdf_c_i_mod
+    use netcdf_cxx_mod
+    use netcdf_cxx_i_mod
     use Test_netcdf_fixture_t_mod
     implicit none
     @TestCase
