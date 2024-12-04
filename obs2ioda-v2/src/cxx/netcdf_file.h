@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
-#include "ioda_names.h"
 
 namespace Obs2Ioda {
 

@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
-#include "ioda_names.h"
 
 namespace Obs2Ioda {
 
@@ -17,26 +16,9 @@ namespace Obs2Ioda {
             std::shared_ptr<netCDF::NcFile>> NETCDF_FILE_MAP;
     extern std::mutex map_mutex;
 
-    std::string getIodaName(
-            const char *name,
-            const std::unordered_map<
-                    std::string,
-                    std::string
-            > &iodaNameMap
-    );
-
     int netcdfErrorMessage(
             netCDF::exceptions::NcException &e,
             int errorCode
-    );
-
-    std::shared_ptr<netCDF::NcGroup> getRootGroup(
-            int netcdfID,
-            const char *groupName
-    );
-
-    std::string removeWhiteSpace(
-            const std::string &name
     );
 
 }

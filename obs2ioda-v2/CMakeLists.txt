@@ -3,13 +3,8 @@
 include_directories(${NetCDF_INCLUDE_DIRS} )
 
 set(netcdf_cxx_SOURCES
-    netcdf_attribute.cc
-    netcdf_dimension.cc
-    netcdf_group.cc
-    netcdf_variable.cc
     netcdf_file.cc
     netcdf_utils.cc
-    ioda_names.cc
 )
 list(TRANSFORM netcdf_cxx_SOURCES PREPEND "src/cxx/")
 
