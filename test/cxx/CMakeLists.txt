@@ -1,26 +1,22 @@
-include_directories(${GTEST_INCLUDE_DIRS} )
+get_target_property(
+        GTEST_INCLUDE_DIRECTORIES GTest::gtest_main INTERFACE_INCLUDE_DIRECTORIES
+)
+
 set(NETCDF_TEST_SOURCES
     ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test_fixture.cc
     ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test.cc
         )
+set(NETCDF_TEST_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/test/cxx
+    ${CMAKE_SOURCE_DIR}/obs2ioda-v2/src/cxx
+    ${GTEST_INCLUDE_DIRECTORIES}
+    )
+set(NETCDF_TEST_LIBRARY_DEPENDENCIES
+    netcdf_cxx GTest::gtest_main
+    )
 
-set(NETCDF_SATWIND_TEST_SOURCES
-        netcdf_satwind_test.cc
-        )
-list(TRANSFORM NETCDF_SATWIND_TEST_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-add_executable(
-        NetcdfTest
-        ${NETCDF_TEST_SOURCES}
-)
-target_include_directories(
-        NetcdfTest PUBLIC ${CMAKE_SOURCE_DIR}/obs2ioda-v2/src/cxx
-)
-target_link_libraries(
-        NetcdfTest PUBLIC gtest_main NetCDF::NetCDF_CXX NetCDF::NetCDF_C netcdf_cxx
-)
-
-add_test(
-        NAME Netcdf_test
-        COMMAND NetcdfTest --gtest_filter=*
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cxx)
+add_cxx_ctest(NetcdfTest "${NETCDF_TEST_SOURCES}"
+                "${NETCDF_TEST_INCLUDE_DIRS}"
+              "${NETCDF_TEST_LIBRARY_DEPENDENCIES}"
+               )
 add_memcheck_ctest(NetcdfTest)

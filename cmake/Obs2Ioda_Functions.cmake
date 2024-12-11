@@ -1,5 +1,6 @@
-include (${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_CompilerFlags.cmake)
-function(obs2ioda_fortran_target target target_main)
+include(${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_CompilerFlags.cmake)
+
+function(obs2ioda_fortran_library target)
     set_target_properties(${target} PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR})
     target_include_directories(${target} INTERFACE $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}>
                                $<INSTALL_INTERFACE:${OBS2IODA_MODULE_DIR}>)
@@ -35,8 +36,13 @@ function(obs2ioda_fortran_target target target_main)
     endif ()
     target_compile_options(${target} PRIVATE ${OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE})
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
-    add_executable(obs2ioda_${target} ${target_main})
-    target_link_libraries(obs2ioda_${target} PUBLIC ${target})
+endfunction()
+
+function(obs2ioda_fortran_executable target)
+    set_target_properties(${target} PROPERTIES INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+    set(public_link_libraries_name ${target}_PUBLIC_LINK_LIBRARIES)
+    set(public_link_libraries ${${public_link_libraries_name}})
+    target_link_libraries(${target} PUBLIC ${public_link_libraries})
 endfunction()
 
 function(obs2ioda_cxx_target target)
@@ -71,14 +77,32 @@ endfunction()
 #
 function(add_memcheck_ctest target)
     find_program(VALGRIND "valgrind")
-    if(VALGRIND)
+    if (VALGRIND)
         message(STATUS "Valgrind found: ${VALGRIND}")
         message(STATUS "Adding memory check for test: ${target}")
         set(VALGRIND_COMMAND valgrind --leak-check=full --error-exitcode=1 --undef-value-errors=no)
         add_test(NAME ${target}_memcheck
                  COMMAND ${VALGRIND_COMMAND} $<TARGET_FILE:${target}>)
-    else()
+    else ()
         message(STATUS "Valgrind not found")
         message(STATUS "Memory check for test: ${target} will not be added")
-    endif()
+    endif ()
 endfunction()
+
+function(add_fortran_ctest test_name test_sources library_deps)
+    add_executable("Test_${test_name}" ${test_sources})
+    target_link_libraries("Test_${test_name}" ${library_deps})
+    add_test(NAME ${test_name}
+             COMMAND ${CMAKE_BINARY_DIR}/bin/Test_${test_name})
+endfunction()
+
+function(add_cxx_ctest name sources include_dirs library_deps)
+    add_executable(${name} ${sources})
+    target_include_directories(${name} PUBLIC ${include_dirs})
+    target_link_libraries(${name} PUBLIC ${library_deps})
+    add_test(
+            NAME ${name}
+            COMMAND ${name} --gtest_filter=*
+    )
+endfunction()
+

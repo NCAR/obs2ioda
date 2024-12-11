@@ -1,16 +1,14 @@
 module Test_netcdf_create_mod
-    use funit
     use netcdf_cxx_mod
     use netcdf_cxx_i_mod
     use Test_netcdf_fixture_t_mod
+    use fortran_test_framework_mod, only: assertEqual
     implicit none
-    @TestCase
     type, extends(Test_netcdf_fixture_t) :: Test_netcdf_create_t
     contains
         procedure :: test_netcdfCreate => test_netcdfCreate
     end type
 contains
-    @Test
     subroutine test_netcdfCreate(this)
         class(Test_netcdf_create_t), intent(inout) :: this
         integer(c_int) :: netcdfID

@@ -1,10 +1,10 @@
 module Test_netcdf_fixture_t_mod
-    use funit
-    use f_c_string_t_mod
+    use iso_c_binding, only : c_int, c_float
     use kinds, only: i_llong
-    use iso_c_binding, only : c_int, c_float, c_long
+    use define_mod, only: StrLen
     implicit none
-    !Define NetCDF type constants
+
+    ! Define NetCDF type constants
     integer, parameter :: NC_BYTE    = 1    ! 1-byte signed integer
     integer, parameter :: NC_CHAR    = 2    ! 1-byte character
     integer, parameter :: NC_SHORT   = 3    ! 2-byte signed integer
@@ -18,8 +18,8 @@ module Test_netcdf_fixture_t_mod
     integer, parameter :: NC_INT64   = 10   ! 8-byte signed integer
     integer, parameter :: NC_UINT64  = 11   ! 8-byte unsigned integer
     integer, parameter :: NC_STRING  = 12   ! Variable-length string
-    @TestCase
-    type, extends(TestCase) :: Test_netcdf_fixture_t
+
+    type :: Test_netcdf_fixture_t
         character(len=:), allocatable :: test_file_path
         character(len=:), allocatable :: test_group_path
         character(len=:), allocatable :: test_dim_path
@@ -41,23 +41,22 @@ module Test_netcdf_fixture_t_mod
         integer(c_int), allocatable, dimension(:) :: test_int_var_data
         integer(i_llong), allocatable, dimension(:) :: test_int64_var_data
         real(c_float), allocatable, dimension(:) :: test_real_var_data
-        character(len=:), allocatable, dimension(:) :: test_string_var_data
+        character(len=StrLen), allocatable, dimension(:) :: test_string_var_data
 
         character(len=:), allocatable :: test_int_att_name
         character(len=:), allocatable :: test_string_att_name
         character(len=:), allocatable :: test_string_att_data
         integer(c_int) :: test_int_att_data
-
-
-
     contains
-        procedure :: setUp => setUp
-        procedure :: tearDown => tearDown
+        procedure :: setUp
+        procedure :: tearDown
     end type Test_netcdf_fixture_t
 
-    contains
+contains
+
     subroutine setUp(this)
         class(Test_netcdf_fixture_t), intent(inout) :: this
+
         this%test_file_path = "test_file.nc"
         this%test_group_path = "test_group.nc"
         this%test_dim_path = "test_dim.nc"
@@ -76,9 +75,12 @@ module Test_netcdf_fixture_t_mod
         this%test_int64_var_name = "int64_var"
         this%test_real_var_name = "real_var"
         this%test_string_var_name = "string_var"
+        allocate(this%test_int_var_data(5))
+        allocate(this%test_int64_var_data(5))
+        allocate(this%test_real_var_data(5))
+        allocate(this%test_string_var_data(5))
         this%test_int_var_data = [1, 2, 3, 4, 5]
-        this%test_int64_var_data = [11111, 22222, &
-                33333, 44444, 55555]
+        this%test_int64_var_data = [11111, 22222, 33333, 44444, 55555]
         this%test_real_var_data = [1.1, 2.2, 3.3, 4.4, 5.5]
         this%test_string_var_data = ["one  ", "two  ", "three", "four ", "five "]
 
@@ -90,6 +92,11 @@ module Test_netcdf_fixture_t_mod
 
     subroutine tearDown(this)
         class(Test_netcdf_fixture_t), intent(inout) :: this
+        ! Clean up allocated arrays
+        if (allocated(this%test_int_var_data)) deallocate(this%test_int_var_data)
+        if (allocated(this%test_int64_var_data)) deallocate(this%test_int64_var_data)
+        if (allocated(this%test_real_var_data)) deallocate(this%test_real_var_data)
+        if (allocated(this%test_string_var_data)) deallocate(this%test_string_var_data)
     end subroutine tearDown
 
 end module Test_netcdf_fixture_t_mod
