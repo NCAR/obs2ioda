@@ -6,7 +6,7 @@ obs2ioda-v2 utilizes CMake as its primary build system. Follow the steps below t
 
 Prior to building `obs2ioda`, ensure that you have installed the following libraries:
 
-- **CMake**: Required (version 3.20 or higher).
+- **CMake**: Required (version 3.12 or higher).
 - **NetCDF**: Required.
 - **NCEP BUFR Library**: Required.
 - **pFUnit**: Optional (Needed for testing).
