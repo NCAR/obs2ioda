@@ -91,6 +91,7 @@ endfunction()
 
 function(add_fortran_ctest test_name test_sources library_deps)
     add_executable("Test_${test_name}" ${test_sources})
+    message(STATUS "Adding test: ${test_name} with sources: ${test_sources} and dependencies: ${library_deps}")
     target_link_libraries("Test_${test_name}" ${library_deps})
     add_test(NAME ${test_name}
              COMMAND ${CMAKE_BINARY_DIR}/bin/Test_${test_name})
@@ -105,4 +106,3 @@ function(add_cxx_ctest name sources include_dirs library_deps)
             COMMAND ${name} --gtest_filter=*
     )
 endfunction()
-

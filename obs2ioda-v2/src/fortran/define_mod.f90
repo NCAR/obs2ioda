@@ -106,6 +106,7 @@ character(len=nstring), dimension(n_ncdim) :: name_ncdim = &
       'nvars     '  &
     , 'nlocs     '  &
     , 'nstring   '  &
+!    , 'ndatetime '  &
    /)
 character(len=nstring), dimension(n_ncgrp) :: name_ncgrp = &
    (/               &

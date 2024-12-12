@@ -12,7 +12,7 @@ module f_c_string_t_mod
         ! Length of the Fortran string
         integer :: n=-1
 
-        contains
+    contains
         ! Type-bound procedures
         procedure :: to_c => to_c
         procedure :: to_f => to_f
@@ -58,4 +58,3 @@ contains
     end subroutine cleanup
 
 end module f_c_string_t_mod
-

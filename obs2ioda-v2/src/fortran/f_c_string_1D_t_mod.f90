@@ -116,4 +116,3 @@ contains
     end subroutine cleanup
 
 end module f_c_string_1D_t_mod
-
