@@ -14,9 +14,8 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 
 
 # Set the Fortran compiler and flags
-set(NCEP_BUFR_LIB CACHE STRING "")
+set(NCEP_BUFR_LIB CACHE STRING "" )
 # Set to ON to build tests. Default is OFF. If testing is enabled,
-# pFUnit is required to be installed.
 set(BUILD_TESTS CACHE BOOL OFF)
 
 # Find required packages
