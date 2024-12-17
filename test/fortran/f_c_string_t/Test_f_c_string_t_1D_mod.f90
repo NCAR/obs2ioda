@@ -28,7 +28,7 @@ contains
 
         f_c_string_1D_2%m = m
         f_c_string_1D_2%n = n
-        f_string_1D_upper = f_c_string_1D_2%to_f2(c_string_1D)
+        f_string_1D_upper = f_c_string_1D_2%to_f2(c_string_1D, m, n)
 
         do i = 1, m
             call assertEqual(f_string_1D_upper_ref(i), &

@@ -47,13 +47,12 @@ contains
         character(len = :), allocatable, intent(in) :: f_string_1D(:)
         character(len = :), allocatable :: f_string
         type(c_ptr) :: c_string_1D
-        integer :: i
-        !this%f_string_1D = f_string_1D
-        this%m = size(f_string_1D)
-        this%n = len(f_string_1D(1))
-        allocate(this%f_c_string_t_array(this%m))
-        allocate(this%fc_string_1D(this%m))
-        do i = 1, this%m
+        integer :: i, m, n
+        m = size(f_string_1D)
+        n = len(f_string_1D(1))
+        allocate(this%f_c_string_t_array(m))
+        allocate(this%fc_string_1D(m))
+        do i = 1, m
             f_string = f_string_1D(i)
             this%fc_string_1D(i) = this%f_c_string_t_array(i)%to_c2(f_string)
         end do
@@ -96,23 +95,21 @@ contains
 
     end subroutine to_f
 
-    function to_f2(this, c_string_1D) result(f_string_1D)
+    function to_f2(this, c_string_1D, m, n) result(f_string_1D)
         class(f_c_string_1D_t), intent(inout) :: this
         type(c_ptr), intent(in) :: c_string_1D
+        integer, intent(in) :: m, n
         character(len = :), allocatable :: f_string_1D(:)
         type(c_ptr), pointer :: fc_string_1D_pointer(:)
         integer :: i
-        if (this%m < 0) then
+        if (m < 0) then
             return
         end if
-        if (this%n < 0) then
+        if (n < 0) then
             return
-        end if
-        if (allocated(f_string_1D)) then
-            deallocate(f_string_1D)
         end if
         if (allocated(this%f_c_string_t_array)) then
-            do i = 1, this%m
+            do i = 1, m
                 call this%f_c_string_t_array(i)%cleanup()
             end do
             deallocate(this%f_c_string_t_array)
@@ -120,15 +117,15 @@ contains
         if (allocated(this%fc_string_1D)) then
             deallocate(this%fc_string_1D)
         end if
-        allocate(character(len = this%n) :: f_string_1D(1:this%m))
-        allocate(this%f_c_string_t_array(this%m))
-        allocate(this%fc_string_1D(this%m))
-        call c_f_pointer(c_string_1D, fc_string_1D_pointer, [this%m])
-        do i = 1, this%m
-            this%f_c_string_t_array(i)%c_string = fc_string_1D_pointer(i)
-            this%f_c_string_t_array(i)%n = this%n
-            call this%f_c_string_t_array(i)%to_f()
-            f_string_1D(i) = this%f_c_string_t_array(i)%f_string
+        allocate(character(len = n) :: f_string_1D(1:m))
+        allocate(this%f_c_string_t_array(m))
+        allocate(this%fc_string_1D(m))
+        call c_f_pointer(c_string_1D, fc_string_1D_pointer, [m])
+        do i = 1, m
+!            this%f_c_string_t_array(i)%c_string = fc_string_1D_pointer(i)
+!            this%f_c_string_t_array(i)%n = n
+            f_string_1D(i) = this%f_c_string_t_array(i)%to_f2(fc_string_1D_pointer(i))
+!            f_string_1D(i) = this%f_c_string_t_array(i)%f_string
         end do
 
     end function to_f2
