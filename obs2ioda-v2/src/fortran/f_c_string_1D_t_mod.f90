@@ -15,33 +15,16 @@ module f_c_string_1D_t_mod
         integer :: m = -1, n = -1
 
     contains
-        ! Type-bound procedures
-        procedure :: init => init
         procedure :: to_c => to_c
+        procedure :: to_c1 => to_c
+        procedure :: to_c2 => to_c2
         procedure :: to_f => to_f
+        procedure :: to_f1 => to_f
+        procedure :: to_f2 => to_f2
         procedure :: cleanup => cleanup
     end type f_c_string_1D_t
 
 contains
-    ! Convert the Fortran string to a C-compatible null-terminated string.
-    subroutine init(this, m, n)
-        class(f_c_string_1D_t), target, intent(inout) :: this
-        integer, intent(in) :: m, n
-        character(len=n), dimension(m) :: a
-        integer :: i
-        this%m = m
-        this%n = n
-        allocate(this%f_c_string_t_array(this%m))
-        allocate(this%fc_string_1D(this%m))
-        a = repeat('a', n)
-        this%f_string_1D = a
-        do i = 1, this%m
-            this%f_c_string_t_array(i)%f_string = this%f_string_1D(i)
-            call this%f_c_string_t_array(i)%to_c()
-            this%fc_string_1D(i) = this%f_c_string_t_array(i)%c_string
-        end do
-        this%c_string_1D = c_loc(this%fc_string_1D)
-    end subroutine init
     ! Convert the Fortran string to a C-compatible null-terminated string.
     subroutine to_c(this)
         class(f_c_string_1D_t), target, intent(inout) :: this
@@ -58,6 +41,24 @@ contains
         this%c_string_1D = c_loc(this%fc_string_1D)
 
     end subroutine to_c
+
+    function to_c2(this, f_string_1D) result(c_string_1D)
+        class(f_c_string_1D_t), target, intent(inout) :: this
+        character(len = :), allocatable, intent(in) :: f_string_1D(:)
+        character(len = :), allocatable :: f_string
+        type(c_ptr) :: c_string_1D
+        integer :: i
+        !this%f_string_1D = f_string_1D
+        this%m = size(f_string_1D)
+        this%n = len(f_string_1D(1))
+        allocate(this%f_c_string_t_array(this%m))
+        allocate(this%fc_string_1D(this%m))
+        do i = 1, this%m
+            f_string = f_string_1D(i)
+            this%fc_string_1D(i) = this%f_c_string_t_array(i)%to_c2(f_string)
+        end do
+        c_string_1D = c_loc(this%fc_string_1D)
+    end function to_c2
 
     ! Convert a C-compatible null-terminated string to a Fortran string.
     subroutine to_f(this)
@@ -94,6 +95,43 @@ contains
         end do
 
     end subroutine to_f
+
+    function to_f2(this, c_string_1D) result(f_string_1D)
+        class(f_c_string_1D_t), intent(inout) :: this
+        type(c_ptr), intent(in) :: c_string_1D
+        character(len = :), allocatable :: f_string_1D(:)
+        type(c_ptr), pointer :: fc_string_1D_pointer(:)
+        integer :: i
+        if (this%m < 0) then
+            return
+        end if
+        if (this%n < 0) then
+            return
+        end if
+        if (allocated(f_string_1D)) then
+            deallocate(f_string_1D)
+        end if
+        if (allocated(this%f_c_string_t_array)) then
+            do i = 1, this%m
+                call this%f_c_string_t_array(i)%cleanup()
+            end do
+            deallocate(this%f_c_string_t_array)
+        end if
+        if (allocated(this%fc_string_1D)) then
+            deallocate(this%fc_string_1D)
+        end if
+        allocate(character(len = this%n) :: f_string_1D(1:this%m))
+        allocate(this%f_c_string_t_array(this%m))
+        allocate(this%fc_string_1D(this%m))
+        call c_f_pointer(c_string_1D, fc_string_1D_pointer, [this%m])
+        do i = 1, this%m
+            this%f_c_string_t_array(i)%c_string = fc_string_1D_pointer(i)
+            this%f_c_string_t_array(i)%n = this%n
+            call this%f_c_string_t_array(i)%to_f()
+            f_string_1D(i) = this%f_c_string_t_array(i)%f_string
+        end do
+
+    end function to_f2
 
     subroutine cleanup(this)
         class(f_c_string_1D_t), intent(inout) :: this

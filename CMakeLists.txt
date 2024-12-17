@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_Functions.cmake")
 # Define the project
-project(obs2ioda LANGUAGES Fortran)
+project(obs2ioda LANGUAGES Fortran C)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -23,8 +23,8 @@ find_package(NetCDF REQUIRED COMPONENTS Fortran C)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 
-if (BUILD_TESTS)
+#if (BUILD_TESTS)
     enable_testing()
     add_subdirectory("${CMAKE_SOURCE_DIR}/test")
-endif()
+#endif()
 
