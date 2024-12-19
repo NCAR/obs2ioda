@@ -23,13 +23,11 @@ contains
         f_string_1D_ref = ["abc", "def", "ghi", "jkl", "mno"]
         f_string_1D_upper_ref = ["ABC", "DEF", "GHI", "JKL", "MNO"]
 
-        c_string_1D = f_c_string_1D_1%to_c2(f_string_1D_ref)
+        c_string_1D = f_c_string_1D_1%to_c(f_string_1D_ref)
 
         call to_upper_array(c_string_1D, m)
 
-        f_c_string_1D_2%m = m
-        f_c_string_1D_2%n = n
-        f_string_1D_upper = f_c_string_1D_2%to_f2(c_string_1D, m, n)
+        f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m, n)
 
         do i = 1, m
             call assertEqual(f_string_1D_upper_ref(i), &

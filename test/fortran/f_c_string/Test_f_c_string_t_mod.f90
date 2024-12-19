@@ -21,14 +21,14 @@ module Test_f_c_string_t_mod
         f_string_upper_ref = "FOO"
         n = len(f_string_ref)
 
-        c_string = f_c_string1%to_c2(f_string_ref)
+        c_string = f_c_string1%to_c(f_string_ref)
         c_string_len = strlen(c_string)
 
         call assertEqual(len(f_string_ref), c_string_len, status, assert)
 
         call to_upper(c_string)
 
-        f_string_upper = f_c_string2%to_f2(c_string)
+        f_string_upper = f_c_string2%to_f(c_string)
 
         call assertEqual(f_string_upper_ref, f_string_upper, status, assert)
 
