@@ -84,12 +84,7 @@ contains
             f_string = ""
             return
         end if
-
-        ! Safe to assign the value to n
         n = c_strlen_result
-        if (allocated(f_string)) then
-            deallocate(f_string)
-        end if
         allocate(character(len = n) :: f_string)
         call c_f_pointer(c_string, fc_string_pointer, [n + 1])
         f_string = transfer(fc_string_pointer(1:n), f_string)
