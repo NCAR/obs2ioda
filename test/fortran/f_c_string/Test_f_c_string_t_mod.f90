@@ -8,6 +8,7 @@ module Test_f_c_string_t_mod
     subroutine Test_f_c_string_t()
         type(f_c_string_t), allocatable :: f_c_string1
         type(f_c_string_t), allocatable :: f_c_string2
+        type(f_c_string_t), allocatable :: f_c_string_empty
         character(len=:), allocatable :: f_string
         character(len=:), allocatable :: f_string_upper
         character(len=:), allocatable :: f_string_ref
@@ -22,16 +23,19 @@ module Test_f_c_string_t_mod
 
         allocate(f_c_string1)
         allocate(f_c_string2)
+        allocate(f_c_string_empty)
+        allocate(f_c_string_huge)
+
+        c_string = f_c_string_empty%to_c("")
+        c_string_len= strlen(c_string)
+        call assertEqual(0, c_string_len, status, assert)
 
         c_string = f_c_string1%to_c(f_string_ref)
         c_string_len = strlen(c_string)
-
         call assertEqual(len(f_string_ref), c_string_len, status, assert)
 
         call to_upper(c_string)
-
         f_string_upper = f_c_string2%to_f(c_string)
-
         call assertEqual(f_string_upper_ref, f_string_upper, status, assert)
 
     end subroutine Test_f_c_string_t

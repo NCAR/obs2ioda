@@ -49,7 +49,7 @@ contains
     ! - expected (integer, in): The expected value.
     ! - actual (integer, in): The actual value.
     ! - status (integer, out): Status code (0 for success, 1 for failure).
-    ! - assert_procedure (procedure, optional): Procedure to handle assertion logic.
+    ! - assert_procedure (procedure, optional): Custom procedure to handle assertion logic.
     subroutine assertEqual_integer(expected, actual, status, assert_procedure)
         implicit none
         integer, intent(in) :: expected, actual

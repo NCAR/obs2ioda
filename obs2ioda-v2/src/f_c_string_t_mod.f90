@@ -77,7 +77,16 @@ contains
         character(len = :), allocatable :: f_string
         character(len = 1, kind = c_char), pointer :: fc_string_pointer(:)
         integer :: n
-        n = strlen(c_string)
+        integer(c_size_t) :: c_strlen_result
+
+        c_strlen_result = strlen(c_string)
+        if (c_strlen_result > HUGE(n)) then
+            f_string = ""
+            return
+        end if
+
+        ! Safe to assign the value to n
+        n = c_strlen_result
         if (allocated(f_string)) then
             deallocate(f_string)
         end if

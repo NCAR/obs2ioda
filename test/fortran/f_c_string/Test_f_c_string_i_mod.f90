@@ -8,12 +8,12 @@ module Test_f_c_string_i_mod
     interface
         subroutine to_upper(c_string) bind(C, name = "to_upper")
             import :: c_ptr
-            type(c_ptr), intent(inout) :: c_string
+            type(c_ptr), value, intent(in) :: c_string
         end subroutine to_upper
 
         subroutine to_upper_array(c_string_array, n) bind(C, name = "to_upper_array")
             import :: c_ptr, c_int
-            type(c_ptr), intent(inout) :: c_string_array
+            type(c_ptr), value, intent(in) :: c_string_array
             integer(c_int), value  :: n
         end subroutine to_upper_array
     end interface
