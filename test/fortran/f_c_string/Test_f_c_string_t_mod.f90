@@ -14,17 +14,16 @@ module Test_f_c_string_t_mod
         character(len=:), allocatable :: f_string_ref
         character(len=:), allocatable :: f_string_upper_ref
         type(c_ptr) :: c_string
-        integer :: c_string_len, n, status
+        integer :: c_string_len, f_string_len, status
 
         status = 0
         f_string_ref = "foo"
         f_string_upper_ref = "FOO"
-        n = len(f_string_ref)
+        f_string_len = len(f_string_ref)
 
         allocate(f_c_string1)
         allocate(f_c_string2)
         allocate(f_c_string_empty)
-        allocate(f_c_string_huge)
 
         c_string = f_c_string_empty%to_c("")
         c_string_len= strlen(c_string)
@@ -32,7 +31,7 @@ module Test_f_c_string_t_mod
 
         c_string = f_c_string1%to_c(f_string_ref)
         c_string_len = strlen(c_string)
-        call assertEqual(len(f_string_ref), c_string_len, status, assert)
+        call assertEqual(f_string_len, c_string_len, status, assert)
 
         call to_upper(c_string)
         f_string_upper = f_c_string2%to_f(c_string)
