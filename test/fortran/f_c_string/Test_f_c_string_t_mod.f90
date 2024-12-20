@@ -1,7 +1,6 @@
 module Test_f_c_string_t_mod
     use fortran_test_framework_mod, only : assertEqual, assert
-    use f_c_string_t_mod, only : f_c_string_t
-    use f_c_string_i_mod, only : strlen
+    use f_c_string_t_mod, only : f_c_string_t, strlen
     use Test_f_c_string_i_mod, only : to_upper
     use iso_c_binding, only : c_null_char, c_ptr
     implicit none

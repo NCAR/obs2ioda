@@ -1,8 +1,18 @@
+! Module providing functionality for handling one-dimensional arrays of
+! Fortran strings as C-compatible null-terminated strings.
 module f_c_string_1D_t_mod
     use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer, c_null_ptr
     use f_c_string_t_mod, only : f_c_string_t
     implicit none
 
+    ! Type to handle a 1D array of Fortran strings and convert them to/from
+    ! C-compatible null-terminated strings.
+    !
+    ! Array of f_c_string_t, each representing a null-terminated C string.
+    ! type(f_c_string_t), allocatable :: f_c_string_t_array(:)
+    !
+    ! Array of C pointers, each pointing to a null-terminated string in memory.
+    ! type(c_ptr), allocatable :: fc_string_1D(:)
     type :: f_c_string_1D_t
         ! Allocatable C-compatible null-terminated string
         type(f_c_string_t), allocatable :: f_c_string_t_array(:)
@@ -16,6 +26,16 @@ module f_c_string_1D_t_mod
 
 contains
 
+    ! Converts a Fortran array of strings to a C-compatible null-terminated
+    ! string array and stores it internally as `fc_string_1D`.
+    !
+    ! Arguments:
+    ! - this: The instance of f_c_string_1D_t being operated on.
+    ! - f_string_1D: A 1D Fortran array of allocatable character strings.
+    !
+    ! Returns:
+    ! - c_string_1D: A C pointer to the first element of the null-terminated
+    !   string array in memory.
     function to_c(this, f_string_1D) result(c_string_1D)
         class(f_c_string_1D_t), target, intent(inout) :: this
         character(len = :), allocatable, intent(in) :: f_string_1D(:)
@@ -39,6 +59,19 @@ contains
         c_string_1D = c_loc(this%fc_string_1D)
     end function to_c
 
+    ! Converts a C-compatible null-terminated string array back into a
+    ! Fortran array of strings.
+    !
+    ! Arguments:
+    ! - this: The instance of f_c_string_1D_t being operated on.
+    ! - c_string_1D: A C pointer to the first element of a null-terminated
+    !   string array in memory.
+    ! - m: The number of strings in the array.
+    ! - n: The maximum length of each string.
+    !
+    ! Returns:
+    ! - f_string_1D: A Fortran array of strings reconstructed from the C
+    !   string array.
     function to_f(this, c_string_1D, m, n) result(f_string_1D)
         class(f_c_string_1D_t), intent(inout) :: this
         type(c_ptr), intent(in) :: c_string_1D
@@ -71,6 +104,11 @@ contains
 
     end function to_f
 
+    ! Automatically deallocates memory associated with the instance of
+    ! f_c_string_1D_t when it goes out of scope or is explicitly deallocated.
+    !
+    ! Arguments:
+    ! - this: The instance of f_c_string_1D_t being finalized.
     subroutine cleanup(this)
         type(f_c_string_1D_t), intent(inout) :: this
         integer :: i

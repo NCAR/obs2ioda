@@ -38,12 +38,14 @@ contains
         end do
 
         f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m, n)
+        !Test if allocation logic is correct in to_f
         do i = 1, m
             call assertEqual(f_string_1D_upper_ref(i), &
                     f_string_1D_upper(i), status, assert)
         end do
 
         call assertEqual(.true., allocated(f_c_string_1D_1%fc_string_1D), status, assert)
+        ! Tests if the final subroutine is called
         call foo(f_c_string_1D_1)
         call assertEqual(.false., allocated(f_c_string_1D_1%fc_string_1D), status, assert)
 

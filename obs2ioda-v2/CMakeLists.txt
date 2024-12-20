@@ -18,7 +18,6 @@ set(v2_SOURCES
     utils_mod.f90
     test/fortran_test_framework_mod.f90
     f_c_string_t_mod.f90
-    f_c_string_i_mod.f90
     f_c_string_1D_t_mod.f90
 )
 list(TRANSFORM v2_SOURCES PREPEND "src/")
