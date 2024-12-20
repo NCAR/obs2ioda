@@ -7,9 +7,9 @@ module Test_f_c_string_1D_mod
 
 contains
 
-    subroutine foo(f_c_string_1D)
+    subroutine invoke_f_c_string_1D_final(f_c_string_1D)
         type(f_c_string_1D_t), intent(out) :: f_c_string_1D
-    end subroutine foo
+    end subroutine invoke_f_c_string_1D_final
 
     subroutine Test_f_c_string_t_1D()
         type(f_c_string_1D_t) :: f_c_string_1D_1
@@ -46,7 +46,7 @@ contains
 
         call assertEqual(.true., allocated(f_c_string_1D_1%fc_string_1D), status, assert)
         ! Tests if the final subroutine is called
-        call foo(f_c_string_1D_1)
+        call invoke_f_c_string_1D_final(f_c_string_1D_1)
         call assertEqual(.false., allocated(f_c_string_1D_1%fc_string_1D), status, assert)
 
     end subroutine Test_f_c_string_t_1D
