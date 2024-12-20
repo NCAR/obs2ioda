@@ -11,6 +11,7 @@ module f_c_string_1D_t_mod
     contains
         procedure :: to_c => to_c
         procedure :: to_f => to_f
+        final :: cleanup
     end type f_c_string_1D_t
 
 contains
@@ -23,6 +24,12 @@ contains
         integer :: i, m, n
         m = size(f_string_1D)
         n = len(f_string_1D(1))
+        if (allocated(this%fc_string_1D)) then
+            deallocate(this%fc_string_1D)
+        end if
+        if (allocated(this%f_c_string_t_array)) then
+            deallocate(this%f_c_string_t_array)
+        end if
         allocate(this%f_c_string_t_array(m))
         allocate(this%fc_string_1D(m))
         do i = 1, m
@@ -45,6 +52,15 @@ contains
         if (n < 0) then
             return
         end if
+        if (allocated(f_string_1D)) then
+            deallocate(f_string_1D)
+        end if
+        if (allocated(this%fc_string_1D)) then
+            deallocate(this%fc_string_1D)
+        end if
+        if (allocated(this%f_c_string_t_array)) then
+            deallocate(this%f_c_string_t_array)
+        end if
         allocate(character(len = n) :: f_string_1D(1:m))
         allocate(this%f_c_string_t_array(m))
         allocate(this%fc_string_1D(m))
@@ -54,5 +70,16 @@ contains
         end do
 
     end function to_f
+
+    subroutine cleanup(this)
+        type(f_c_string_1D_t), intent(inout) :: this
+        integer :: i
+        if (allocated(this%fc_string_1D)) then
+            deallocate(this%fc_string_1D)
+        end if
+        if (allocated(this%f_c_string_t_array)) then
+            deallocate(this%f_c_string_t_array)
+        end if
+    end subroutine cleanup
 
 end module f_c_string_1D_t_mod

@@ -7,8 +7,8 @@ module Test_f_c_string_t_mod
     implicit none
     contains
     subroutine Test_f_c_string_t()
-        type(f_c_string_t) :: f_c_string1
-        type(f_c_string_t) :: f_c_string2
+        type(f_c_string_t), allocatable :: f_c_string1
+        type(f_c_string_t), allocatable :: f_c_string2
         character(len=:), allocatable :: f_string
         character(len=:), allocatable :: f_string_upper
         character(len=:), allocatable :: f_string_ref
@@ -20,6 +20,9 @@ module Test_f_c_string_t_mod
         f_string_ref = "foo"
         f_string_upper_ref = "FOO"
         n = len(f_string_ref)
+
+        allocate(f_c_string1)
+        allocate(f_c_string2)
 
         c_string = f_c_string1%to_c(f_string_ref)
         c_string_len = strlen(c_string)

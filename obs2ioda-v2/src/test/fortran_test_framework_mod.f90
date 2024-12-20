@@ -49,12 +49,12 @@ contains
     ! - expected (integer, in): The expected value.
     ! - actual (integer, in): The actual value.
     ! - status (integer, out): Status code (0 for success, 1 for failure).
-    ! - assert_procedure (procedure, optional): Custom procedure to handle assertion logic.
+    ! - assert_procedure (procedure): Procedure to handle assertion logic.
     subroutine assertEqual_integer(expected, actual, status, assert_procedure)
         implicit none
         integer, intent(in) :: expected, actual
         integer, intent(out) :: status
-        procedure(assert_interface), optional :: assert_procedure
+        procedure(assert_interface) :: assert_procedure
         procedure(assert_interface), pointer :: assert_handler => assert
 
         if (present(assert_procedure)) then
@@ -75,12 +75,12 @@ contains
     ! - expected (character, in): The expected string value.
     ! - actual (character, in): The actual string value.
     ! - status (integer, out): Status code (0 for success, 1 for failure).
-    ! - assert_procedure (procedure, optional): Custom procedure to handle assertion logic.
+    ! - assert_procedure (procedure): Procedure to handle assertion logic.
     subroutine assertEqual_string(expected, actual, status, assert_procedure)
         implicit none
         character(len = *), intent(in) :: expected, actual
         integer, intent(out) :: status
-        procedure(assert_interface), optional :: assert_procedure
+        procedure(assert_interface) :: assert_procedure
         procedure(assert_interface), pointer :: assert_handler => assert
 
         if (present(assert_procedure)) then
@@ -101,12 +101,12 @@ contains
     ! - expected (logical, in): The expected logical value.
     ! - actual (logical, in): The actual logical value.
     ! - status (integer, out): Status code (0 for success, 1 for failure).
-    ! - assert_procedure (procedure, optional): Custom procedure to handle assertion logic.
+    ! - assert_procedure (procedure): Procedure to handle assertion logic.
     subroutine assertEqual_logical(expected, actual, status, assert_procedure)
         implicit none
         logical, intent(in) :: expected, actual
         integer, intent(out) :: status
-        procedure(assert_interface), optional :: assert_procedure
+        procedure(assert_interface) :: assert_procedure
         procedure(assert_interface), pointer :: assert_handler => assert
 
         if (present(assert_procedure)) then
