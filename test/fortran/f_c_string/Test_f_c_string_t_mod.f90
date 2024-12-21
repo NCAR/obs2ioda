@@ -36,6 +36,5 @@ module Test_f_c_string_t_mod
         call to_upper(c_string)
         f_string_upper = f_c_string2%to_f(c_string)
         call assertEqual(f_string_upper_ref, f_string_upper, status, assert)
-
     end subroutine Test_f_c_string_t
 end module Test_f_c_string_t_mod

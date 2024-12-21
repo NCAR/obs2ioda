@@ -34,16 +34,15 @@ contains
     ! - f_string_1D: A 1D Fortran array of allocatable character strings.
     !
     ! Returns:
-    ! - c_string_1D: A C pointer to the first element of the null-terminated
-    !   string array in memory.
+    ! - c_string_1D: A C pointer to an array of C pointers, where
+    !       each pointer in the array points to a C string.
     function to_c(this, f_string_1D) result(c_string_1D)
         class(f_c_string_1D_t), target, intent(inout) :: this
         character(len = :), allocatable, intent(in) :: f_string_1D(:)
         character(len = :), allocatable :: f_string
         type(c_ptr) :: c_string_1D
-        integer :: i, m, n
+        integer :: i, m
         m = size(f_string_1D)
-        n = len(f_string_1D(1))
         if (allocated(this%fc_string_1D)) then
             deallocate(this%fc_string_1D)
         end if
@@ -64,8 +63,8 @@ contains
     !
     ! Arguments:
     ! - this: The instance of f_c_string_1D_t being operated on.
-    ! - c_string_1D: A C pointer to the first element of a null-terminated
-    !   string array in memory.
+    ! - c_string_1D: A C pointer to an array of C pointers, where
+    !       each pointer in the array points to a C string.
     ! - m: The number of strings in the array.
     ! - n: The maximum length of each string.
     !
@@ -84,9 +83,6 @@ contains
         end if
         if (n < 0) then
             return
-        end if
-        if (allocated(f_string_1D)) then
-            deallocate(f_string_1D)
         end if
         if (allocated(this%fc_string_1D)) then
             deallocate(this%fc_string_1D)
