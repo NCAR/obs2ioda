@@ -19,11 +19,10 @@ contains
         character(len = :), dimension(:), allocatable :: f_string_1D_ref
         character(len = :), dimension(:), allocatable :: f_string_1D_upper_ref
         type(c_ptr) :: c_string_1D
-        integer :: i, m, n, status
+        integer :: i, m, status
 
         status = 0
         m = 5
-        n = 3
         f_string_1D_ref = ["abc", "def", "ghi", "jkl", "mno"]
         f_string_1D_upper_ref = ["ABC", "DEF", "GHI", "JKL", "MNO"]
 
@@ -31,13 +30,13 @@ contains
 
         call to_upper_array(c_string_1D, m)
 
-        f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m, n)
+        f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m)
         do i = 1, m
             call assertEqual(f_string_1D_upper_ref(i), &
                     f_string_1D_upper(i), status, assert)
         end do
 
-        f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m, n)
+        f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m)
         !Test if allocation logic is correct in to_f
         do i = 1, m
             call assertEqual(f_string_1D_upper_ref(i), &

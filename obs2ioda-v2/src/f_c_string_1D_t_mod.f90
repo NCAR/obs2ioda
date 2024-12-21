@@ -2,7 +2,7 @@
 ! Fortran strings as C-compatible null-terminated strings.
 module f_c_string_1D_t_mod
     use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer, c_null_ptr
-    use f_c_string_t_mod, only : f_c_string_t
+    use f_c_string_t_mod, only : f_c_string_t, strlen
     implicit none
 
     ! Type to handle a 1D array of Fortran strings and convert them to/from
@@ -66,22 +66,18 @@ contains
     ! - c_string_1D: A C pointer to an array of C pointers, where
     !       each pointer in the array points to a C string.
     ! - m: The number of strings in the array.
-    ! - n: The maximum length of each string.
     !
     ! Returns:
     ! - f_string_1D: A Fortran array of strings reconstructed from the C
     !   string array.
-    function to_f(this, c_string_1D, m, n) result(f_string_1D)
+    function to_f(this, c_string_1D, m) result(f_string_1D)
         class(f_c_string_1D_t), intent(inout) :: this
         type(c_ptr), intent(in) :: c_string_1D
-        integer, intent(in) :: m, n
+        integer, intent(inout) :: m
         character(len = :), allocatable :: f_string_1D(:)
         type(c_ptr), pointer :: fc_string_1D_pointer(:)
-        integer :: i
+        integer :: i, n
         if (m < 0) then
-            return
-        end if
-        if (n < 0) then
             return
         end if
         if (allocated(this%fc_string_1D)) then
@@ -90,10 +86,11 @@ contains
         if (allocated(this%f_c_string_t_array)) then
             deallocate(this%f_c_string_t_array)
         end if
-        allocate(character(len = n) :: f_string_1D(1:m))
         allocate(this%f_c_string_t_array(m))
         allocate(this%fc_string_1D(m))
         call c_f_pointer(c_string_1D, fc_string_1D_pointer, [m])
+        n = strlen(fc_string_1D_pointer(1))
+        allocate(character(len = n) :: f_string_1D(1:m))
         do i = 1, m
             f_string_1D(i) = this%f_c_string_t_array(i)%to_f(fc_string_1D_pointer(i))
         end do
@@ -107,7 +104,6 @@ contains
     ! - this: The instance of f_c_string_1D_t being finalized.
     subroutine cleanup(this)
         type(f_c_string_1D_t), intent(inout) :: this
-        integer :: i
         if (allocated(this%fc_string_1D)) then
             deallocate(this%fc_string_1D)
         end if
