@@ -1,7 +1,8 @@
 ! Module providing functionality for handling one-dimensional arrays of
 ! Fortran strings as C-compatible null-terminated strings.
 module f_c_string_1D_t_mod
-    use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer, c_null_ptr
+    use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer, c_null_ptr, &
+            c_associated
     use f_c_string_t_mod, only : f_c_string_t, strlen
     implicit none
 
@@ -73,11 +74,12 @@ contains
     function to_f(this, c_string_1D, m) result(f_string_1D)
         class(f_c_string_1D_t), intent(inout) :: this
         type(c_ptr), intent(in) :: c_string_1D
-        integer, intent(inout) :: m
+        integer, intent(in) :: m
         character(len = :), allocatable :: f_string_1D(:)
         type(c_ptr), pointer :: fc_string_1D_pointer(:)
         integer :: i, n
-        if (m < 0) then
+        if (m < 0 .or. .not. c_associated(c_string_1D)) then
+            f_string_1D = [""]
             return
         end if
         if (allocated(this%fc_string_1D)) then
@@ -89,7 +91,12 @@ contains
         allocate(this%f_c_string_t_array(m))
         allocate(this%fc_string_1D(m))
         call c_f_pointer(c_string_1D, fc_string_1D_pointer, [m])
-        n = strlen(fc_string_1D_pointer(1))
+        n = 0
+        do i = 1, m
+            if (strlen(fc_string_1D_pointer(i)) > n) then
+                n = strlen(fc_string_1D_pointer(i))
+            end if
+        end do
         allocate(character(len = n) :: f_string_1D(1:m))
         do i = 1, m
             f_string_1D(i) = this%f_c_string_t_array(i)%to_f(fc_string_1D_pointer(i))
