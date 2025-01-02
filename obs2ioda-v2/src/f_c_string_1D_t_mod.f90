@@ -54,8 +54,7 @@ contains
         allocate(this%f_c_string_t_array(m))
         allocate(this%fc_string_1D(m))
         do i = 1, m
-            f_string = f_string_1D(i)
-            this%fc_string_1D(i) = this%f_c_string_t_array(i)%to_c(f_string)
+            this%fc_string_1D(i) = this%f_c_string_t_array(i)%to_c(f_string_1D(i))
         end do
         c_string_1D = c_loc(this%fc_string_1D)
     end function to_c
