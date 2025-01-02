@@ -38,10 +38,15 @@ contains
         call to_upper_array(c_string_1D, m)
 
         f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m)
+        !Test if allocation logic is correct in to_f
         do i = 1, m
             call assertEqual(f_string_1D_upper_ref(i), &
                     f_string_1D_upper(i), status, assert)
         end do
+
+        c_string_1D = f_c_string_1D_1%to_c(["abc", "def", "ghi", "jkl", "mno"])
+
+        call to_upper_array(c_string_1D, m)
 
         f_string_1D_upper = f_c_string_1D_2%to_f(c_string_1D, m)
         !Test if allocation logic is correct in to_f

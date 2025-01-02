@@ -3,7 +3,7 @@
 module f_c_string_1D_t_mod
     use iso_c_binding, only : c_loc, c_ptr, c_null_char, c_char, c_f_pointer, c_null_ptr, &
             c_associated
-    use f_c_string_t_mod, only : f_c_string_t, strlen
+    use f_c_string_t_mod, only : f_c_string_t, c_strlen
     implicit none
 
     ! Type to handle a 1D array of Fortran strings and convert them to/from
@@ -32,14 +32,14 @@ contains
     !
     ! Arguments:
     ! - this: The instance of f_c_string_1D_t being operated on.
-    ! - f_string_1D: A 1D Fortran array of allocatable character strings.
+    ! - f_string_1D: A 1D Fortran array of character strings.
     !
     ! Returns:
     ! - c_string_1D: A C pointer to an array of C pointers, where
     !       each pointer in the array points to a C string.
     function to_c(this, f_string_1D) result(c_string_1D)
         class(f_c_string_1D_t), target, intent(inout) :: this
-        character(len = :), allocatable, intent(in) :: f_string_1D(:)
+        character(len = *), intent(in) :: f_string_1D(:)
         character(len = :), allocatable :: f_string
         type(c_ptr) :: c_string_1D
         integer :: i, m
@@ -93,9 +93,7 @@ contains
         call c_f_pointer(c_string_1D, fc_string_1D_pointer, [m])
         n = 0
         do i = 1, m
-            if (strlen(fc_string_1D_pointer(i)) > n) then
-                n = strlen(fc_string_1D_pointer(i))
-            end if
+            n = max(n, c_strlen(fc_string_1D_pointer(i)))
         end do
         allocate(character(len = n) :: f_string_1D(1:m))
         do i = 1, m

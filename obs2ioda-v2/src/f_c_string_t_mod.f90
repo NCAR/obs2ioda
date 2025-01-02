@@ -5,7 +5,7 @@ module f_c_string_t_mod
             c_char, c_f_pointer, c_null_ptr, c_size_t, c_associated, c_int, c_size_t
     implicit none
 
-    public :: strlen
+    public :: c_strlen
 
     public :: f_c_string_t
 
@@ -18,11 +18,11 @@ module f_c_string_t_mod
         !
         ! Returns:
         ! - n: The length of the C string as an integer of kind `c_size_t`.
-        function c_strlen(c_string) bind(C, name = "strlen") result(n)
+        function strlen(c_string) bind(C, name = "strlen") result(n)
             import :: c_ptr, c_size_t
             type(c_ptr), value :: c_string
             integer(c_size_t) :: n
-        end function c_strlen
+        end function strlen
     end interface
 
     ! Type to represent a single Fortran string that can be converted to/from
@@ -44,7 +44,7 @@ contains
     ! Computes the length of a null-terminated C string.
     !
     ! This function first checks if the input pointer is a null pointer. If the pointer
-    ! is null, it returns `-1`. Otherwise, it calls the `c_strlen` wrapper for C's
+    ! is null, it returns `-1`. Otherwise, it calls the `strlen` wrapper for C's
     ! `strlen` function to calculate the length of the string.
     !
     ! Arguments:
@@ -53,15 +53,16 @@ contains
     ! Returns:
     ! - n: The length of the C string as an integer of kind `c_size_t`.
     !      Returns `-1` if `c_string` is a null pointer.
-    function strlen(c_string) result(n)
+    function c_strlen(c_string) result(n)
         type(c_ptr), value :: c_string
         integer(c_size_t) :: n
         if (.not. c_associated(c_string)) then
             n = -1
             return
         end if
-        n = c_strlen(c_string)
-    end function strlen
+        n = strlen(c_string)
+    end function c_strlen
+
     ! Converts a Fortran string to a C-compatible null-terminated string.
     !
     ! Arguments:
@@ -100,7 +101,7 @@ contains
         integer :: n
         integer(c_size_t) :: c_strlen_result
 
-        c_strlen_result = strlen(c_string)
+        c_strlen_result = c_strlen(c_string)
         if (c_strlen_result > HUGE(n) .or. c_strlen_result < 0) then
             f_string = ""
             return

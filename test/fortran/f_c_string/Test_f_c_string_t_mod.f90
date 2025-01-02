@@ -1,6 +1,6 @@
 module Test_f_c_string_t_mod
     use fortran_test_framework_mod, only : assertEqual, assert
-    use f_c_string_t_mod, only : f_c_string_t, strlen
+    use f_c_string_t_mod, only : f_c_string_t, c_strlen
     use Test_f_c_string_i_mod, only : to_upper
     use iso_c_binding, only : c_null_char, c_ptr, c_null_ptr
     implicit none
@@ -34,17 +34,17 @@ module Test_f_c_string_t_mod
         allocate(f_c_string_empty)
 
         c_string = f_c_string_empty%to_c("")
-        c_string_len= strlen(c_string)
+        c_string_len= c_strlen(c_string)
         call assertEqual(0, c_string_len, status, assert)
 
         c_string = f_c_string1%to_c(f_string_ref)
-        c_string_len = strlen(c_string)
+        c_string_len = c_strlen(c_string)
         call assertEqual(f_string_len, c_string_len, status, assert)
 
         call to_upper(c_string)
         f_string_upper = f_c_string2%to_f(c_string)
         call assertEqual(f_string_upper_ref, f_string_upper, status, assert)
-        c_string_len = strlen(c_null_ptr)
+        c_string_len = c_strlen(c_null_ptr)
         call assertEqual(-1, c_string_len, status, assert)
 
     end subroutine Test_f_c_string_t
