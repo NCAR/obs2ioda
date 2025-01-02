@@ -35,12 +35,14 @@ module f_c_string_t_mod
         character(len = :, kind = c_char), allocatable :: fc_string
 
     contains
+
         procedure :: to_c => to_c
         procedure :: to_f => to_f
         final :: cleanup
     end type f_c_string_t
 
 contains
+
     ! Computes the length of a null-terminated C string.
     !
     ! This function first checks if the input pointer is a null pointer. If the pointer

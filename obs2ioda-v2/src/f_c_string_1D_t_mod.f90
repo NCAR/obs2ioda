@@ -20,6 +20,7 @@ module f_c_string_1D_t_mod
         type(c_ptr), allocatable :: fc_string_1D(:)
 
     contains
+
         procedure :: to_c => to_c
         procedure :: to_f => to_f
         final :: cleanup
