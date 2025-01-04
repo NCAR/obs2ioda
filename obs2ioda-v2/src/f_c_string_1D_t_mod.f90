@@ -89,7 +89,6 @@ contains
             deallocate(this%f_c_string_t_array)
         end if
         allocate(this%f_c_string_t_array(m))
-        allocate(this%fc_string_1D(m))
         call c_f_pointer(c_string_1D, fc_string_1D_pointer, [m])
         n = 0
         do i = 1, m
