@@ -206,6 +206,7 @@ subroutine def_netcdf_dims(fileid,variable,input,output)
    endif
 
    output = ncdimid
+   print *, 'ncdimid = ', ncdimid
 
    return
 end subroutine def_netcdf_dims
