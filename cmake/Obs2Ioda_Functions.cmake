@@ -47,6 +47,7 @@ function(obs2ioda_fortran_library target public_link_libraries)
     endif ()
     target_compile_options(${target} PRIVATE ${OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE})
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
+    install(TARGETS ${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endfunction()
 
 # This CMake function, `obs2ioda_fortran_executable`, configures the installation and linking of Fortran executables for obs2ioda.
@@ -63,6 +64,9 @@ endfunction()
 function(obs2ioda_fortran_executable target public_link_libraries)
     set_target_properties(${target} PROPERTIES INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
+    if (NOT CMAKE_INSTALL_PREFIX STREQUAL CMAKE_BINARY_DIR)
+        install(TARGETS ${target} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif ()
 endfunction()
 
 # This CMake function, `obs2ioda_cxx_library`, configures C++ targets for obs2ioda.
@@ -81,6 +85,7 @@ endfunction()
 function(obs2ioda_cxx_library target public_link_libraries)
     set_target_properties(${target} PROPERTIES INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
+    install(TARGETS ${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endfunction()
 
 # Function: add_memcheck_ctest
