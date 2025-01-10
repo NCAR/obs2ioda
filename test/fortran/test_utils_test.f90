@@ -1,5 +1,5 @@
-module Test_fortran_test_framework_mod
-    use fortran_test_framework_mod, only : assertEqual, assert_interface
+module test_utils_test_mod
+    use test_utils_mod, only : assertEqual, assert_interface
     implicit none
 
 contains
@@ -86,4 +86,25 @@ contains
         call assertEqual(1, status, status, assert_proc)
     end subroutine test_assertEqual_string
 
-end module Test_fortran_test_framework_mod
+end module test_utils_test_mod
+
+program test_utils_test
+    use test_utils_test_mod, only : test_assertEqual_integer, test_assertEqual_logical, test_assertEqual_string
+    use test_utils_mod, only : assert, assert_log, determine_test_type, assert_interface
+    implicit none
+    integer n_args
+    character(len = 64) :: test_type, arg
+    integer :: i
+    procedure(assert_interface), pointer :: assert_proc
+
+    call determine_test_type(test_type)
+
+    if (trim(test_type) == "standard") then
+        assert_proc => assert
+    else
+        assert_proc => assert_log
+    end if
+    call test_assertEqual_integer(assert_proc)
+    call test_assertEqual_logical(assert_proc)
+    call test_assertEqual_string(assert_proc)
+end program

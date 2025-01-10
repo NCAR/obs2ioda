@@ -1,11 +1,7 @@
-module fortran_test_framework_mod
+module test_utils_mod
     implicit none
 
-    public :: assertEqual
-    public :: assert_interface
-    public :: determine_test_type
-    public :: assert
-    public :: assert_memcheck
+    private :: itoa, logical_to_string
 
     interface assertEqual
         module procedure assertEqual_integer
@@ -34,7 +30,7 @@ contains
         n_args = command_argument_count()
         do i = 1, n_args
             call get_command_argument(i, arg)
-            if (arg == "memcheck") then
+            if (trim(arg) == "memcheck") then
                 test_type = "memcheck"
             end if
         end do
@@ -63,15 +59,16 @@ contains
         end if
     end subroutine assert
 
-    ! Subroutine: assert_memcheck
-    ! An assertion handler used for memcheck tests. Unlike `assert`, this subroutine does not terminate
+    ! Subroutine: assert_log
+    ! An assertion handler that does not terminate
     ! the program on failure.
     !
     ! Arguments:
     ! - condition (logical, in): The condition to evaluate.
-    ! - message (character, in): The message associated with the assertion (not used in this mock).
+    ! - message (character, in): The message associated with the assertion.
     ! - status (integer, out): The status code set based on the condition (0 for success, 1 for failure).
-    subroutine assert_memcheck(condition, message, status)
+    subroutine assert_log(condition, message, status)
+        implicit none
         logical, intent(in) :: condition
         character(len = *), intent(in) :: message
         integer, intent(out) :: status
@@ -83,7 +80,7 @@ contains
             status = 0
             write(*, '(A)') "Success: " // message
         end if
-    end subroutine assert_memcheck
+    end subroutine assert_log
 
     ! Subroutine: assertEqual_integer
     ! Asserts that two integer values are equal, using a custom or default assertion handler.
@@ -192,4 +189,4 @@ contains
         end if
     end function logical_to_string
 
-end module fortran_test_framework_mod
+end module test_utils_mod
