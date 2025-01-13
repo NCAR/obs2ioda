@@ -1,3 +1,16 @@
+! Module: test_utils_mod
+! Provides utilities for test assertions and command-line test configuration.
+!
+! This module includes subroutines and functions for:
+! - Performing assertions with custom handlers.
+! - Comparing values of various types (integer, string, logical).
+! - Determining the test type based on command-line arguments.
+! - Converting data types to strings for reporting purposes.
+!
+! Key Features:
+! - `assertEqual` interface for type-specific equality checks.
+! - `determine_test_type` for setting test configurations.
+! - Helper functions like `itoa` and `logical_to_string`.
 module test_utils_mod
     implicit none
 
@@ -9,6 +22,31 @@ module test_utils_mod
         module procedure assertEqual_logical
     end interface assertEqual
 
+    ! Abstract Interface: assert_interface
+    ! Defines a generic interface for assertion handlers.
+    !
+    ! This interface provides a standard structure for custom assertion subroutines,
+    ! allowing flexibility in how assertion results are handled (e.g., printing messages,
+    ! logging, or terminating the program).
+    !
+    ! Arguments:
+    ! - condition (logical, in): The condition to evaluate.
+    !   - Should be `.true.` for the assertion to pass.
+    ! - message (character, in): The message associated with the assertion.
+    !   - Typically used to describe the expected and actual values or the context of the check.
+    ! - status (integer, out): Status code indicating the result of the assertion.
+    !   - 0: Assertion passed.
+    !   - 1: Assertion failed.
+    !
+    ! Example Implementation:
+    !   subroutine custom_assert(condition, message, status)
+    !       if (.not. condition) then
+    !           status = 1
+    !           write(*, *) "Assertion failed: ", message
+    !       else
+    !           status = 0
+    !       end if
+    !   end subroutine custom_assert
     abstract interface
         subroutine assert_interface(condition, message, status)
             logical, intent(in) :: condition
@@ -19,6 +57,31 @@ module test_utils_mod
 
 contains
 
+    ! Subroutine: determine_test_type
+    ! Determines the type of test to perform based on command-line arguments.
+    !
+    ! This subroutine reads the command-line arguments and sets the `test_type`
+    ! output variable based on their contents. If no specific argument is provided,
+    ! the test type defaults to "standard". If the "memcheck" argument is found,
+    ! the test type is set to "memcheck".
+    !
+    ! Arguments:
+    ! - test_type (character, out): The type of test to perform.
+    !   Possible values:
+    !     - "standard": Default test type.
+    !     - "memcheck": Memory checking test.
+    !
+    ! Example Usage:
+    !   call determine_test_type(test_type)
+    !   if (test_type == "memcheck") then
+    !       print *, "Performing memory check tests."
+    !   else
+    !       print *, "Performing standard tests."
+    !   end if
+    !
+    ! Notes:
+    ! - This subroutine uses `command_argument_count` and `get_command_argument`
+    !   to retrieve and evaluate the command-line arguments.
     subroutine determine_test_type(test_type)
         implicit none
         character(len = *), intent(out) :: test_type
