@@ -1,0 +1,12 @@
+set(Test_test_utils_SOURCES
+    test_utils_test.f90
+)
+list(TRANSFORM Test_test_utils_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+set(Test_test_utils_LIBRARY_DEPENDENCIES
+    test_utils
+)
+add_fortran_ctest(test_utils
+                  "${Test_test_utils_SOURCES}"
+                  "${Test_test_utils_LIBRARY_DEPENDENCIES}"
+)
+add_memcheck_ctest(Test_test_utils)

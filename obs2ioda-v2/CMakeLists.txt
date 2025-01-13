@@ -23,10 +23,17 @@ set(obs2ioda_v2_SOURCES
     main.f90
 )
 list(TRANSFORM obs2ioda_v2_SOURCES PREPEND "src/")
+set(test_utils_SOURCES
+    test_utils.f90
+)
+list(TRANSFORM test_utils_SOURCES PREPEND "src/test/")
 set(v2_PUBLIC_LINK_LIBRARIES "${NetCDF_LIBRARIES}" "${NCEP_BUFR_LIB}")
 add_library(v2 SHARED ${v2_SOURCES})
 obs2ioda_fortran_library(v2 "${v2_PUBLIC_LINK_LIBRARIES}")
+add_library(test_utils SHARED ${test_utils_SOURCES})
+obs2ioda_fortran_library(test_utils "")
 set(obs2ioda_v2_PUBLIC_LINK_LIBRARIES v2 )
 add_executable(obs2ioda_v2 ${obs2ioda_v2_SOURCES})
 obs2ioda_fortran_executable(obs2ioda_v2 "${obs2ioda_v2_PUBLIC_LINK_LIBRARIES}")
+
 

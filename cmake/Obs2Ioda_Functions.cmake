@@ -47,6 +47,7 @@ function(obs2ioda_fortran_library target public_link_libraries)
     endif ()
     target_compile_options(${target} PRIVATE ${OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE})
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
+    install(TARGETS ${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endfunction()
 
 # This CMake function, `obs2ioda_fortran_executable`, configures the installation and linking of Fortran executables for obs2ioda.
@@ -63,6 +64,9 @@ endfunction()
 function(obs2ioda_fortran_executable target public_link_libraries)
     set_target_properties(${target} PROPERTIES INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
+    if (NOT CMAKE_INSTALL_PREFIX STREQUAL CMAKE_BINARY_DIR)
+        install(TARGETS ${target} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif ()
 endfunction()
 
 # This CMake function, `obs2ioda_cxx_library`, configures C++ targets for obs2ioda.
@@ -81,4 +85,65 @@ endfunction()
 function(obs2ioda_cxx_library target public_link_libraries)
     set_target_properties(${target} PROPERTIES INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
     target_link_libraries(${target} PUBLIC ${public_link_libraries})
+    install(TARGETS ${target} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endfunction()
+
+# Function: add_memcheck_ctest
+# Adds a memory check test for a given target using Valgrind.
+#
+# Arguments:
+# - target (string): The name of the target to check for memory issues.
+#
+# Behavior:
+# - If Valgrind is found, it adds a CTest named `<target>_memcheck` that runs the target
+#   with Valgrind's memory checking options (`--leak-check=full`, `--error-exitcode=1`).
+# - If Valgrind is not found, it outputs a status message and does not add the memory check.
+#
+# Example Usage:
+# add_memcheck_ctest(my_target)
+#
+# Notes:
+# - Ensure Valgrind is installed and accessible in the system's PATH for this function to work.
+function(add_memcheck_ctest target)
+    find_program(VALGRIND "valgrind")
+    if (VALGRIND)
+        message(STATUS "Valgrind found: ${VALGRIND}")
+        message(STATUS "Adding memory check for test: ${target}")
+        set(VALGRIND_COMMAND valgrind --leak-check=full --error-exitcode=1 --undef-value-errors=no)
+        add_test(NAME ${target}_memcheck
+                 COMMAND ${VALGRIND_COMMAND} $<TARGET_FILE:${target}> memcheck)
+    else ()
+        message(STATUS "Valgrind not found")
+        message(STATUS "Memory check for test: ${target} will not be added")
+    endif ()
+endfunction()
+
+# Function: add_fortran_ctest
+# Creates and registers a CTest for a Fortran test executable, handling mixed Fortran and C sources.
+#
+# Arguments:
+# - test_name (string): The name of the test.
+# - test_sources (list): List of source files for the test, including Fortran and optional C sources.
+# - library_deps (list): List of library dependencies to link with the test executable.
+#
+# Behavior:
+# - Identifies C source files (`*.c`) from the `test_sources` list and compiles them into shared libraries.
+# - Updates the `library_deps` list to include the created shared libraries for C sources.
+# - Creates a Fortran executable target named `Test_<test_name>` using the remaining Fortran sources.
+# - Links the test executable with the specified libraries and any generated C libraries.
+# - Registers the test with CTest, with the executable's path resolved to `${CMAKE_BINARY_DIR}/bin`.
+function(add_fortran_ctest test_name test_sources library_deps)
+    foreach(test_source ${test_sources})
+        if (${test_source} MATCHES ".*\\.c$")
+            get_filename_component(test_source_name ${test_source} NAME_WE)
+            message(STATUS "Adding C test: ${test_source_name}")
+            add_library("c_${test_source_name}" SHARED ${test_source})
+            list(APPEND library_deps "c_${test_source_name}")
+            list(REMOVE_ITEM test_sources ${test_source})
+        endif ()
+    endforeach ()
+    add_executable("Test_${test_name}" ${test_sources})
+    target_link_libraries("Test_${test_name}" ${library_deps})
+    add_test(NAME ${test_name}
+             COMMAND ${CMAKE_BINARY_DIR}/bin/Test_${test_name})
 endfunction()
