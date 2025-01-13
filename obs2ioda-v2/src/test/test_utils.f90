@@ -52,7 +52,7 @@ contains
         if (.not. condition) then
             status = 1
             write(*, '(A)') "Failed: " // message
-            call exit(1)
+            stop 1
         else
             status = 0
             write(*, '(A)') "Success: " // message
