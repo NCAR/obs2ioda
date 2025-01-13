@@ -165,8 +165,16 @@ contains
     function itoa(value) result(str)
         implicit none
         integer, intent(in) :: value
-        character(len = 32) :: str
-        write(str, '(I0)') value
+        character(len=32) :: str
+        character(len=32) :: tmp
+        integer :: ios
+
+        write(tmp, '(I0)', iostat=ios) value
+        if (ios /= 0) then
+            str = '**overflow**'
+        else
+            str = tmp
+        endif
     end function itoa
 
     ! Function: logical_to_string
