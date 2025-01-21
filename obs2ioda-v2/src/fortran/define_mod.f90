@@ -185,7 +185,7 @@ character(len=nstring), dimension(nsen_info) :: name_sen_info = &
 integer(i_kind), dimension(nsen_info) :: type_sen_info = &
    (/             &
       nf90_float, &
-      nf90_float, &
+      nf90_int, &
       nf90_float, &
       nf90_float, &
       nf90_float, &
