@@ -9,15 +9,14 @@ namespace Obs2Ioda {
             const std::string& fileName
     ) {
         std::stringstream message;
-        message << "NetCDF Error" << std::endl;
-        message << "Error code: " << e.errorCode() << std::endl;
+        message << "NetCDF Error: Code: " << e.errorCode();
         if (not fileName.empty()) {
-            message << "Obs2Ioda File: " << fileName << std::endl;
+            message << " File: " << fileName;
             if (lineNumber > 0) {
-                message << "Obs2Ioda Line: " << lineNumber << std::endl;
+                message << " Line: " << lineNumber;
             }
         }
-        message << "Message: " << e.what() << std::endl;
+        message << std::endl << "Message: " << e.what() << std::endl;
         std::cerr << message.str();
         return e.errorCode();
     }
