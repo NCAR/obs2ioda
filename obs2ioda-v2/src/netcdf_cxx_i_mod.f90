@@ -18,13 +18,13 @@ module netcdf_cxx_i_mod
         !
         !   Returns:
         !     - integer(c_int): A status code indicating success (0) or failure (non-zero).
-        function c_netcdfCreate(path, netcdfID) &
+        function c_netcdfCreate(path, netcdfID, fileMode) &
                 bind(C, name = "netcdfCreate")
             import :: c_int
             import :: c_ptr
             type(c_ptr), value, intent(in) :: path
-            integer(c_int), intent(out) :: netcdfID
-            integer(c_int), intent(in) :: fileMode
+            integer(c_int), intent(inout) :: netcdfID
+            integer(c_int), value, intent(in) :: fileMode
             integer(c_int) :: c_netcdfCreate
         end function
 
