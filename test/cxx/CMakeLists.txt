@@ -1,13 +1,9 @@
-include_directories(${GTEST_INCLUDE_DIRS} )
+include_directories(${GTEST_INCLUDE_DIRS})
 set(NETCDF_TEST_SOURCES
-    ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test_fixture.cc
-    ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test.cc
-        )
+        ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test_fixture.cc
+        ${CMAKE_SOURCE_DIR}/test/cxx/netcdf_test.cc
+)
 
-set(NETCDF_SATWIND_TEST_SOURCES
-        netcdf_satwind_test.cc
-        )
-list(TRANSFORM NETCDF_SATWIND_TEST_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 add_executable(
         NetcdfTest
         ${NETCDF_TEST_SOURCES}
@@ -24,3 +20,5 @@ add_test(
         COMMAND NetcdfTest --gtest_filter=*
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cxx)
 add_memcheck_ctest(NetcdfTest)
+
+

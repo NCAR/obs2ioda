@@ -1,9 +1,10 @@
+#include <netcdf_utils.h>
+
 #include "netcdf_test_fixture.h"
 #include "netcdf_file.h"
 #include "netcdf_group.h"
 #include "netcdf_dimension.h"
 #include "netcdf_variable.h"
-#include "netcdf_attribute.h"
 #include <gtest/gtest.h>
 
 // Example test case using the fixture
@@ -177,6 +178,25 @@ TEST_F(NetCDFTestFixture, NetCDFAddVarTest) {
 
     status = Obs2Ioda::netcdfClose(netcdfID);
     EXPECT_EQ(status, 0);
+}
+
+TEST(NetcdfObsTest, NetCDFObsGlobalDimVar) {
+        int netcdfID{};
+        std::string v2LocationDimName = "nlocs";
+        std::string v2LocationVarName = "nlocs";
+        std::string v3LocationDimName = "Location";
+        std::string v3LocationVarName = "Location";
+        Obs2Ioda::netcdfCreate("test_obs_global_dim_var.nc", &netcdfID);
+        Obs2Ioda::netcdfAddDim(netcdfID, nullptr, v2LocationDimName.c_str(), 5);
+        Obs2Ioda::netcdfAddVar(netcdfID, nullptr, v2LocationVarName.c_str(), NC_INT, 1, std::vector<const char *>({v2LocationDimName.c_str()}).data());
+        auto locationDim = Obs2Ioda::NETCDF_FILE_MAP[netcdfID]->getDim(v3LocationDimName);
+        auto locationVar = Obs2Ioda::NETCDF_FILE_MAP[netcdfID]->getVar(v3LocationVarName);
+        auto locationDimName = locationDim.getName();
+        auto locationVarName = locationVar.getName();
+        EXPECT_EQ(locationDimName, v3LocationDimName);
+        EXPECT_EQ(locationVarName, v3LocationVarName);
+        EXPECT_EQ(locationVar.getDims()[0].getName(), "Location");
+        Obs2Ioda::netcdfClose(netcdfID);
 }
 
 int main(int argc, char **argv) {
