@@ -50,7 +50,8 @@ namespace Obs2Ioda {
 
     int netcdfCreate(
         const char *path,
-        int *netcdfID
+        int *netcdfID,
+        int fileMode
     ) {
         try {
             const auto file = std::make_shared<netCDF::NcFile>(

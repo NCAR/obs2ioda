@@ -14,6 +14,7 @@ module netcdf_cxx_i_mod
         !       string representing the file path.
         !     - netcdfID (integer(c_int), intent(out)): Receives the file identifier
         !       for the created or opened NetCDF file.
+        !     - fileMode (integer(c_int), intent(in)): File mode for creating the NetCDF file.
         !
         !   Returns:
         !     - integer(c_int): A status code indicating success (0) or failure (non-zero).
@@ -23,6 +24,7 @@ module netcdf_cxx_i_mod
             import :: c_ptr
             type(c_ptr), value, intent(in) :: path
             integer(c_int), intent(out) :: netcdfID
+            integer(c_int), intent(in) :: fileMode
             integer(c_int) :: c_netcdfCreate
         end function
 
