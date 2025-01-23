@@ -43,7 +43,6 @@ namespace Obs2Ioda {
          *
          * @param netcdfID The unique NetCDF file ID.
          * @param file A shared pointer to the NetCDF file to be added.
-         * @return 0 on success, or an error code if an exception is caught.
          * @throws netCDF::exceptions::NcCantCreate if the `netcdfID` already exists in the map.
          */
         void addFile(
@@ -58,7 +57,6 @@ namespace Obs2Ioda {
          * Throws an exception if the ID does not exist in the map.
          *
          * @param netcdfID The unique NetCDF file ID to be removed.
-         * @return 0 on success, or an error code if an exception is caught.
          * @throws netCDF::exceptions::NcBadId if the `netcdfID` does not exist in the map.
          */
         void removeFile(
