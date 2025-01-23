@@ -1,6 +1,8 @@
 set(obs2ioda_cxx_SOURCES
     netcdf_error.cc
     netcdf_file.cc
+    netcdf_group.cc
+    netcdf_utils.cc
 )
 set(obs2ioda_cxx_LIBRARIES
     NetCDF::NetCDF_CXX
