@@ -46,7 +46,7 @@ namespace Obs2Ioda {
          * @return 0 on success, or an error code if an exception is caught.
          * @throws netCDF::exceptions::NcCantCreate if the `netcdfID` already exists in the map.
          */
-        int addFile(
+        void addFile(
             int netcdfID,
             const std::shared_ptr<netCDF::NcFile> &file
         );
@@ -61,7 +61,7 @@ namespace Obs2Ioda {
          * @return 0 on success, or an error code if an exception is caught.
          * @throws netCDF::exceptions::NcBadId if the `netcdfID` does not exist in the map.
          */
-        int removeFile(
+        void removeFile(
             int netcdfID
         );
 

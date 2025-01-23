@@ -8,7 +8,10 @@ namespace Obs2Ioda {
         return instance;
     }
 
-    int FileMap::addFile(const int netcdfID, const std::shared_ptr<netCDF::NcFile> &file) {
+    void FileMap::addFile(
+        const int netcdfID,
+        const std::shared_ptr<netCDF::NcFile> &file
+    ) {
         auto netcdfFileIterator = this->fileMap.find(netcdfID);
         if (netcdfFileIterator != this->fileMap.end()) {
             throw netCDF::exceptions::NcCantCreate(
@@ -18,11 +21,12 @@ namespace Obs2Ioda {
             );
         }
         this->fileMap[netcdfID] = file;
-        return 0;
     }
 
 
-    int FileMap::removeFile(const int netcdfID) {
+    void FileMap::removeFile(
+        const int netcdfID
+    ) {
         auto netcdfFileIterator = this->fileMap.find(netcdfID);
         if (netcdfFileIterator == this->fileMap.end()) {
             throw netCDF::exceptions::NcBadId(
@@ -32,7 +36,6 @@ namespace Obs2Ioda {
             );
         }
         this->fileMap.erase(netcdfFileIterator);
-        return 0;
     }
 
     std::shared_ptr<netCDF::NcFile> FileMap::getFile(const int netcdfID) {
@@ -76,7 +79,8 @@ namespace Obs2Ioda {
     int netcdfClose(const int netcdfID) {
         try {
             FileMap::getInstance().getFile(netcdfID)->close();
-            return FileMap::getInstance().removeFile(netcdfID);
+            FileMap::getInstance().removeFile(netcdfID);
+            return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
                 e,
