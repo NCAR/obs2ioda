@@ -5,11 +5,11 @@
 
 namespace Obs2Ioda {
     /**
-     * @brief Retrieves the parent NetCDF group associated with a given NetCDF file ID.
+     * @brief Retrieves the NetCDF group associated with a given NetCDF file ID.
      *
      * @param netcdfID The unique identifier for the NetCDF file.
      * @param groupName The name of the group within the NetCDF file.
-     *                  If nullptr, the root group of the file will be returned.
+     *                  If nullptr, the file's root group will be returned.
      * @return A shared pointer to the requested NetCDF group.
      * @exception netCDF::exceptions::NcException Thrown if the groupName is invalid
      *            or the NetCDF operation fails.
