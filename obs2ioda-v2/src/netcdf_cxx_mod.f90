@@ -10,9 +10,7 @@ contains
 
     ! netcdfCreate:
     !   Creates a new NetCDF file or opens an existing file in a specified mode,
-    !   using a Fortran string for the file path. This function wraps the
-    !   `c_netcdfCreate` interface, which calls a C++ wrapper function that
-    !   interacts with the NetCDF C++ API.
+    !   using a Fortran string for the file path.
     !
     !   Arguments:
     !     - path (character(len=*), intent(in)): The file path as a Fortran string.
@@ -29,13 +27,6 @@ contains
     !
     !   Returns:
     !     - integer(c_int): A status code indicating success (0) or failure (non-zero).
-    !
-    !   Notes:
-    !     - The `f_c_string_t` type is used internally to handle the conversion
-    !       of the Fortran string `path` into a null-terminated C string (`c_path`).
-    !     - The `c_netcdfCreate` function serves as an interface between Fortran
-    !       and the C++ wrapper function, ensuring proper communication between
-    !       the languages.
     function netcdfCreate(path, netcdfID, fileMode)
         character(len = *), intent(in) :: path
         integer(c_int), intent(inout) :: netcdfID
@@ -56,8 +47,6 @@ contains
 
     ! netcdfClose:
     !   Closes a previously opened NetCDF file identified by its file identifier.
-    !   This function wraps the `c_netcdfClose` interface, which calls a C++
-    !   wrapper function to interact with the NetCDF C++ API.
     !
     !   Arguments:
     !     - netcdfID (integer(c_int), intent(in), value): The identifier of the
@@ -65,10 +54,6 @@ contains
     !
     !   Returns:
     !     - integer(c_int): A status code indicating success (0) or failure (non-zero).
-    !
-    !   Notes:
-    !     - The `c_netcdfClose` function acts as an interface between Fortran and
-    !       the C++ wrapper function, abstracting the complexity of C++ interactions.
     function netcdfClose(netcdfID)
         integer(c_int), value, intent(in) :: netcdfID
         integer(c_int) :: netcdfClose
