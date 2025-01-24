@@ -12,7 +12,7 @@ namespace Obs2Ioda {
             auto file = FileMap::getInstance().getFile(netcdfID);
             // Set the parent group to the root group if the parent group name is null.
             // Otherwise, set the parent group to the group with the specified name.
-            const auto parentGroup = parentGroupName == nullptr
+            const auto parentGroup = strlen(parentGroupName) == 0
                                          ? file
                                          : std::make_shared<
                                              netCDF::NcGroup>(
