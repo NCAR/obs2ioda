@@ -11,21 +11,6 @@
 namespace Obs2Ioda {
 
     /**
-     * @brief Retrieves the parent NetCDF group associated with a given NetCDF file ID.
-     *
-     * @param netcdfID The unique identifier for the NetCDF file.
-     * @param groupName The name of the group within the NetCDF file.
-     *                  If nullptr, the root group of the file will be returned.
-     * @return A shared pointer to the requested NetCDF group.
-     * @exception netCDF::exceptions::NcException Thrown if the groupName is invalid
-     *            or the NetCDF operation fails.
-     */
-    std::shared_ptr<netCDF::NcGroup> getParentGroup(
-            int netcdfID,
-            const char *groupName
-    );
-
-    /**
      * @brief Removes all whitespace characters from the provided string.
      *
      * @param name The input string from which whitespace should be removed.

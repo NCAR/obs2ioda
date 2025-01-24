@@ -1,7 +1,23 @@
 #ifndef NETCDF_GROUP_H
 #define NETCDF_GROUP_H
+#include <memory>
+#include <netcdf>
 
 namespace Obs2Ioda {
+    /**
+     * @brief Retrieves the parent NetCDF group associated with a given NetCDF file ID.
+     *
+     * @param netcdfID The unique identifier for the NetCDF file.
+     * @param groupName The name of the group within the NetCDF file.
+     *                  If nullptr, the root group of the file will be returned.
+     * @return A shared pointer to the requested NetCDF group.
+     * @exception netCDF::exceptions::NcException Thrown if the groupName is invalid
+     *            or the NetCDF operation fails.
+     */
+    std::shared_ptr<netCDF::NcGroup> getGroup(
+            int netcdfID,
+            const char *groupName
+    );
 
     extern "C" {
 /**

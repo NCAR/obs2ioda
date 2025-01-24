@@ -5,6 +5,17 @@
 
 namespace Obs2Ioda {
 
+    std::shared_ptr<netCDF::NcGroup> getGroup(
+            int netcdfID,
+            const char *groupName
+    ) {
+        auto file = FileMap::getInstance().getFile(netcdfID);
+        if (groupName != nullptr) {
+            return std::make_shared<netCDF::NcGroup>(file->getGroup(groupName));
+        }
+        return file;
+    }
+
     int netcdfAddGroup(
             int netcdfID,
             const char *parentGroupName,
@@ -12,8 +23,8 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto parrentGroup = getParentGroup(netcdfID, parentGroupName);
-            const auto group = parrentGroup->addGroup(groupName);
+            const auto rootGroup = getGroup(netcdfID, parentGroupName);
+            const auto group = rootGroup->addGroup(groupName);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
