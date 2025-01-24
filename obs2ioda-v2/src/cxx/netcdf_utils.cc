@@ -5,7 +5,7 @@
 
 namespace Obs2Ioda {
 
-    std::shared_ptr<netCDF::NcGroup> getRootGroup(
+    std::shared_ptr<netCDF::NcGroup> getParentGroup(
             int netcdfID,
             const char *groupName
     ) {

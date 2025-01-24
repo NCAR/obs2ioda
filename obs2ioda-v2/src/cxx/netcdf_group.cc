@@ -12,8 +12,8 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto rootGroup = getRootGroup(netcdfID, parentGroupName);
-            const auto group = rootGroup->addGroup(groupName);
+            const auto parrentGroup = getParentGroup(netcdfID, parentGroupName);
+            const auto group = parrentGroup->addGroup(groupName);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
