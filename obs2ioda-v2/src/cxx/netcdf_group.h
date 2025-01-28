@@ -1,7 +1,5 @@
 #ifndef NETCDF_GROUP_H
 #define NETCDF_GROUP_H
-#include <memory>
-#include <netcdf>
 
 namespace Obs2Ioda {
 
@@ -25,29 +23,7 @@ namespace Obs2Ioda {
  *     - 0 on success.
  *     - A non-zero error code if an exception is encountered (e.g., invalid group name,
  *       parent group not found, or other NetCDF-related errors).
- *
- * @throws netCDF::exceptions::NcException
- *     If any NetCDF-related operation fails, this exception is caught and processed
- *     to generate an appropriate error message using `netcdfErrorMessage`.
- *
- * @note
- * - This function requires the `FileMap` and `getRootGroup` utilities to manage NetCDF
- *   file and group objects.
- * - Ensure that `netcdfID` is valid and corresponds to an open file managed by the
- *   `FileMap` instance.
- *
- * Example Usage:
- * ```
- * int netcdfID = 1; // ID of an open NetCDF file
- * const char* parentGroupName = "parent_group";
- * const char* groupName = "new_group";
- * int result = Obs2Ioda::netcdfAddGroup(netcdfID, parentGroupName, groupName);
- * if (result != 0) {
- *     // Handle error
- * }
- * ```
  */
-
         int netcdfAddGroup(
                 int netcdfID,
                 const char *parentGroupName,
