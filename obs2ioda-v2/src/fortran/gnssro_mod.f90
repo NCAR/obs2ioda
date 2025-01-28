@@ -7,6 +7,7 @@
 
 module gnssro_bufr2ioda
 use netcdf
+use netcdf_cxx_mod
 implicit none
 
 integer, parameter :: i_kind  = selected_int_kind(8)    !4
@@ -51,6 +52,7 @@ integer(i_kind)           :: ibit(mxib),nib
 integer(i_kind),parameter :: maxlevs=500
 integer(i_kind),parameter :: n1ahdr=13
 integer(i_kind)           :: maxobs
+integer(i_kind)           :: status
 real(r_kind) :: timeo
 type gnssro_type
       integer(i_kind), allocatable, dimension(:)    :: said
@@ -331,13 +333,20 @@ if (nrec==0) then
     stop 2
 endif
 
-call check( nf90_create(trim(outfile), NF90_NETCDF4, ncid))
-call check( nf90_def_dim(ncid, 'nlocs', ndata,   nlocs_dimid) )
-call check( nf90_put_att(ncid, NF90_GLOBAL, 'date_time', anatime) )
-call check( nf90_put_att(ncid, NF90_GLOBAL, 'ioda_version', 'fortran generated ioda2 file') )
-call check( nf90_def_grp(ncid, 'MetaData', grpid_metadata) )
-call check( nf90_def_grp(ncid, 'ObsValue', grpid_obsvalue) )
-call check( nf90_def_grp(ncid, 'ObsError', grpid_obserror) )
+!call check( nf90_create(trim(outfile), NF90_NETCDF4, ncid))
+status = netcdfCreate(trim(outfile), ncid)
+!call check( nf90_def_dim(ncid, 'nlocs', ndata,   nlocs_dimid) )
+status = netcdfAddDim(ncid, 'nlocs', ndata)
+!call check( nf90_put_att(ncid, NF90_GLOBAL, 'date_time', anatime) )
+status = netcdfPutAtt(ncid, "date_time", anatime)
+!call check( nf90_put_att(ncid, NF90_GLOBAL, 'ioda_version', 'fortran generated ioda2 file') )
+status = netcdfPutAtt(ncid, "ioda_version", "fortran generated ioda2 file")
+!call check( nf90_def_grp(ncid, 'MetaData', grpid_metadata) )
+status = netcdfAddGroup(ncid, 'MetaData')
+!call check( nf90_def_grp(ncid, 'ObsValue', grpid_obsvalue) )
+status = netcdfAddGroup(ncid, 'ObsValue')
+!call check( nf90_def_grp(ncid, 'ObsError', grpid_obserror) )
+status = netcdfAddGroup(ncid, 'ObsError')
 
 call check( nf90_def_var(grpid_metadata, "latitude",      NF90_FLOAT, nlocs_dimid, varid_lat) )
 call check( nf90_put_att(grpid_metadata, varid_lat, "units",  "degree_north" ))

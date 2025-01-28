@@ -337,7 +337,7 @@ namespace Obs2Ioda {
                 groupName,
                 varName,
                 fillMode,
-                fillValue
+                fillValue == NULL ? std::string("") : std::string(fillValue)
 
         );
     }
