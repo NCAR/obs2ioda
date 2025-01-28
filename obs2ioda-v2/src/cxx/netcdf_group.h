@@ -13,9 +13,12 @@ namespace Obs2Ioda {
  * @param netcdfID
  *     The unique identifier for the NetCDF file, used to retrieve the associated file
  *     object from the internal file map.
- * @param parentGroupName
- *     The name of the parent group under which the new group will be added. If this is
- *     the root group, it should typically be an empty string or a top-level group name.
+*  @param parentGroupName
+*      The name of the parent group under which the new group will be added.
+*      - If `parentGroupName` is `nullptr`, the root group of the file (represented by
+*        the `netCDF::NcFile` object) is used as the parent group.
+*      - If `parentGroupName` specifies the name of an existing group, that group will
+*        be used as the parent.
  * @param groupName
  *     The name of the new group to be created within the specified parent group.
  *
