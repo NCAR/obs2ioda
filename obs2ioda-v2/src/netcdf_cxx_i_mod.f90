@@ -53,7 +53,7 @@ module netcdf_cxx_i_mod
         !     - parentGroupName (type(c_ptr), intent(in), value):
         !       A C pointer to a null-terminated string specifying the name of the parent
         !       group under which the new group will be created. If targeting the root
-        !       group, this can be an empty string or the top-level group name.
+        !       group, pass a c_null_ptr.
         !     - groupName (type(c_ptr), intent(in), value):
         !       A C pointer to a null-terminated string specifying the name of the new group
         !       to be added under the parent group.
