@@ -36,6 +36,7 @@ namespace Obs2Ioda {
             const char *attName,
             const int *data
     );
+           int netcdfPutAttInt1
     }
 }
 #endif //OBS2IODA_NETCDF_ATTRIBUTE_H
