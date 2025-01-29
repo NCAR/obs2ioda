@@ -9,34 +9,52 @@
 #include "ioda_names.h"
 
 namespace Obs2Ioda {
-
     template<typename T>
     int netcdfPutAtt(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const char *attName,
-            netCDF::NcType netcdfDataType,
-            T value
+        int netcdfID,
+        const char *groupName,
+        const char *varName,
+        const char *attName,
+        netCDF::NcType netcdfDataType,
+        T value
+    );
+
+    template<typename T>
+    int netcdfPutAtt1D(
+        int netcdfID,
+        const char *groupName,
+        const char *varName,
+        const char *attName,
+        netCDF::NcType netcdfDataType,
+        T *value,
+        const size_t len
     );
 
     extern "C" {
-
     int netcdfPutAttString(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const char *attName,
-            const char *data
+        int netcdfID,
+        const char *groupName,
+        const char *varName,
+        const char *attName,
+        const char *data
     );
+
     int netcdfPutAttInt(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const char *attName,
-            const int *data
+        int netcdfID,
+        const char *groupName,
+        const char *varName,
+        const char *attName,
+        const int *data
     );
-           int netcdfPutAttInt1
+
+    int netcdfPutAttInt1D(
+        int netcdfID,
+        const char *groupName,
+        const char *varName,
+        const char *attName,
+        const int **data,
+        const size_t len
+    );
     }
 }
 #endif //OBS2IODA_NETCDF_ATTRIBUTE_H

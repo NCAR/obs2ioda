@@ -24,6 +24,16 @@ namespace Obs2Ioda {
             float
     );
 
+   template int netcdfPutAtt1D<int>(
+            int,
+            const char *,
+            const char *,
+            const char *,
+            netCDF::NcType,
+            int *,
+            const size_t
+    );
+
 
     template<typename T>
     int netcdfPutAtt(
@@ -58,6 +68,54 @@ namespace Obs2Ioda {
                 group->putAtt(
                         attName,
                         netcdfDataType,
+                        value
+                );
+            }
+            return 0;
+        } catch (netCDF::exceptions::NcException &e) {
+            return netcdfErrorMessage(
+                    e,
+                    1
+            );
+        }
+    }
+
+    template<typename T>
+    int netcdfPutAtt1D(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const char *attName,
+            netCDF::NcType netcdfDataType,
+            T *value,
+            const size_t len
+    ) {
+        try {
+            std::lock_guard<std::mutex> lock(map_mutex);
+            auto file = NETCDF_FILE_MAP[netcdfID];
+            netCDF::NcVar var;
+            std::shared_ptr<netCDF::NcGroup> group = getRootGroup(
+                    netcdfID,
+                    groupName
+            );
+            if (varName != nullptr) {
+                auto ioda3VarName = getIodaName(
+                        varName,
+                        IODA_VARIABLE_NAMES
+                );
+                var = group->getVar(ioda3VarName);
+                var.putAtt(
+                        attName,
+                        netcdfDataType,
+                        len,
+                        value
+                );
+            }
+            else {
+                group->putAtt(
+                        attName,
+                        netcdfDataType,
+                        len,
                         value
                 );
             }
@@ -123,6 +181,24 @@ namespace Obs2Ioda {
                 attName,
                 netCDF::ncInt,
                 *data
+        );
+    }
+    int netcdfPutAttInt1D(
+            int netcdfID,
+            const char *groupName,
+            const char *varName,
+            const char *attName,
+            const int **data,
+            const size_t len
+    ) {
+        return netcdfPutAtt1D<const int*>(
+                netcdfID,
+                groupName,
+                varName,
+                attName,
+                netCDF::ncInt,
+                data,
+                len
         );
     }
 }
