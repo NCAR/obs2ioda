@@ -183,17 +183,19 @@ contains
             netcdfID, attName, data, varName, groupName, len)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: attName
-        class(*), intent(in) :: data(:)
+        class(*), dimension(:), intent(in) :: data
         character(len = *), intent(in), optional :: varName
         character(len = *), intent(in), optional :: groupName
-        integer, value, intent(in) :: len
+        integer, intent(in) :: len
         integer(c_int) :: netcdfPutAtt1D
 
         type(f_c_string_t) :: c_attName
         type(f_c_string_t) :: c_varName
         type(f_c_string_t) :: c_groupName
         type(c_ptr) :: c_data
+        integer(c_size_t) :: c_len
 
+        c_len = len
         c_attName%f_string = attName
         call c_attName%to_c()
         call init_optional_string(varName, c_varName)
@@ -201,8 +203,10 @@ contains
         select type (data)
         type is (integer(c_int))
             c_data = c_loc(data)
+            print *, c_len
+            print *, data
             netcdfPutAtt1D = c_netcdfPutAttInt1D(netcdfID, c_groupName%c_string, &
-                    c_varName%c_string, c_attName%c_string, c_data, integer(len, c_size_t))
+                    c_varName%c_string, c_attName%c_string, c_data, c_len)
         end select
         call c_attName%cleanup()
         call c_varName%cleanup()

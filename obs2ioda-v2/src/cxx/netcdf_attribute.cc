@@ -98,6 +98,7 @@ namespace Obs2Ioda {
                     netcdfID,
                     groupName
             );
+            std::cout << groupName << std::endl;
             if (varName != nullptr) {
                 auto ioda3VarName = getIodaName(
                         varName,
@@ -110,6 +111,7 @@ namespace Obs2Ioda {
                         len,
                         value
                 );
+                std::cout << var.getName() << std::endl;
             }
             else {
                 group->putAtt(
@@ -188,10 +190,11 @@ namespace Obs2Ioda {
             const char *groupName,
             const char *varName,
             const char *attName,
-            const int **data,
+            int *data,
             const size_t len
     ) {
-        return netcdfPutAtt1D<const int*>(
+        std::cout << "netcdfPutAttInt1D" << std::endl;
+        return netcdfPutAtt1D<int>(
                 netcdfID,
                 groupName,
                 varName,

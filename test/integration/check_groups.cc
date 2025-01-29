@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <iostream>
 
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(NetCDFTest);
+
 namespace fs = std::filesystem;
 
 const std::string REFERENCE_DIR = "data/reference";

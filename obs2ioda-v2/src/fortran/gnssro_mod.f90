@@ -461,7 +461,7 @@ status = netcdfPutAtt(ncid, "longname", "Atmospheric refractivity", varName="ref
 !call check( nf90_put_att(grpid_obsvalue, varid_ref, "units", "N" ))
 status = netcdfPutAtt(ncid, "units", "N", varName="refractivity", groupName="ObsValue")
 !call check( nf90_put_att(grpid_obsvalue, varid_ref, "valid_range", real((/ 0.0, 500.0 /))) )
-status = netcdfPutAtt(ncid, "valid_range", (/ 0.0, 500.0 /), varName="refractivity", groupName="ObsValue")
+status = netcdfPutAtt1D(ncid, "valid_range", (/ 0.0, 500.0 /), varName="refractivity", groupName="ObsValue", len=2)
 !call check( nf90_def_var_fill(grpid_obsvalue, varid_ref, 0, real(r_missing) ))
 status = netcdfSetFill(ncid, "refractivity", 1, real(r_missing), groupName="ObsValue")
 !
@@ -472,7 +472,7 @@ status = netcdfPutAtt(ncid, "longname", "Input error in atmospheric refractivity
 !call check( nf90_put_att(grpid_obserror, varid_refoe, "units", "N" ))
 status = netcdfPutAtt(ncid, "units", "N", varName="refractivity", groupName="ObsError")
 !call check( nf90_put_att(grpid_obserror, varid_refoe, "valid_range", real((/ 0.0, 10.0 /))) )
-status = netcdfPutAtt(ncid, "valid_range", (/ 0.0, 10.0 /), varName="refractivity", groupName="ObsError")
+status = netcdfPutAtt1D(ncid, "valid_range", (/ 0.0, 10.0 /), varName="refractivity", groupName="ObsError", len=2)
 !call check( nf90_def_var_fill(grpid_obserror, varid_refoe, 0, real(r_missing) ))
 status = netcdfSetFill(ncid, "refractivity", 1, real(r_missing), groupName="ObsError")
 !

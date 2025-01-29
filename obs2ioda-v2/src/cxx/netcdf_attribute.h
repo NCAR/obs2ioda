@@ -52,7 +52,7 @@ namespace Obs2Ioda {
         const char *groupName,
         const char *varName,
         const char *attName,
-        const int **data,
+        int *data,
         size_t len
     );
     }
