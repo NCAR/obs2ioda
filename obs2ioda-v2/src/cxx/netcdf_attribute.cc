@@ -31,7 +31,7 @@ namespace Obs2Ioda {
             const char *,
             netCDF::NcType,
             int *,
-            const size_t
+            size_t
     );
 
 

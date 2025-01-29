@@ -1,5 +1,5 @@
 module netcdf_cxx_mod
-    use iso_c_binding, only : c_char, c_null_char, c_null_ptr, c_int
+    use iso_c_binding, only : c_char, c_null_char, c_null_ptr, c_int, c_size_t
     use f_c_string_t_mod, only : f_c_string_t
     use f_c_string_1D_t_mod, only : f_c_string_1D_t
     use netcdf_cxx_i_mod
@@ -178,6 +178,36 @@ contains
         call c_varName%cleanup()
         call c_groupName%cleanup()
     end function netcdfPutAtt
+
+    function netcdfPutAtt1D(&
+            netcdfID, attName, data, varName, groupName, len)
+        integer(c_int), value, intent(in) :: netcdfID
+        character(len = *), intent(in) :: attName
+        class(*), intent(in) :: data(:)
+        character(len = *), intent(in), optional :: varName
+        character(len = *), intent(in), optional :: groupName
+        integer, value, intent(in) :: len
+        integer(c_int) :: netcdfPutAtt1D
+
+        type(f_c_string_t) :: c_attName
+        type(f_c_string_t) :: c_varName
+        type(f_c_string_t) :: c_groupName
+        type(c_ptr) :: c_data
+
+        c_attName%f_string = attName
+        call c_attName%to_c()
+        call init_optional_string(varName, c_varName)
+        call init_optional_string(groupName, c_groupName)
+        select type (data)
+        type is (integer(c_int))
+            c_data = c_loc(data)
+            netcdfPutAtt1D = c_netcdfPutAttInt1D(netcdfID, c_groupName%c_string, &
+                    c_varName%c_string, c_attName%c_string, c_data, integer(len, c_size_t))
+        end select
+        call c_attName%cleanup()
+        call c_varName%cleanup()
+        call c_groupName%cleanup()
+    end function netcdfPutAtt1D
 
     function netcdfSetFill(netcdfID, varName, fillMode, fillValue, groupName)
         integer(c_int), value, intent(in) :: netcdfID

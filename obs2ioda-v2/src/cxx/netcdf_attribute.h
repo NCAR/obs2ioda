@@ -27,7 +27,7 @@ namespace Obs2Ioda {
         const char *attName,
         netCDF::NcType netcdfDataType,
         T *value,
-        const size_t len
+        size_t len
     );
 
     extern "C" {
@@ -53,7 +53,7 @@ namespace Obs2Ioda {
         const char *varName,
         const char *attName,
         const int **data,
-        const size_t len
+        size_t len
     );
     }
 }

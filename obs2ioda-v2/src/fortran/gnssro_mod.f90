@@ -433,9 +433,9 @@ status = netcdfAddVar(ncid, 'ascending_flag', NF90_INT, 1, ['nlocs'], groupName=
 status = netcdfPutAtt(ncid, "longname", "the original occultation ascending/descending flag", varName="ascending_flag", &
 groupName="MetaData")
 !call check( nf90_put_att(grpid_metadata, varid_asce, "valid_range", int((/ 0, 1 /))) )
-status = netcdfPutAtt(ncid, "valid_range", (/ 0, 1 /), varName="ascending_flag", groupName="MetaData")
+status = netcdfPutAtt1D(ncid, "valid_range", (/ 0, 1 /), varName="ascending_flag", groupName="MetaData", len=2)
 !call check( nf90_put_att(grpid_metadata, varid_asce, "flag_values", int((/ 0, 1 /))) )
-status = netcdfPutAtt(ncid, "flag_values", (/ 0, 1 /), varName="ascending_flag", groupName="MetaData")
+status = netcdfPutAtt1D(ncid, "flag_values", (/ 0, 1 /), varName="ascending_flag", groupName="MetaData", len=2)
 !call check( nf90_put_att(grpid_metadata, varid_asce, "flag_meanings", "descending ascending") )
 status = netcdfPutAtt(ncid, "flag_meanings", "descending ascending", varName="ascending_flag", groupName="MetaData")
 !call check( nf90_put_att(grpid_metadata, varid_asce, "units",  "1" ))
