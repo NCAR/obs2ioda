@@ -112,6 +112,134 @@ module netcdf_cxx_i_mod
             integer(c_int) :: c_netcdfAddDim
         end function c_netcdfAddDim
 
+        ! c_netcdfAddVar:
+        !   Adds a new variable to a NetCDF file, specifying its name, type, and associated dimensions.
+        !
+        !   Arguments:
+        !     - netcdfID (integer(c_int), intent(in), value):
+        !       The identifier of the NetCDF file where the variable will be created.
+        !     - groupName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the group name. If `c_null_ptr`,
+        !       the variable is added as a global variable.
+        !     - varName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the variable name.
+        !     - netcdfDataType (integer(c_int), intent(in), value):
+        !       The NetCDF data type of the variable (e.g., `NF90_INT`, `NF90_REAL`).
+        !     - numDims (integer(c_int), intent(in), value):
+        !       The number of dimensions associated with the variable.
+        !     - dimNames (type(c_ptr), intent(in), value):
+        !       A C pointer to an array of null-terminated strings representing the dimension names.
+        !
+        !   Returns:
+        !     - integer(c_int): Status code indicating the result of the operation:
+        !         - 0: Success.
+        !         - Non-zero: Failure.
+        !
+        !   Notes:
+        !     - This function assumes that `netcdfID` corresponds to a valid NetCDF file.
+        !     - All strings must be null-terminated and passed as C pointers.
+        function c_netcdfAddVar(&
+                netcdfID, groupName, varName, netcdfDataType, numDims, dimNames) &
+                bind(C, name = "netcdfAddVar")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            integer(c_int), value, intent(in) :: netcdfDataType
+            integer(c_int), value, intent(in) :: numDims
+            type(c_ptr), value, intent(in) :: dimNames
+            integer(c_int) :: c_netcdfAddVar
+        end function c_netcdfAddVar
+
+        ! c_netcdfPutVarInt:
+        !   Writes integer data to a NetCDF variable in the specified group or as a global variable.
+        !
+        !   Arguments:
+        !     - netcdfID (integer(c_int), intent(in), value):
+        !       The identifier of the NetCDF file.
+        !     - groupName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the group name. If `c_null_ptr`,
+        !       the variable is assumed to be a global variable.
+        !     - varName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the variable name.
+        !     - data (type(c_ptr), intent(in), value):
+        !       A C pointer to the array of integer data to be written.
+        !
+        !   Returns:
+        !     - integer(c_int): Status code indicating the result of the operation:
+        !         - 0: Success.
+        !         - Non-zero: Failure.
+        function c_netcdfPutVarInt(&
+                netcdfID, groupName, varName, data) &
+                bind(C, name = "netcdfPutVarInt")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: data
+            integer(c_int) :: c_netcdfPutVarInt
+        end function c_netcdfPutVarInt
+
+        ! c_netcdfPutVarInt64:
+        !   Writes 64-bit integer data to a NetCDF variable in the specified group or as a global variable.
+        function c_netcdfPutVarInt64(&
+                netcdfID, groupName, varName, data) &
+                bind(C, name = "netcdfPutVarInt64")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: data
+            integer(c_int) :: c_netcdfPutVarInt64
+        end function c_netcdfPutVarInt64
+
+        ! c_netcdfPutVarReal:
+        !   Writes real (floating-point) data to a NetCDF variable in the specified group or as a global variable.
+        function c_netcdfPutVarReal(&
+                netcdfID, groupName, varName, data) &
+                bind(C, name = "netcdfPutVarReal")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: data
+            integer(c_int) :: c_netcdfPutVarReal
+        end function c_netcdfPutVarReal
+
+        ! c_netcdfPutVarString:
+        !   Writes string data to a NetCDF variable in the specified group or as a global variable.
+        !
+        !   Arguments:
+        !     - netcdfID (integer(c_int), intent(in), value):
+        !       The identifier of the NetCDF file.
+        !     - groupName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the group name. If `c_null_ptr`,
+        !       the variable is assumed to be a global variable.
+        !     - varName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the variable name.
+        !     - data (type(c_ptr), intent(in), value):
+        !       A C pointer to the array of strings to be written.
+        !
+        !   Returns:
+        !     - integer(c_int): Status code indicating the result of the operation:
+        !         - 0: Success.
+        !         - Non-zero: Failure.
+        function c_netcdfPutVarString(&
+                netcdfID, groupName, varName, data) &
+                bind(C, name = "netcdfPutVarString")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: data
+            integer(c_int) :: c_netcdfPutVarString
+        end function c_netcdfPutVarString
+
     end interface
 
 end module netcdf_cxx_i_mod
