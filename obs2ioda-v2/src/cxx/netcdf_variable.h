@@ -59,8 +59,8 @@ namespace Obs2Ioda {
      * @param groupName A null-terminated string specifying the group containing the variable.
      *                  If `nullptr`, the variable is assumed to be in the root group.
      * @param varName A null-terminated string specifying the name of the variable.
-     * @param fillMode The fill mode to be set (e.g., `NC_FILL` or `NC_NOFILL`).
-     * @param fillValue The fill value to be set for the variable (optional if `fillMode` is `NC_NOFILL`).
+     * @param fillMode The fill mode to be set.
+     * @param fillValue The fill value to be set for the variable.
      * @return 0 on success, non-zero on failure.
      */
     template<typename T>
@@ -73,18 +73,18 @@ namespace Obs2Ioda {
     );
 
     extern "C" {
-        /**
- * @brief Adds a variable to a NetCDF file.
- *
- * @param netcdfID The identifier of the NetCDF file.
- * @param groupName A null-terminated string specifying the group to which the variable will be added.
- *                  If `nullptr`, the variable is added to the root group.
- * @param varName A null-terminated string specifying the name of the variable.
- * @param netcdfDataType The NetCDF data type of the variable (e.g., `NC_INT`, `NC_FLOAT`).
- * @param numDims The number of dimensions for the variable.
- * @param dimNames An array of null-terminated strings specifying the names of the dimensions.
- * @return 0 on success, non-zero on failure.
- */
+    /**
+* @brief Adds a variable to a NetCDF file.
+*
+* @param netcdfID The identifier of the NetCDF file.
+* @param groupName A null-terminated string specifying the group to which the variable will be added.
+*                  If `nullptr`, the variable is added to the root group.
+* @param varName A null-terminated string specifying the name of the variable.
+* @param netcdfDataType The NetCDF data type of the variable (e.g., `NC_INT`, `NC_FLOAT`).
+* @param numDims The number of dimensions for the variable.
+* @param dimNames An array of null-terminated strings specifying the names of the dimensions.
+* @return 0 on success, non-zero on failure.
+*/
     int netcdfAddVar(
         int netcdfID,
         const char *groupName,
