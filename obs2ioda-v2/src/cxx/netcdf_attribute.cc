@@ -1,48 +1,82 @@
 #include "netcdf_attribute.h"
 #include "netcdf_file.h"
 #include "netcdf_error.h"
-#include <variant>
 
 namespace Obs2Ioda {
     template<typename T>
     int netcdfPutAtt(
-        const int netcdfID,
+        int netcdfID,
         const char *groupName,
         const char *varName,
         const char *attName,
         const netCDF::NcType &netcdfDataType,
+        size_t len,
         T values
     ) {
         try {
             auto file = FileMap::getInstance().getFile(
                 netcdfID
             );
-            const auto group = !groupName
-                                   ? file
-                                   : std::make_shared<
-                                       netCDF::NcGroup>(
-                                       file->getGroup(
-                                           groupName
-                                       )
-                                   );
+            std::shared_ptr<netCDF::NcGroup> group = (groupName && *
+                groupName)
+                ? std::make_shared<netCDF::NcGroup>(
+                    file->getGroup(
+                        groupName
+                    )
+                )
+                : file;
+
+            // This is required because the putAtt method signature is different for strings.
+            auto putStringAtt = [](
+                auto &target,
+                const char *stringAttName,
+                T attValue
+            ) {
+                target.putAtt(
+                    stringAttName,
+                    std::string(
+                        reinterpret_cast<const char *>(attValue)
+                    )
+                );
+            };
+
             if (varName) {
                 auto var = group->getVar(
                     varName
                 );
-                var.putAtt(
-                    attName,
-                    netcdfDataType,
-                    values
-                );
+                if (netcdfDataType == netCDF::ncString) {
+                    putStringAtt(
+                        var,
+                        attName,
+                        values
+                    );
+                } else {
+                    var.putAtt(
+                        attName,
+                        netcdfDataType,
+                        len,
+                        values
+                    );
+                }
             } else {
-                group->putAtt(
-                    attName,
-                    netcdfDataType,
-                    values
-                );
+                if (netcdfDataType == netCDF::ncString) {
+                    putStringAtt(
+                        *group,
+                        attName,
+                        values
+                    );
+                } else {
+                    group->putAtt(
+                        attName,
+                        netcdfDataType,
+                        len,
+                        values
+                    );
+                }
             }
+
             return 0;
-        } catch (netCDF::exceptions::NcException &e) {
+        } catch (const netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
                 e,
                 __LINE__,
@@ -51,6 +85,7 @@ namespace Obs2Ioda {
         }
     }
 
+
     int netcdfPutAttInt(
         int netcdfID,
         const char *groupName,
@@ -58,7 +93,7 @@ namespace Obs2Ioda {
         const char *attName,
         const int *attValue
     ) {
-        return netcdfPutAtt<int>(
+        return netcdfPutAtt(
             netcdfID,
             groupName,
             varName,
@@ -66,7 +101,8 @@ namespace Obs2Ioda {
             netCDF::NcType(
                 netCDF::ncInt
             ),
-            *attValue
+            1,
+            attValue
         );
     }
 
@@ -77,39 +113,18 @@ namespace Obs2Ioda {
         const char *attName,
         const char *attValue
     ) {
-        try {
-            auto file = FileMap::getInstance().getFile(
-                netcdfID
-            );
-            const auto group = !groupName
-                                   ? file
-                                   : std::make_shared<
-                                       netCDF::NcGroup>(
-                                       file->getGroup(
-                                           groupName
-                                       )
-                                   );
-
-            if (!varName) {
-                group->putAtt(
-                    attName,
-                    attValue
-                );
-            } else {
-                group->getVar(
-                    varName
-                ).putAtt(
-                    attName,
-                    attValue
-                );
-            }
-            return 0;
-        } catch (netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
-        }
+        return netcdfPutAtt(
+            netcdfID,
+            groupName,
+            varName,
+            attName,
+            netCDF::NcType(
+                netCDF::ncString
+            ),
+            strlen(
+                attValue
+            ),
+            attValue
+        );
     }
 }
