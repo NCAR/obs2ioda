@@ -2,6 +2,7 @@
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 #include <variant>
+#include "netcdf_names.h"
 
 namespace Obs2Ioda {
     template<typename T>
@@ -22,21 +23,21 @@ namespace Obs2Ioda {
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           groupName
+                                           trim(groupName)
                                        )
                                    );
             if (varName) {
                 auto var = group->getVar(
-                    varName
+                    trim(varName)
                 );
                 var.putAtt(
-                    attName,
+                    trim(attName),
                     netcdfDataType,
                     values
                 );
             } else {
                 group->putAtt(
-                    attName,
+                    trim(attName),
                     netcdfDataType,
                     values
                 );
@@ -86,21 +87,21 @@ namespace Obs2Ioda {
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           groupName
+                                           trim(groupName)
                                        )
                                    );
 
             if (!varName) {
                 group->putAtt(
-                    attName,
-                    attValue
+                    trim(attName),
+                    trim(attValue)
                 );
             } else {
                 group->getVar(
-                    varName
+                    trim(varName)
                 ).putAtt(
-                    attName,
-                    attValue
+                    trim(attName),
+                    (attValue)
                 );
             }
             return 0;
