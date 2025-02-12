@@ -299,83 +299,53 @@ module netcdf_cxx_i_mod
             integer(c_int) :: c_netcdfSetFillString
         end function c_netcdfSetFillString
 
-        ! c_netcdfSetFillInt:
-        !   Sets the fill mode and fill value for an integer NetCDF variable in the specified group
-        !   or as a global variable.
+        ! c_netcdfPutAttInt:
+        !   Writes an integer attribute to a NetCDF variable, group, or as a global attribute.
         !
         !   Arguments:
         !     - netcdfID (integer(c_int), intent(in), value):
         !       The identifier of the NetCDF file.
         !     - groupName (type(c_ptr), intent(in), value):
         !       A C pointer to a null-terminated string specifying the group name. If `c_null_ptr`,
-        !       the variable is assumed to be a global variable.
+        !       the attribute is assigned to the root group.
         !     - varName (type(c_ptr), intent(in), value):
-        !       A C pointer to a null-terminated string specifying the variable name.
-        !     - fillMode (integer(c_int), intent(in), value):
-        !       The fill mode flag, typically `NC_FILL` (enable fill) or `NC_NOFILL` (disable fill).
-        !     - fillValue (integer(c_int), intent(in), value):
-        !       The integer fill value to be used if fill mode is enabled.
+        !       A C pointer to a null-terminated string specifying the variable name. If `c_null_ptr`,
+        !       the attribute is assigned to the group instead.
+        !     - attName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the attribute name.
+        !     - attValue (type(c_ptr), intent(in), value):
+        !       A C pointer to the integer value to be assigned to the attribute.
         !
         !   Returns:
         !     - integer(c_int): Status code indicating the result of the operation:
         !         - 0: Success.
         !         - Non-zero: Failure.
-        function c_netcdfSetFillInt(&
-                netcdfID, groupName, varName, fillMode, fillValue) &
-                bind(C, name = "netcdfSetFillInt")
+        function c_netcdfPutAttInt(&
+                netcdfID, groupName, varName, attName, attValue) &
+                bind(C, name = "netcdfPutAttInt")
             import :: c_int
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
             type(c_ptr), value, intent(in) :: groupName
             type(c_ptr), value, intent(in) :: varName
-            integer(c_int), value, intent(in) :: fillMode
-            integer(c_int), value, intent(in) :: fillValue
-            integer(c_int) :: c_netcdfSetFillInt
-        end function c_netcdfSetFillInt
+            type(c_ptr), value, intent(in) :: attName
+            type(c_ptr), value, intent(in) :: attValue
+            integer(c_int) :: c_netcdfPutAttInt
+        end function c_netcdfPutAttInt
 
-        ! See documentation for `c_netcdfSetFillInt`.
-        function c_netcdfSetFillInt64(&
-                netcdfID, groupName, varName, fillMode, fillValue) &
-                bind(C, name = "netcdfSetFillInt64")
+        ! See documentation for `c_netcdfPutAttInt`.
+        function c_netcdfPutAttString(&
+                netcdfID, groupName, varName, attName, attValue) &
+                bind(C, name = "netcdfPutAttString")
             import :: c_int
-            import :: c_long
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
             type(c_ptr), value, intent(in) :: groupName
             type(c_ptr), value, intent(in) :: varName
-            integer(c_int), value, intent(in) :: fillMode
-            integer(c_long), value, intent(in) :: fillValue
-            integer(c_int) :: c_netcdfSetFillInt64
-        end function c_netcdfSetFillInt64
-
-        ! See documentation for `c_netcdfSetFillInt`.
-        function c_netcdfSetFillReal(&
-                netcdfID, groupName, varName, fillMode, fillValue) &
-                bind(C, name = "netcdfSetFillReal")
-            import :: c_int
-            import :: c_ptr
-            import :: c_float
-            real(c_float), value, intent(in) :: fillValue
-            integer(c_int), value, intent(in) :: netcdfID
-            type(c_ptr), value, intent(in) :: groupName
-            type(c_ptr), value, intent(in) :: varName
-            integer(c_int), value, intent(in) :: fillMode
-            integer(c_int) :: c_netcdfSetFillReal
-        end function c_netcdfSetFillReal
-
-        ! See documentation for `c_netcdfSetFillInt`.
-        function c_netcdfSetFillString(&
-                netcdfID, groupName, varName, fillMode, fillValue) &
-                bind(C, name = "netcdfSetFillString")
-            import :: c_int
-            import :: c_ptr
-            type(c_ptr), value, intent(in) :: fillValue
-            integer(c_int), value, intent(in) :: netcdfID
-            type(c_ptr), value, intent(in) :: groupName
-            type(c_ptr), value, intent(in) :: varName
-            integer(c_int), value, intent(in) :: fillMode
-            integer(c_int) :: c_netcdfSetFillString
-        end function c_netcdfSetFillString
+            type(c_ptr), value, intent(in) :: attName
+            type(c_ptr), value, intent(in) :: attValue
+            integer(c_int) :: c_netcdfPutAttString
+        end function c_netcdfPutAttString
 
     end interface
 
