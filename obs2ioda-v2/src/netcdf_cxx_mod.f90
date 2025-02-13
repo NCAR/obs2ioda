@@ -327,7 +327,9 @@ contains
     !     - attName (character(len=*), intent(in)):
     !       The name of the attribute to be written.
     !     - attValue (class(*), intent(in)):
-    !       The value of the attribute. The type must match the expected NetCDF data type.
+    !       The value of the attribute. Must be of a supported NetCDF type,
+    !       such as integer(c_int) or character(len=*). Unsupported types will
+    !       result in an error with status code -2.
     !     - varName (character(len=*), intent(in), optional):
     !       The name of the variable to which the attribute will be assigned.
     !       If not provided, the attribute is assigned to the group instead.
@@ -373,12 +375,10 @@ contains
         select type (attValue)
         type is (integer(c_int))
             c_attValue = c_loc(attValue)
-            netcdfPutAtt = c_netcdfPutAttInt(netcdfID, c_groupName, &
-                    c_varName, c_attName, c_attValue)
+            netcdfPutAtt = c_netcdfPutAttInt(netcdfID, c_attName, c_attValue, c_varName, c_groupName)
         type is (character(len = *))
             c_attValue = f_c_string_attValue%to_c(attValue)
-            netcdfPutAtt = c_netcdfPutAttString(netcdfID, c_groupName, &
-                    c_varName, c_attName, c_attValue)
+            netcdfPutAtt = c_netcdfPutAttString(netcdfID, c_attName, c_attValue, c_varName, c_groupName)
         class default
             netcdfPutAtt = -2
         end select

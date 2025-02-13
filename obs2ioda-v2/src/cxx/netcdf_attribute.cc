@@ -3,128 +3,66 @@
 #include "netcdf_error.h"
 
 namespace Obs2Ioda {
-    template<typename T>
-    int netcdfPutAtt(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        const char *attName,
-        const netCDF::NcType &netcdfDataType,
-        size_t len,
-        T values
+    template<typename T> int netcdfPutAtt(
+        int netcdfID, const char *attName, T values,
+        const char *varName, const char *groupName,
+        const netCDF::NcType &netcdfDataType, size_t len
     ) {
         try {
-            auto file = FileMap::getInstance().getFile(
-                netcdfID
-            );
+            auto file = FileMap::getInstance().getFile(netcdfID);
             std::shared_ptr<netCDF::NcGroup> group = (groupName && *
                 groupName)
                 ? std::make_shared<netCDF::NcGroup>(
-                    file->getGroup(
-                        groupName
-                    )
-                )
-                : file;
-
-            // This is required because the putAtt method signature is different for strings.
-            auto putStringAtt = [](
-                auto &target,
-                const char *stringAttName,
-                T attValue
-            ) {
-                target.putAtt(
-                    stringAttName,
-                    std::string(
-                        reinterpret_cast<const char *>(attValue)
-                    )
-                );
-            };
+                    file->getGroup(groupName)
+                ) : file;
 
             if (varName) {
-                auto var = group->getVar(
-                    varName
-                );
+                auto var = group->getVar(varName);
                 if (netcdfDataType == netCDF::ncString) {
-                    putStringAtt(
-                        var,
-                        attName,
-                        values
+                    var.putAtt(
+                        attName, std::string(
+                            reinterpret_cast<const char *>(values)
+                        )
                     );
                 } else {
-                    var.putAtt(
-                        attName,
-                        netcdfDataType,
-                        len,
-                        values
-                    );
+                    var.putAtt(attName, netcdfDataType, len, values);
                 }
             } else {
                 if (netcdfDataType == netCDF::ncString) {
-                    putStringAtt(
-                        *group,
-                        attName,
-                        values
+                    group->putAtt(
+                        attName, std::string(
+                            reinterpret_cast<const char *>(values)
+                        )
                     );
                 } else {
-                    group->putAtt(
-                        attName,
-                        netcdfDataType,
-                        len,
-                        values
-                    );
+                    group->putAtt(attName, netcdfDataType, len, values);
                 }
             }
 
             return 0;
         } catch (const netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
         }
     }
 
 
     int netcdfPutAttInt(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        const char *attName,
-        const int *attValue
+        int netcdfID, const char *attName, const int *attValue,
+        const char *varName, const char *groupName
     ) {
         return netcdfPutAtt(
-            netcdfID,
-            groupName,
-            varName,
-            attName,
-            netCDF::NcType(
-                netCDF::ncInt
-            ),
-            1,
-            attValue
+            netcdfID, attName, attValue, varName, groupName,
+            netCDF::NcType(netCDF::ncInt), 1
         );
     }
 
     int netcdfPutAttString(
-        const int netcdfID,
-        const char *groupName,
-        const char *varName,
-        const char *attName,
-        const char *attValue
+        const int netcdfID, const char *attName, const char *attValue,
+        const char *varName, const char *groupName
     ) {
         return netcdfPutAtt(
-            netcdfID,
-            groupName,
-            varName,
-            attName,
-            netCDF::NcType(
-                netCDF::ncString
-            ),
-            strlen(
-                attValue
-            ),
-            attValue
+            netcdfID, attName, attValue, varName, groupName,
+            netCDF::NcType(netCDF::ncString), strlen(attValue)
         );
     }
 }

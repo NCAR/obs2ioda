@@ -321,29 +321,29 @@ module netcdf_cxx_i_mod
         !         - 0: Success.
         !         - Non-zero: Failure.
         function c_netcdfPutAttInt(&
-                netcdfID, groupName, varName, attName, attValue) &
+                netcdfID, attName, attValue, varName, groupName) &
                 bind(C, name = "netcdfPutAttInt")
             import :: c_int
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
-            type(c_ptr), value, intent(in) :: groupName
-            type(c_ptr), value, intent(in) :: varName
             type(c_ptr), value, intent(in) :: attName
             type(c_ptr), value, intent(in) :: attValue
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: groupName
             integer(c_int) :: c_netcdfPutAttInt
         end function c_netcdfPutAttInt
 
         ! See documentation for `c_netcdfPutAttInt`.
         function c_netcdfPutAttString(&
-                netcdfID, groupName, varName, attName, attValue) &
+                netcdfID, attName, attValue, varName, groupName) &
                 bind(C, name = "netcdfPutAttString")
             import :: c_int
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
-            type(c_ptr), value, intent(in) :: groupName
-            type(c_ptr), value, intent(in) :: varName
             type(c_ptr), value, intent(in) :: attName
             type(c_ptr), value, intent(in) :: attValue
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: groupName
             integer(c_int) :: c_netcdfPutAttString
         end function c_netcdfPutAttString
 
