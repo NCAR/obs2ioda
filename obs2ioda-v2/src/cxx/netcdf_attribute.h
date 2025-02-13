@@ -4,7 +4,7 @@
 namespace Obs2Ioda {
     extern "C" {
     /**
-     * @brief Writes an integer attribute to a variable, group, or as a global attribute in a NetCDF file.
+     * @brief Writes an attribute to a variable, group, or as a global attribute in a NetCDF file.
      *
      * If `varName` is provided, the attribute is assigned to the specified variable.
      * If `varName` is `NULL`, the attribute is assigned to the group.

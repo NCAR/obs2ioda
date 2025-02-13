@@ -153,7 +153,7 @@ module netcdf_cxx_i_mod
         end function c_netcdfAddVar
 
         ! c_netcdfPutVar:
-        !   Writes integer data to a NetCDF variable in the specified group or as a global variable.
+        !   Writes data to a NetCDF variable in the specified group or as a global variable.
         !
         !   Arguments:
         !     - netcdfID (integer(c_int), intent(in), value):
@@ -222,7 +222,7 @@ module netcdf_cxx_i_mod
         end function c_netcdfPutVarString
 
         ! c_netcdfSetFillInt:
-        !   Sets the fill mode and fill value for an integer NetCDF variable in the specified group
+        !   Sets the fill mode and fill value for an NetCDF variable in the specified group
         !   or as a global variable.
         !
         !   Arguments:
@@ -300,7 +300,7 @@ module netcdf_cxx_i_mod
         end function c_netcdfSetFillString
 
         ! c_netcdfPutAttInt:
-        !   Writes an integer attribute to a NetCDF variable, group, or as a global attribute.
+        !   Writes an attribute to a NetCDF variable, group, or as a global attribute.
         !
         !   Arguments:
         !     - netcdfID (integer(c_int), intent(in), value):
