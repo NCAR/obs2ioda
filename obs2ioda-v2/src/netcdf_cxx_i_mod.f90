@@ -305,16 +305,16 @@ module netcdf_cxx_i_mod
         !   Arguments:
         !     - netcdfID (integer(c_int), intent(in), value):
         !       The identifier of the NetCDF file.
-        !     - groupName (type(c_ptr), intent(in), value):
-        !       A C pointer to a null-terminated string specifying the group name. If `c_null_ptr`,
-        !       the attribute is assigned to the root group.
-        !     - varName (type(c_ptr), intent(in), value):
-        !       A C pointer to a null-terminated string specifying the variable name. If `c_null_ptr`,
-        !       the attribute is assigned to the group instead.
         !     - attName (type(c_ptr), intent(in), value):
         !       A C pointer to a null-terminated string specifying the attribute name.
         !     - attValue (type(c_ptr), intent(in), value):
         !       A C pointer to the integer value to be assigned to the attribute.
+        !     - varName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the variable name. If `c_null_ptr`,
+        !       the attribute is assigned to the group instead.
+        !     - groupName (type(c_ptr), intent(in), value):
+        !       A C pointer to a null-terminated string specifying the group name. If `c_null_ptr`,
+        !       the attribute is assigned to the root group.
         !
         !   Returns:
         !     - integer(c_int): Status code indicating the result of the operation:
