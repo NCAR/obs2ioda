@@ -1,6 +1,7 @@
 #include "netcdf_dimension.h"
 #include "netcdf_file.h"
 #include "netcdf_error.h"
+#include "netcdf_names.h"
 
 namespace Obs2Ioda {
     int netcdfAddDim(
@@ -17,7 +18,8 @@ namespace Obs2Ioda {
                                        netCDF::NcGroup>(
                                        file->getGroup(
                                            groupName));
-            auto dim = group->addDim(dimName, len);
+            auto strippedName = trim(dimName);
+            auto dim = group->addDim(strippedName, len);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(

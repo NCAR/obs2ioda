@@ -1,6 +1,7 @@
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 #include <memory>
+#include <netcdf_names.h>
 
 namespace Obs2Ioda {
     FileMap &FileMap::getInstance() {
@@ -57,7 +58,7 @@ namespace Obs2Ioda {
     ) {
         try {
             const auto file = std::make_shared<netCDF::NcFile>(
-                path,
+                trim(path),
                 static_cast<netCDF::NcFile::FileMode>(fileMode)
             );
             *netcdfID = file->getId();
