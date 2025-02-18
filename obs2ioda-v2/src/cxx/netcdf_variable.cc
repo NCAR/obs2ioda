@@ -1,4 +1,7 @@
 #include "netcdf_variable.h"
+
+#include <ioda_names.h>
+
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 
@@ -22,10 +25,18 @@ namespace Obs2Ioda {
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
-                dims.push_back(file->getDim(dimNames[i]));;
+                auto iodaDimName = getIodaName(
+                    dimNames[i],
+                    IODA_DIMENSION_NAMES
+                );
+                dims.push_back(file->getDim(iodaDimName));;
             }
-            auto var = group->addVar(
+            auto iodaVarName = getIodaName(
                 varName,
+                IODA_VARIABLE_NAMES
+            );
+            auto var = group->addVar(
+                iodaVarName,
                 netCDF::NcType(netcdfDataType),
                 dims
             );
@@ -54,7 +65,11 @@ namespace Obs2Ioda {
                                        netCDF::NcGroup>(
                                        file->getGroup(
                                            groupName));
-            auto var = group->getVar(varName);
+            auto iodaVarName = getIodaName(
+                varName,
+                IODA_VARIABLE_NAMES
+            );
+            auto var = group->getVar(iodaVarName);
             var.putVar(values);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
@@ -138,7 +153,11 @@ namespace Obs2Ioda {
                                        netCDF::NcGroup>(
                                        file->getGroup(
                                            groupName));
-            auto var = group->getVar(varName);
+            auto iodaVarName = getIodaName(
+                varName,
+                IODA_VARIABLE_NAMES
+            );
+            auto var = group->getVar(iodaVarName);
             var.setFill(
                 fillMode,
                 fillValue
