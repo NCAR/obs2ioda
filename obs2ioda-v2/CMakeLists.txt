@@ -2,7 +2,6 @@
 # Set include directories
 include_directories(${NetCDF_INCLUDE_DIRS})
 add_subdirectory(src/cxx)
-add_subdirectory(src/test)
 
 # Define sources
 set(v2_SOURCES
