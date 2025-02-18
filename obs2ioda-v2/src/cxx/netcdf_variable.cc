@@ -1,7 +1,6 @@
 #include "netcdf_variable.h"
 #include "netcdf_file.h"
 #include "netcdf_error.h"
-#include "netcdf_names.h"
 
 namespace Obs2Ioda {
     int netcdfAddVar(
@@ -19,14 +18,14 @@ namespace Obs2Ioda {
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           trim(groupName)));
+                                           groupName));
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
-                dims.push_back(file->getDim(trim(dimNames[i])));;
+                dims.push_back(file->getDim(dimNames[i]));;
             }
             auto var = group->addVar(
-                trim(varName),
+                varName,
                 netCDF::NcType(netcdfDataType),
                 dims
             );
@@ -54,8 +53,8 @@ namespace Obs2Ioda {
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           trim(groupName)));
-            auto var = group->getVar(trim(varName));
+                                           groupName));
+            auto var = group->getVar(varName);
             var.putVar(values);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
@@ -138,8 +137,8 @@ namespace Obs2Ioda {
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           trim(groupName)));
-            auto var = group->getVar(trim(varName));
+                                           groupName));
+            auto var = group->getVar(varName);
             var.setFill(
                 fillMode,
                 fillValue
@@ -214,7 +213,7 @@ namespace Obs2Ioda {
             groupName,
             varName,
             fillMode,
-            trim(fillValue)
+            fillValue
 
         );
     }

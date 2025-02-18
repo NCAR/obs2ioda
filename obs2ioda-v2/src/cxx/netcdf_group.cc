@@ -1,7 +1,6 @@
 #include "netcdf_group.h"
 #include "netcdf_file.h"
 #include "netcdf_error.h"
-#include "netcdf_names.h"
 
 namespace Obs2Ioda {
     int netcdfAddGroup(
@@ -18,8 +17,8 @@ namespace Obs2Ioda {
                                          : std::make_shared<
                                              netCDF::NcGroup>(
                                              file->getGroup(
-                                                 trim(parentGroupName)));
-            const auto group = parentGroup->addGroup(trim(groupName));
+                                                 parentGroupName));
+            const auto group = parentGroup->addGroup(groupName);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(

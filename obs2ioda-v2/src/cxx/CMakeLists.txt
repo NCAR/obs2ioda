@@ -5,7 +5,6 @@ set(obs2ioda_cxx_SOURCES
     netcdf_dimension.cc
     netcdf_variable.cc
     netcdf_attribute.cc
-    netcdf_names.cc
 )
 set(obs2ioda_cxx_LIBRARIES
     NetCDF::NetCDF_CXX
