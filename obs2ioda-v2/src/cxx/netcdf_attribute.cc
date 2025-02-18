@@ -1,4 +1,7 @@
 #include "netcdf_attribute.h"
+
+#include <ioda_names.h>
+
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 
@@ -17,7 +20,8 @@ namespace Obs2Ioda {
                 ) : file;
 
             if (varName) {
-                auto var = group->getVar(varName);
+                auto iodaVarName = getIodaName(varName, IODA_VARIABLE_NAMES);
+                auto var = group->getVar(iodaVarName);
                 if (netcdfDataType == netCDF::ncString) {
                     var.putAtt(
                         attName, std::string(
