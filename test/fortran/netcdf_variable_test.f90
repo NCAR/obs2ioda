@@ -14,6 +14,7 @@
 subroutine int_variable_test()
     use test_utils_mod
     use netcdf_cxx_mod
+    use netcdf
     implicit none
     integer :: status
     integer(c_int) :: netcdfID
@@ -65,6 +66,8 @@ end subroutine int_variable_test
 subroutine string_variable_test()
     use test_utils_mod
     use netcdf_cxx_mod
+    use netcdf
+    use netcdf_cxx_get_variable_mod
     implicit none
     integer :: status
     integer(c_int) :: netcdfID

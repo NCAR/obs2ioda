@@ -6,6 +6,7 @@
 #include <netcdf_group.h>
 #include <netcdf_attribute.h>
 #include <netcdf_variable.h>
+#include <netcdf_get_variable.h>
 
 /**
  * @brief Test case for creating, managing, and closing NetCDF files using Obs2Ioda functionality.

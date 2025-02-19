@@ -12,6 +12,7 @@
 subroutine int_attribute_test()
     use test_utils_mod
     use netcdf_cxx_mod
+    use netcdf
     implicit none
     integer :: status
     integer(c_int) :: netcdfID
@@ -54,6 +55,7 @@ end subroutine int_attribute_test
 subroutine string_attribute_test()
     use test_utils_mod
     use netcdf_cxx_mod
+    use netcdf
     implicit none
     integer :: status
     integer(c_int) :: netcdfID

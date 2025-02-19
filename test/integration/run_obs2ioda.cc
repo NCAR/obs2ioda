@@ -21,7 +21,7 @@ const std::string INPUT_DIR = std::string(TEST_DIR) + "/data/input";
 
 const std::vector<std::string> FILES = {
     "gdas.1bamua.t00z.20180415.bufr", "gdas.satwnd.t00z.20180415.bufr",
-    "gdas.gpsro.t00z.20180415.bufr" "prepbufr.gdas.20180415.t00z.nr.48h"
+    "gdas.gpsro.t00z.20180415.bufr", "prepbufr.gdas.20180415.t00z.nr.48h"
 };
 
 const std::vector<std::string> IGNORE_ATTRIBUTES = {
@@ -39,6 +39,9 @@ class NetCDFTest : public ::testing::TestWithParam<std::pair<std::string
 protected:
     // Runs before each test in this suite
     void SetUp() override {
+        if (!fs::exists(OUTPUT_DIR)) {
+            fs::create_directories(OUTPUT_DIR);
+        }
         ASSERT_TRUE(
             fs::exists(OUTPUT_DIR )
         ) <<

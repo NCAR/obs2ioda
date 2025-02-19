@@ -4,6 +4,7 @@ set(obs2ioda_cxx_SOURCES
     netcdf_group.cc
     netcdf_dimension.cc
     netcdf_variable.cc
+    netcdf_get_variable.cc
     netcdf_attribute.cc
     ioda_names.cc
 )

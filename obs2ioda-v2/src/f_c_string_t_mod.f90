@@ -77,8 +77,9 @@ contains
         class(f_c_string_t), target, intent(inout) :: this
         character(len = *), intent(in) :: f_string
         type(c_ptr) :: c_string
+        character(len = :), allocatable :: trimmed_f_string
         integer :: n
-        n = len(f_string)
+        n = len(trim(f_string))
         if (allocated(this%fc_string)) then
             deallocate(this%fc_string)
         end if

@@ -21,6 +21,8 @@ set(v2_SOURCES
         f_c_string_1D_t_mod.f90
         netcdf_cxx_i_mod.f90
         netcdf_cxx_mod.f90
+        netcdf_cxx_get_variable_mod.f90
+        netcdf_cxx_get_variable_i_mod.f90
 )
 list(TRANSFORM v2_SOURCES PREPEND "src/")
 set(obs2ioda_v2_SOURCES
