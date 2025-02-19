@@ -1,6 +1,5 @@
 module ncio_mod
 
-use netcdf
 use kinds, only: i_kind, r_single, r_kind, i_llong
 use define_mod, only: nobtype, nvar_info, n_ncdim, n_ncgrp, nstring, ndatetime, &
    obtype_list, name_ncdim, name_ncgrp, name_var_met, name_var_info, name_sen_info, &
@@ -11,9 +10,10 @@ use define_mod, only: nobtype, nvar_info, n_ncdim, n_ncgrp, nstring, ndatetime, 
 use netcdf_mod, only: open_netcdf_for_write, close_netcdf, &
    def_netcdf_dims, def_netcdf_grp, def_netcdf_var, def_netcdf_end, &
    put_netcdf_var, get_netcdf_dims
-use netcdf, only: nf90_string
+use netcdf, only: nf90_string, nf90_int, nf90_float, nf90_char, nf90_int64
 use ufo_vars_mod, only: ufo_vars_getindex
-use netcdf_cxx_mod
+use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfAddVar, &
+   netcdfSetFill, netcdfAddGroup, netcdfPutVar, netcdfClose
 
 implicit none
 
