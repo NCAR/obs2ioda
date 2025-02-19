@@ -77,15 +77,13 @@ contains
         class(f_c_string_t), target, intent(inout) :: this
         character(len = *), intent(in) :: f_string
         type(c_ptr) :: c_string
-        character(len = :), allocatable :: trimmed_f_string
         integer :: n
-        trimmed_f_string = trim(f_string)
-        n = len(trimmed_f_string)
+        n = len(f_string)
         if (allocated(this%fc_string)) then
             deallocate(this%fc_string)
         end if
         allocate(character(len = n + 1) :: this%fc_string)
-        this%fc_string = trimmed_f_string // c_null_char
+        this%fc_string = f_string(1:n) // c_null_char
         c_string = c_loc(this%fc_string)
     end function to_c
 
