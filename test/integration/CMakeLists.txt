@@ -1,8 +1,8 @@
 set(run_obs2ioda_SOURCES
-    run_obs2ioda.cc
+        run_obs2ioda.cc
 )
 add_executable(run_obs2ioda ${run_obs2ioda_SOURCES})
-target_compile_definitions(run_obs2ioda PUBLIC -DTEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(run_obs2ioda PUBLIC -DTEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}" -DOBS2IODA_EXECUTABLE="${CMAKE_BINARY_DIR}/bin/obs2ioda_v2")
 target_link_libraries(run_obs2ioda PUBLIC obs2ioda_cxx GTest::gmock_main)
 add_test(
         NAME run_obs2ioda_test
@@ -11,7 +11,7 @@ add_test(
 add_memcheck_ctest(run_obs2ioda)
 
 set(check_groups_SOURCES
-    check_groups.cc
+        check_groups.cc
 )
 add_executable(check_groups ${check_groups_SOURCES})
 target_link_libraries(check_groups PUBLIC obs2ioda_cxx GTest::gmock_main)

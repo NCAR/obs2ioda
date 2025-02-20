@@ -13,6 +13,10 @@ namespace fs = std::filesystem;
 #define TEST_DIR
 #endif
 
+#ifndef OBS2IODA_EXECUTABLE
+#define OBS2IODA_EXECUTABLE
+#endif
+
 const std::string REFERENCE_DIR =
         std::string(TEST_DIR) + "/data/reference";
 const std::string OUTPUT_DIR = std::string(TEST_DIR) + "/data/output";
@@ -58,7 +62,7 @@ protected:
 
         // Process each file
         std::string command =
-                std::string(TEST_DIR) + "/obs2ioda_v2 -i " + INPUT_DIR + " -o " +
+                std::string(OBS2IODA_EXECUTABLE) + " -i " + INPUT_DIR + " -o " +
                 OUTPUT_DIR + " " + file;
         std::cout << "Processing file: " << file << std::endl;
         int result = std::system(command.c_str());
