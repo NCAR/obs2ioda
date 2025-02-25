@@ -85,6 +85,27 @@ TEST_F(NetCDFTestFixture, NetCDFCreateReplaceModeTest) {
                  netCDF::exceptions::NcBadId);
 }
 
+TEST_F(NetCDFTestFixture, NetCDFDimensionTest) {
+    int netcdfID{};
+    int dimID{};
+    int status = Obs2Ioda::netcdfCreate(
+        this->test_dim_path.c_str(),
+        &netcdfID,
+        static_cast<netCDF::NcFile::FileMode>(netCDF::NcFile::replace)
+    );
+    EXPECT_EQ(status, 0);
+    status = Obs2Ioda::netcdfAddDim(
+        netcdfID,
+        nullptr,
+        this->test_dim_name.c_str(),
+        this->test_dim_len,
+        &dimID
+    );
+    EXPECT_EQ(status, 0);
+    EXPECT_EQ(dimID, 0);
+
+}
+
 TEST_F(NetCDFTestFixture, NetCDFVariableTest) {
     int netcdfID{};
     int status = Obs2Ioda::netcdfCreate(

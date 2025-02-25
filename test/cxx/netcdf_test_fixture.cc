@@ -7,6 +7,7 @@ void NetCDFTestFixture::SetUp() {
     test_dim_path = "test_dim.nc";
     test_var_path = "test_var.nc";
     test_att_path = "test_att.nc";
+    test_dim_path = "test_dim.nc";
 
     test_group_name = "group";
     test_nested_group_name = "nested_group";
