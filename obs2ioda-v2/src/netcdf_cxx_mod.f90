@@ -129,6 +129,7 @@ contains
         type(c_ptr) :: c_dimName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_dimName
+        integer(c_int) :: status
 
         if (present(groupName)) then
             c_groupName = f_c_string_groupName%to_c(groupName)
@@ -137,8 +138,9 @@ contains
         end if
         c_dimName = f_c_string_dimName%to_c(dimName)
 
-        netcdfAddDim = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len, dimID)
-
+        status = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len, dimID)
+        dimID = dimID + 1
+        netcdfAddDim = status
     end function netcdfAddDim
 
     ! netcdfAddVar:
