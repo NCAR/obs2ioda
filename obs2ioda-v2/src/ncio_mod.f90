@@ -138,15 +138,16 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       end if
 
       status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1), ncid_ncdim(1))
-      status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(1))
-      status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)])
-      status = netcdfPutAtt(netcdfID, "suggested_chunk_dim", val_ncdim(1), varName = trim(ncname))
+      if ( trim(ncname) == 'nchans' ) then
+         status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)])
+         status = netcdfSetFill(netcdfID, ncname, 1, -999)
+      end if
+
+      status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(ncid_ncdim(1)))
       do i = 2, n_ncdim
          ncid_ncdim(i) = i
          status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i), ncid_ncdim(i))
          status = netcdfPutAtt(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
-         status = netcdfAddVar(netcdfID, trim(name_ncdim(i)), NF90_INT, 1, [trim(name_ncdim(i))])
-         status = netcdfPutAtt(netcdfID, "suggested_chunk_dim", 100, varName = name_ncdim(i))
       end do
 
       ! define global attributes
@@ -241,7 +242,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             dim2_name = 'nstring'
             status = netcdfAddVar(netcdfID, ncname, NF90_CHAR, 2, &
                [dim1_name, dim2_name], "MetaData")
-            status = netcdfSetFill(netcdfID, ncname, 1, "", "MetaData")
          else
             if (ncname == 'dateTime') then
                dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
@@ -249,13 +249,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                   [dim1_name], "MetaData")
                status = netcdfPutAtt(netcdfID, "units", "seconds since 1970-01-01T00:00:00Z", varName = trim(ncname), &
                   groupName = "MetaData")
-               if (type_var_info(i) == NF90_INT) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
-               else if (type_var_info(i) == NF90_INT64) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999_i_llong, "MetaData")
-               else if (type_var_info(i) == NF90_FLOAT) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
-               end if
             else
                dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
                status = netcdfAddVar(netcdfID, ncname, type_var_info(i), 1, &
