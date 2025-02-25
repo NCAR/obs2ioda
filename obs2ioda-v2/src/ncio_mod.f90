@@ -145,9 +145,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(ncid_ncdim(1)))
       do i = 2, n_ncdim
-         ncid_ncdim(i) = i
          status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i), ncid_ncdim(i))
-         status = netcdfPutAtt(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
+         status = netcdfPutAtt(netcdfID, trim(name_ncdim(ncid_ncdim(i))), val_ncdim(i))
       end do
 
       ! define global attributes
