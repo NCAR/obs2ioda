@@ -138,9 +138,8 @@ contains
         end if
         c_dimName = f_c_string_dimName%to_c(dimName)
 
-        status = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len, dimID)
+        netcdfAddDim = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len, dimID)
         dimID = dimID + 1
-        netcdfAddDim = status
     end function netcdfAddDim
 
     ! netcdfAddVar:
