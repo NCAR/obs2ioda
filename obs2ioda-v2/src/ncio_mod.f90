@@ -7,7 +7,7 @@ use define_mod, only: nobtype, nvar_info, n_ncdim, n_ncgrp, nstring, ndatetime, 
    write_nc_radiance_geo, ninst_geo, geoinst_list, &
    var_tb, nsen_info, type_var_info, type_sen_info, dim_var_info, dim_sen_info, &
    unit_var_met, iflag_conv, iflag_radiance, set_brit_obserr, set_ahi_obserr
-use netcdf, only: nf90_string, nf90_int, nf90_float, nf90_char, nf90_int64
+use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_int64
 use ufo_vars_mod, only: ufo_vars_getindex
 use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfAddVar, &
    netcdfSetFill, netcdfAddGroup, netcdfPutVar, netcdfClose
@@ -31,16 +31,16 @@ contains
     !
     ! Returns:
     ! - dim_name: A character string containing the dimension name.
-    function get_dim_name(dimid, nchans_nvars_flag) result(dim_name)
-        integer(i_kind), intent(in) :: dimid
-        logical, intent(in) :: nchans_nvars_flag
-        character(nstring) :: dim_name
+   function get_dim_name(dimid, nchans_nvars_flag) result(dim_name)
+      integer(i_kind), intent(in) :: dimid
+      logical, intent(in) :: nchans_nvars_flag
+      character(nstring) :: dim_name
 
-        dim_name = name_ncdim(dimid)
-        if (nchans_nvars_flag .and. trim(dim_name) == 'nvars') then
-            dim_name = 'nchans'
-        end if
-    end function get_dim_name
+      dim_name = name_ncdim(dimid)
+      if (nchans_nvars_flag .and. trim(dim_name) == 'nvars') then
+         dim_name = 'nchans'
+      end if
+   end function get_dim_name
 
 subroutine write_obs (filedate, write_opt, outdir, itim)
 
@@ -137,14 +137,13 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          nchans_nvars_flag = .true.
       end if
 
-      ncid_ncdim(1) = 1
-      status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1))
+      status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1), ncid_ncdim(1))
       status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(1))
       status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)])
       status = netcdfPutAtt(netcdfID, "suggested_chunk_dim", val_ncdim(1), varName = trim(ncname))
       do i = 2, n_ncdim
          ncid_ncdim(i) = i
-         status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
+         status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i), ncid_ncdim(i))
          status = netcdfPutAtt(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
          status = netcdfAddVar(netcdfID, trim(name_ncdim(i)), NF90_INT, 1, [trim(name_ncdim(i))])
          status = netcdfPutAtt(netcdfID, "suggested_chunk_dim", 100, varName = name_ncdim(i))
@@ -239,8 +238,9 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i))
             dim2 = ncid_ncdim(idim)
             dim1_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
-            status = netcdfAddVar(netcdfID, ncname, NF90_STRING, 1, &
-               [dim1_name], "MetaData")
+            dim2_name = 'nstring'
+            status = netcdfAddVar(netcdfID, ncname, NF90_CHAR, 2, &
+               [dim1_name, dim2_name], "MetaData")
             status = netcdfSetFill(netcdfID, ncname, 1, "", "MetaData")
          else
             if (ncname == 'dateTime') then
