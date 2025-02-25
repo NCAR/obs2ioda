@@ -6,7 +6,6 @@
 !  Author: Hailing Zhang
 
 module gnssro_bufr2ioda
-   use netcdf
    use define_mod, only: ndatetime, output_info_type
    implicit none
    private
@@ -423,6 +422,10 @@ contains
 
 
    subroutine write_gnssro_data(gnssro_data, gnssro_bufr_info, file_output_info, idx_window)
+      use netcdf, only: NF90_INT, NF90_INT64, NF90_FLOAT
+      use kinds, only: r_single, i_llong
+      use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfAddGroup, &
+         netcdfAddVar, netcdfSetFill, netcdfPutVar, netcdfClose
       type(gnssro_type), intent(in) :: gnssro_data
       type(bufr_info_type), intent(in) :: gnssro_bufr_info
       type(output_info_type), intent(in) :: file_output_info
@@ -430,13 +433,9 @@ contains
       logical, dimension(gnssro_bufr_info%nobs_max) :: is_in_window
       integer(i_kind) :: ndata
       integer :: idx_min_time, idx_max_time
-      integer(i_kind) :: status
       integer :: file_mode
       character(:), allocatable :: dim_name, var_name, group_name
-      integer :: ncid, nlocs_dimid, grpid_metadata, grpid_obsvalue, grpid_obserror
-      integer :: varid_lat, varid_lon, varid_time, varid_epochtime, varid_recn, varid_sclf, varid_ptid, varid_said
-      integer :: varid_siid, varid_asce, varid_ogce, varid_msl, varid_impp, varid_imph, varid_azim, varid_geoid, varid_rfict
-      integer :: varid_ref, varid_refoe, varid_bnd, varid_bndoe
+      integer :: ncid
       character(:), allocatable :: output_file_name
 
       ! Identify observations in current time window
@@ -635,7 +634,7 @@ contains
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%bndoe_gsi, is_in_window), r_single), group_name))
       
       ! close file
-      status = netcdfClose(ncid)
+      call check(netcdfClose(ncid))
    end subroutine
 
 
