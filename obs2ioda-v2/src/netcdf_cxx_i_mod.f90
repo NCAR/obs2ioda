@@ -221,6 +221,19 @@ module netcdf_cxx_i_mod
             integer(c_int) :: c_netcdfPutVarString
         end function c_netcdfPutVarString
 
+        ! See documentation for `c_netcdfPutVarInt`.
+        function c_netcdfPutVarChar(&
+           netcdfID, groupName, varName, values) &
+           bind(C, name = "netcdfPutVarChar")
+            import :: c_int
+            import :: c_ptr
+            integer(c_int), value, intent(in) :: netcdfID
+            type(c_ptr), value, intent(in) :: groupName
+            type(c_ptr), value, intent(in) :: varName
+            type(c_ptr), value, intent(in) :: values
+            integer(c_int) :: c_netcdfPutVarString
+        end function c_netcdfPutVarChar
+
         ! c_netcdfSetFillInt:
         !   Sets the fill mode and fill value for an NetCDF variable in the specified group
         !   or as a global variable.
