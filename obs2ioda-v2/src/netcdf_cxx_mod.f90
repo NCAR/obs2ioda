@@ -3,7 +3,7 @@ module netcdf_cxx_mod
     use f_c_string_t_mod, only : f_c_string_t
     use f_c_string_1D_t_mod, only : f_c_string_1D_t
     use netcdf_cxx_i_mod, only : c_netcdfCreate, c_netcdfClose, c_netcdfAddGroup, c_netcdfAddDim, &
-            c_netcdfAddVar, c_netcdfPutVarInt, c_netcdfPutVarInt64, c_netcdfPutVarReal, c_netcdfPutVarString, &
+            c_netcdfAddVar, c_netcdfPutVarInt, c_netcdfPutVarInt64, c_netcdfPutVarReal, c_netcdfPutVarChar, &
             c_netcdfSetFillInt, c_netcdfSetFillInt64, c_netcdfSetFillReal, c_netcdfSetFillString, &
             c_netcdfPutAttInt, c_netcdfPutAttString
     implicit none
@@ -109,6 +109,8 @@ contains
     !       Name of the new dimension.
     !   - len (integer(c_int), intent(in), value):
     !       Length of the dimension.
+    !  - dimID (integer(c_int), intent(out)):
+    !       Identifier of the new dimension.
     !   - groupName (character(len=*), intent(in), optional):
     !       Name of the target group. If absent, the dimension is added as a global dimension.
     !
@@ -116,16 +118,18 @@ contains
     !    - integer(c_int): A status code indicating the outcome of the operation:
     !       - 0: Success.
     !       - Non-zero: Failure
-    function netcdfAddDim(netcdfID, dimName, len, groupName)
+    function netcdfAddDim(netcdfID, dimName, len, dimID, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: dimName
         integer(c_int), value, intent(in) :: len
+        integer(c_int), intent(out) :: dimID
         character(len = *), optional, intent(in) :: groupName
         integer(c_int) :: netcdfAddDim
         type(c_ptr) :: c_groupName
         type(c_ptr) :: c_dimName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_dimName
+        integer(c_int) :: status
 
         if (present(groupName)) then
             c_groupName = f_c_string_groupName%to_c(groupName)
@@ -134,8 +138,9 @@ contains
         end if
         c_dimName = f_c_string_dimName%to_c(dimName)
 
-        netcdfAddDim = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len)
-
+        status = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len, dimID)
+        dimID = dimID + 1
+        netcdfAddDim = status
     end function netcdfAddDim
 
     ! netcdfAddVar:
@@ -244,7 +249,7 @@ contains
 
         type is (character(len = *))
             c_values = f_c_string_1D_values%to_c(values)
-            netcdfPutVar = c_netcdfPutVarString(netcdfID, c_groupName, &
+            netcdfPutVar = c_netcdfPutVarChar(netcdfID, c_groupName, &
                     c_varName, c_values)
         class default
             netcdfPutVar = -2
