@@ -252,6 +252,11 @@ contains
             netcdfPutVar = c_netcdfPutVarReal(netcdfID, c_groupName, &
                     c_varName, c_values)
 
+        type is (real(c_double))
+            c_values = c_loc(values)
+            netcdfPutVar = c_netcdfPutVarDouble(netcdfID, c_groupName, &
+               c_varName, c_values)
+
         type is (character(len = *))
             c_values = f_c_string_1D_values%to_c(values)
             netcdfPutVar = c_netcdfPutVarChar(netcdfID, c_groupName, &

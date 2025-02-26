@@ -133,11 +133,11 @@ namespace Obs2Ioda {
         );
     }
 
-    int netcdfPutVarChar(
+    int netcdfPutVarDouble(
         int netcdfID,
         const char *groupName,
         const char *varName,
-        const char **values
+        const double *values
     ) {
         return netcdfPutVar(
             netcdfID,
