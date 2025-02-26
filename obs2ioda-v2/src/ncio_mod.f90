@@ -54,7 +54,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    character(len=512)                    :: ncfname  ! netcdf file name
    integer(i_kind), dimension(n_ncdim)   :: ncid_ncdim
    integer(i_kind), dimension(n_ncdim)   :: val_ncdim
-   integer(i_kind), dimension(n_ncgrp)   :: ncid_ncgrp
    character(len=nstring)                :: ncname
    integer(i_kind)                       :: ncfileid
    integer(i_kind)                       :: ntype
@@ -70,7 +69,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    integer(i_kind) :: imin_datetime(1), imax_datetime(1)
    integer(i_kind) :: ncstatus
    integer(i_kind) :: has_wavenumber
-   integer(i_kind) :: ncid_ncgrp_wn
    integer(i_kind) :: status, netcdfID
    logical :: nchans_nvars_flag
    character(len = nstring) :: dim1_name
@@ -145,9 +143,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(ncid_ncdim(1)))
       do i = 2, n_ncdim
-         ncid_ncdim(i) = i
          status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i), ncid_ncdim(i))
-         status = netcdfPutAtt(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
+         status = netcdfPutAtt(netcdfID, trim(name_ncdim(ncid_ncdim(i))), val_ncdim(i))
       end do
 
       ! define global attributes

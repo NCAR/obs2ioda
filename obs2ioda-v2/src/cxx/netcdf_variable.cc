@@ -10,7 +10,7 @@ namespace Obs2Ioda {
         std::vector<char> contiguousValues(numStrings * stringSize + numStrings, ' ');
 
         for (int i = 0; i < numStrings; ++i) {
-            auto len = static_cast<int>(std::strlen(values[i]));
+            int len = std::strlen(values[i]);
             std::copy_n(values[i], std::min(len, stringSize), contiguousValues.begin() + i * stringSize);
             contiguousValues[i * stringSize + stringSize] = '\0';
         }
