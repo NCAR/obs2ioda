@@ -23,6 +23,10 @@ namespace Obs2Ioda {
         int netcdfID, const char *attName, const int *attValue, const char *varName, const char *groupName
     );
 
+    int netcdfPutAttInt1D(
+        int netcdfID, const char *attName, const int *attValue, const char *varName, const char *groupName, int len
+    );
+
     int netcdfPutAttString(
         int netcdfID, const char *attName, const char *attValue, const char *varName, const char *groupName
     );

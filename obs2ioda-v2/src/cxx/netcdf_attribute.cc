@@ -45,6 +45,18 @@ namespace Obs2Ioda {
         }
     }
 
+    int netcdfPutAttInt1D(
+        int netcdfID, const char *attName, const int *attValue,
+        const char *varName, const char *groupName, const int len
+    ) {
+        for (auto i = 0; i < len; i++) {
+            std::cout << attValue[i] << std::endl;
+        }
+        return netcdfPutAtt(
+            netcdfID, attName, attValue, varName, groupName,
+            netCDF::NcType(netCDF::ncInt), len
+        );
+    }
 
     int netcdfPutAttInt(
         int netcdfID, const char *attName, const int *attValue,
