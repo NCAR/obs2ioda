@@ -161,6 +161,7 @@ TEST_F(NetCDFTestFixture, NetCDFVariableTest) {
         this->test_int_var_name.c_str(),
         this->test_int_var_data.data()
     );
+    EXPECT_EQ(status, 0);
     int varSize{};
     status = Obs2Ioda::netcdfGetVarSize(
         netcdfID,
