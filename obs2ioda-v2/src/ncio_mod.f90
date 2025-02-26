@@ -230,16 +230,18 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          if ( iflag /= itrue ) cycle var_info_def_loop
          ncname = trim(name_var_info(i))
          igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
-         idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i))
-         dim1 = ncid_ncdim(idim)
          if ( ufo_vars_getindex(name_ncdim, dim_var_info(2,i)) > 0 ) then
             idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i))
+            dim1 = ncid_ncdim(idim)
+            dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
+            idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i))
             dim2 = ncid_ncdim(idim)
-            dim1_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
-            dim2_name = 'nstring'
+            dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, ncname, NF90_CHAR, 2, &
                [dim1_name, dim2_name], "MetaData")
          else
+            idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i))
+            dim1 = ncid_ncdim(idim)
             if (ncname == 'dateTime') then
                dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
                status = netcdfAddVar(netcdfID, ncname, type_var_info(i), 1, &
@@ -345,6 +347,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                rtmp2d(jj, ii) = xdata(ityp, itim)%xfield(ii, jj)%qm
             end do
          end do
+         ! netcdfPutVar expects a 1D variable, but rtmp2d is 2D, so you need to flatten it before passing it to netcdfPutVar.
          status = netcdfPutVar(netcdfID, ncname, &
             reshape(rtmp2d(:,:), [xdata(ityp, itim)%nvars * xdata(ityp, itim)%nlocs]), &
             "PreQC")
