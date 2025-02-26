@@ -1,5 +1,5 @@
 module netcdf_cxx_i_mod
-    use iso_c_binding, only : c_int, c_ptr, c_float, c_long
+    use iso_c_binding, only: c_int, c_ptr, c_float, c_long
     implicit none
     public
 
@@ -223,8 +223,8 @@ module netcdf_cxx_i_mod
 
         ! See documentation for `c_netcdfPutVarInt`.
         function c_netcdfPutVarChar(&
-           netcdfID, groupName, varName, values) &
-           bind(C, name = "netcdfPutVarChar")
+                netcdfID, groupName, varName, values) &
+                bind(C, name = "netcdfPutVarChar")
             import :: c_int
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
