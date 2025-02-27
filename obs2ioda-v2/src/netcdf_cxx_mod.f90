@@ -159,6 +159,8 @@ contains
     !     - groupName (character(len=*), intent(in), optional):
     !       The name of the group in which the variable will be created.
     !       If not provided, the variable will be added as a global variable.
+    !     - fillValue (class(*), intent(in), optional):
+    !       The fill value to be used for the variable.
     !
     !   Returns:
     !     - integer(c_int): A status code indicating the outcome of the operation:
