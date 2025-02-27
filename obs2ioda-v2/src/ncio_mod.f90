@@ -137,8 +137,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1), ncid_ncdim(1))
       if ( trim(ncname) == 'nchans' ) then
-         status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)])
-         status = netcdfSetFill(netcdfID, ncname, 1, -999)
+         status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)], fillValue = -999)
       end if
 
       status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(ncid_ncdim(1)))
@@ -176,22 +175,18 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             ncname = trim(name_var_met(ivar))
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
-            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [dim1_name], "ObsValue")
-            status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "ObsValue")
+            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [dim1_name], "ObsValue", fillValue = -999.0)
             status = netcdfPutAtt(netcdfID, "units", trim(unit_var_met(ivar)), varName = trim(ncname), groupName = "ObsValue")
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
-            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [dim1_name], "ObsError")
-            status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "ObsError")
+            status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [dim1_name], "ObsError", fillValue = -999.0)
             status = netcdfPutAtt(netcdfID, "units", trim(unit_var_met(ivar)), varName = trim(ncname), groupName = "ObsError")
             igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
-            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [dim1_name], "PreQC")
-            status = netcdfSetFill(netcdfID, ncname, 1, -999, "PreQC")
+            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [dim1_name], "PreQC", fillValue = -999)
             igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
-            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [dim1_name], "ObsType")
-            status = netcdfSetFill(netcdfID, ncname, 1, -999, "ObsType")
+            status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [dim1_name], "ObsType", fillValue = -999)
          end do
       else if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          ncname = trim(var_tb)
@@ -203,22 +198,19 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
          dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
-            [dim2_name, dim1_name], "ObsValue")
-         status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "ObsValue")
+            [dim2_name, dim1_name], "ObsValue", fillValue = -999.0)
          status = netcdfPutAtt(netcdfID, "units", "K", varName = trim(ncname), groupName = "ObsValue")
          igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
          dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
          dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
-            [dim2_name, dim1_name], "ObsError")
-         status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "ObsError")
+            [dim2_name, dim1_name], "ObsError", fillValue = -999.0)
          status = netcdfPutAtt(netcdfID, "units", "K", varName = trim(ncname), groupName = "ObsError")
          igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
          dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
          dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_INT, 2, &
-            [dim2_name, dim1_name], "PreQC")
-         status = netcdfSetFill(netcdfID, ncname, 1, -999, "PreQC")
+            [dim2_name, dim1_name], "PreQC", fillValue = -999)
       end if
 
       var_info_def_loop: do i = 1, nvar_info
@@ -295,8 +287,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             dim1 = ncid_ncdim(idim)
             dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, 'sensor_band_central_radiation_wavenumber', NF90_FLOAT, 1, &
-               [dim1_name], "MetaData")
-            status = netcdfSetFill(netcdfID, 'sensor_band_central_radiation_wavenumber', 1, -999.0, "MetaData")
+               [dim1_name], "MetaData", fillValue = -999.0)
          end if
       end if ! write_nc_radiance
 
