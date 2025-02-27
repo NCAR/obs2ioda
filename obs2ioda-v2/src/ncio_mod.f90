@@ -57,7 +57,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    character(len=nstring)                :: ncname
    integer(i_kind)                       :: ncfileid
    integer(i_kind)                       :: ntype
-   integer(i_kind)                       :: i, ityp, igrp, ivar, ii, iv, jj
+   integer(i_kind)                       :: i, ityp, ivar, ii, iv, jj
    integer(i_kind)                       :: idim, dim1, dim2
    character(len=nstring),   allocatable :: str_nstring(:)
    character(len=ndatetime), allocatable :: str_ndatetime(:)
@@ -173,18 +173,14 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          do i = 1, xdata(ityp,itim) % nvars
             ivar = xdata(ityp,itim) % var_idx(i)
             ncname = trim(name_var_met(ivar))
-            igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [dim1_name], "ObsValue", fillValue = -999.0)
             status = netcdfPutAtt(netcdfID, "units", trim(unit_var_met(ivar)), varName = trim(ncname), groupName = "ObsValue")
-            igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 1, [dim1_name], "ObsError", fillValue = -999.0)
             status = netcdfPutAtt(netcdfID, "units", trim(unit_var_met(ivar)), varName = trim(ncname), groupName = "ObsError")
-            igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [dim1_name], "PreQC", fillValue = -999)
-            igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
             dim1_name = get_dim_name(ncid_ncdim(2), nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, ncname, NF90_INT, 1, [dim1_name], "ObsType", fillValue = -999)
          end do
@@ -194,19 +190,16 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          dim1 = ncid_ncdim(idim)
          idim = ufo_vars_getindex(name_ncdim, 'nlocs')
          dim2 = ncid_ncdim(idim)
-         igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
          dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
          dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
             [dim2_name, dim1_name], "ObsValue", fillValue = -999.0)
          status = netcdfPutAtt(netcdfID, "units", "K", varName = trim(ncname), groupName = "ObsValue")
-         igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
          dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
          dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
             [dim2_name, dim1_name], "ObsError", fillValue = -999.0)
          status = netcdfPutAtt(netcdfID, "units", "K", varName = trim(ncname), groupName = "ObsError")
-         igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
          dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
          dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_INT, 2, &
@@ -221,7 +214,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          end if
          if ( iflag /= itrue ) cycle var_info_def_loop
          ncname = trim(name_var_info(i))
-         igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
          if ( ufo_vars_getindex(name_ncdim, dim_var_info(2,i)) > 0 ) then
             idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i))
             dim1 = ncid_ncdim(idim)
@@ -256,7 +248,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          do i = 1, nsen_info
             ncname = trim(name_sen_info(i))
-            igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
             idim = ufo_vars_getindex(name_ncdim, dim_sen_info(1,i))
             dim1 = ncid_ncdim(idim)
             if ( ufo_vars_getindex(name_ncdim, dim_sen_info(2,i)) > 0 ) then
@@ -298,16 +289,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             ivar = xdata(ityp,itim) % var_idx(i)
             if ( vflag(ivar,ityp) == itrue ) then
                ncname = trim(name_var_met(ivar))
-               igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
                status = netcdfPutVar(netcdfID, ncname, [xdata(ityp, itim)%xfield(:, i)%val], "ObsValue")
                ncname = trim(name_var_met(ivar))
-               igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
                status = netcdfPutVar(netcdfID, ncname, [xdata(ityp, itim)%xfield(:, i)%err], "ObsError")
                ncname = trim(name_var_met(ivar))
-               igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
                status = netcdfPutVar(netcdfID, ncname, [xdata(ityp, itim)%xfield(:, i)%qm], "PreQC")
                ncname = trim(name_var_met(ivar))
-               igrp = ufo_vars_getindex(name_ncgrp, 'ObsType')
                status = netcdfPutVar(netcdfID, ncname, [xdata(ityp, itim)%xfield(:, i)%rptype], "ObsType")
             end if
          end do var_loop
@@ -316,7 +303,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          status = netcdfPutVar(netcdfID, ncname, ichan(:))
          allocate(rtmp2d(xdata(ityp,itim)%nvars, xdata(ityp,itim)%nlocs))
          ncname = trim(var_tb)
-         igrp = ufo_vars_getindex(name_ncgrp, 'ObsValue')
          do jj = 1, xdata(ityp,itim)%nvars
             do ii = 1, xdata(ityp,itim)%nlocs
                rtmp2d(jj,ii) = xdata(ityp,itim)%xfield(ii,jj)%val
@@ -325,14 +311,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          status = netcdfPutVar(netcdfID, ncname, &
             reshape(rtmp2d(:,:), [xdata(ityp, itim)%nvars * xdata(ityp, itim)%nlocs]), &
             "ObsValue")
-         igrp = ufo_vars_getindex(name_ncgrp, 'ObsError')
          do ii = 1, xdata(ityp,itim)%nlocs
             rtmp2d(:,ii) = obserr(:)
          end do
          status = netcdfPutVar(netcdfID, ncname, &
             reshape(rtmp2d(:, :), [xdata(ityp, itim)%nvars * xdata(ityp, itim)%nlocs]), &
             "ObsError")
-         igrp = ufo_vars_getindex(name_ncgrp, 'PreQC')
          do jj = 1, xdata(ityp, itim)%nvars
             do ii = 1, xdata(ityp, itim)%nlocs
                rtmp2d(jj, ii) = xdata(ityp, itim)%xfield(ii, jj)%qm
@@ -353,7 +337,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          end if
          if ( iflag /= itrue ) cycle var_info_loop
          ncname = trim(name_var_info(i))
-         igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
          if ( type_var_info(i) == nf90_int ) then
             status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xinfo_int(:, i), "MetaData")
          else if (type_var_info(i) == nf90_float) then
@@ -385,7 +368,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
          do i = 1, nsen_info
             ncname = trim(name_sen_info(i))
-            igrp = ufo_vars_getindex(name_ncgrp, 'MetaData')
             if (type_sen_info(i) == nf90_int) then
                status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_int(:, i), "MetaData")
             else if (type_sen_info(i) == nf90_float) then
