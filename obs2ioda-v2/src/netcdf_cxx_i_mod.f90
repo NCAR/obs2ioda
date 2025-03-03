@@ -241,7 +241,7 @@ module netcdf_cxx_i_mod
         ! See documentation for `c_netcdfPutVarInt`.
         function c_netcdfPutVarChar(&
                 netcdfID, groupName, varName, values) &
-                bind(C, name = "netcdfPutVarChar")
+                bind(C, name = "netcdfPutVarString")
             import :: c_int
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
