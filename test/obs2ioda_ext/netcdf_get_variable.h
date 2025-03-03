@@ -29,21 +29,21 @@ namespace Obs2Ioda {
         int netcdfID,
         const char *groupName,
         const char *varName,
-        int *data
+        int **data
     );
 
     int netcdfGetVarInt64(
         int netcdfID,
         const char *groupName,
         const char *varName,
-        long long *data
+        long long **data
     );
 
     int netcdfGetVarReal(
         int netcdfID,
         const char *groupName,
         const char *varName,
-        float *data
+        float **data
     );
 
     int netcdfGetVarString(

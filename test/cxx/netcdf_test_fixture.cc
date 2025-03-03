@@ -27,7 +27,7 @@ void NetCDFTestFixture::SetUp() {
     test_real_var_data = {1.1f, 2.2f, 3.3f, 4.4f, 5.5f};
     test_string_var_data = {"one", "two", "three", "four", "five"};
 
-    test_int_att_name = "int_att";
+    test_int_att_name = "int_var";
     test_int_1d_att_name = "int_1d_att";
     test_string_att_name = "string_att";
     test_int_att_data = 2;

@@ -164,18 +164,21 @@ contains
     !     - groupName (character(len=*), intent(in), optional):
     !       The name of the group in which the variable will be created.
     !       If not provided, the variable will be added as a global variable.
+    !     - fillValue (class(*), intent(in), optional):
+    !       The fill value to be used for the variable.
     !
     !   Returns:
     !     - integer(c_int): A status code indicating the outcome of the operation:
     !         - 0: Success.
     !         - Non-zero: Failure.
-    function netcdfAddVar(netcdfID, varName, netcdfDataType, numDims, dimNames, groupName)
+    function netcdfAddVar(netcdfID, varName, netcdfDataType, numDims, dimNames, groupName, fillValue)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: varName
         integer(c_int), value, intent(in) :: netcdfDataType
         integer(c_int), value, intent(in) :: numDims
         character(len = *), dimension(numDims), intent(in) :: dimNames
         character(len = *), optional, intent(in) :: groupName
+        class(*), intent(in), optional :: fillValue
         integer(c_int) :: netcdfAddVar
         type(c_ptr) :: c_groupName
         type(c_ptr) :: c_varName
@@ -193,6 +196,9 @@ contains
         c_dimNames = f_c_string_1D_dimNames%to_c(dimNames)
         netcdfAddVar = c_netcdfAddVar(netcdfID, c_groupName, c_varName, &
                 netcdfDataType, numDims, c_dimNames)
+        if (present(fillValue)) then
+            netcdfAddVar = netcdfSetFill(netcdfID, varName, 1, fillValue, groupName)
+        end if
     end function netcdfAddVar
 
     ! netcdfPutVar:

@@ -13,16 +13,16 @@ module netcdf_cxx_get_variable_mod
     public
 
     ! netcdfGetVar:
-    !   Reads data from a variable in a NetCDF file.
+    !   Reads values from a variable in a NetCDF file.
     !
     !   Arguments:
     !     - netcdfID (integer(c_int), intent(in), value):
-    !       The identifier of the NetCDF file from which data will be read.
+    !       The identifier of the NetCDF file from which values will be read.
     !     - varName (character(len=*), intent(in)):
     !       The name of the variable to be read.
-    !     - data (class(*), allocatable, intent(out)):
-    !       The output array where the read data will be stored.
-    !       The type must match the variable's data type.
+    !     - values (class(*), allocatable, intent(out)):
+    !       The output array where the read values will be stored.
+    !       The type must match the variable's values type.
     !     - groupName (character(len=*), intent(in), optional):
     !       The name of the group containing the variable.
     !       If not provided, the variable is assumed to be a global variable.
@@ -41,10 +41,10 @@ module netcdf_cxx_get_variable_mod
 contains
 
     ! See interface netcdfGetVar documentation for details.
-    function netcdfGetVarInt(netcdfID, varName, data, groupName)
+    function netcdfGetVarInt(netcdfID, varName, values, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: varName
-        integer(c_int), allocatable, intent(out) :: data(:)
+        integer(c_int), allocatable, intent(out) :: values(:)
         character(len = *), optional, intent(in) :: groupName
         integer(c_int) :: netcdfGetVarInt
         integer(c_int) :: varSize
@@ -52,8 +52,6 @@ contains
         type(c_ptr) :: c_varName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_varName
-        type(c_ptr) :: c_data
-        integer, pointer :: f_data_ptr(:)
 
         if (present(groupName)) then
             c_groupName = f_c_string_groupName%to_c(groupName)
@@ -62,18 +60,17 @@ contains
         end if
         c_varName = f_c_string_varName%to_c(varName)
         netcdfGetVarInt = c_netcdfGetVarSize(netcdfID, c_groupName, c_varName, varSize)
-        allocate(data(varSize))
-        netcdfGetVarInt = c_netcdfGetVarInt(netcdfID, c_groupName, c_varName, c_data)
-        call c_f_pointer(c_data, f_data_ptr, [varSize])
-        allocate(data(varSize))
-        data = f_data_ptr
+        if (allocated(values)) deallocate(values)
+        allocate(values(varSize))
+        values(:) = 0
+        netcdfGetVarInt = c_netcdfGetVarInt(netcdfID, c_groupName, c_varName, values)
     end function netcdfGetVarInt
 
     ! See interface netcdfGetVar documentation for details.
-    function netcdfGetVarInt64(netcdfID, varName, data, groupName)
+    function netcdfGetVarInt64(netcdfID, varName, values, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: varName
-        integer(c_long), allocatable, intent(out) :: data(:)
+        integer(c_long), allocatable, target, intent(out) :: values(:)
         character(len = *), optional, intent(in) :: groupName
         integer(c_int) :: netcdfGetVarInt64
         integer(c_int) :: varSize
@@ -81,8 +78,6 @@ contains
         type(c_ptr) :: c_varName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_varName
-        type(c_ptr) :: c_data
-        integer(c_long), pointer :: f_data_ptr(:)
 
         if (present(groupName)) then
             c_groupName = f_c_string_groupName%to_c(groupName)
@@ -91,18 +86,16 @@ contains
         end if
         c_varName = f_c_string_varName%to_c(varName)
         netcdfGetVarInt64 = c_netcdfGetVarSize(netcdfID, c_groupName, c_varName, varSize)
-        allocate(data(varSize))
-        netcdfGetVarInt64 = c_netcdfGetVarInt64(netcdfID, c_groupName, c_varName, c_data)
-        call c_f_pointer(c_data, f_data_ptr, [varSize])
-        allocate(data(varSize))
-        data = f_data_ptr
+        if (allocated(values)) deallocate(values)
+        allocate(values(varSize))
+        netcdfGetVarInt64 = c_netcdfGetVarInt64(netcdfID, c_groupName, c_varName, values)
     end function netcdfGetVarInt64
 
     ! See interface netcdfGetVar documentation for details.
-    function netcdfGetVarReal(netcdfID, varName, data, groupName)
+    function netcdfGetVarReal(netcdfID, varName, values, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: varName
-        real(c_float), allocatable, intent(out) :: data(:)
+        real(c_float), allocatable, target, intent(out) :: values(:)
         character(len = *), optional, intent(in) :: groupName
         integer(c_int) :: netcdfGetVarReal
         integer(c_int) :: varSize
@@ -110,8 +103,6 @@ contains
         type(c_ptr) :: c_varName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_varName
-        type(c_ptr) :: c_data
-        real(c_float), pointer :: f_data_ptr(:)
 
         if (present(groupName)) then
             c_groupName = f_c_string_groupName%to_c(groupName)
@@ -120,18 +111,16 @@ contains
         end if
         c_varName = f_c_string_varName%to_c(varName)
         netcdfGetVarReal = c_netcdfGetVarSize(netcdfID, c_groupName, c_varName, varSize)
-        allocate(data(varSize))
-        netcdfGetVarReal = c_netcdfGetVarReal(netcdfID, c_groupName, c_varName, c_data)
-        call c_f_pointer(c_data, f_data_ptr, [varSize])
-        allocate(data(varSize))
-        data = f_data_ptr
+        if (allocated(values)) deallocate(values)
+        allocate(values(varSize))
+        netcdfGetVarReal = c_netcdfGetVarReal(netcdfID, c_groupName, c_varName, values)
     end function netcdfGetVarReal
 
     ! See interface netcdfGetVar documentation for details.
-    function netcdfGetVarString(netcdfID, varName, data, groupName)
+    function netcdfGetVarString(netcdfID, varName, values, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: varName
-        character(len = :), allocatable, intent(out) :: data(:)
+        character(len = :), allocatable, intent(out) :: values(:)
         character(len = *), optional, intent(in) :: groupName
         integer(c_int) :: netcdfGetVarString
         integer(c_int) :: varSize
@@ -139,8 +128,8 @@ contains
         type(c_ptr) :: c_varName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_varName
-        type(c_ptr) :: c_data
-        type(f_c_string_1D_t) :: f_c_string_1D_data
+        type(c_ptr) :: c_values
+        type(f_c_string_1D_t) :: f_c_string_1D_values
         character(len = :), allocatable :: tmpData(:)
 
         if (present(groupName)) then
@@ -150,12 +139,10 @@ contains
         end if
         c_varName = f_c_string_varName%to_c(varName)
         netcdfGetVarString = c_netcdfGetVarSize(netcdfID, c_groupName, c_varName, varSize)
-        allocate(character(len = 1) :: tmpData(varSize))
-        c_data = f_c_string_1D_data%to_c(tmpData)
-        netcdfGetVarString = c_netcdfGetVarString(netcdfID, c_groupName, c_varName, c_data)
-        tmpData = f_c_string_1D_data%to_f(c_data, varSize)
-        data = tmpData
-        call c_netcdfFreeString(varSize, c_data)
+        netcdfGetVarString = c_netcdfGetVarString(netcdfID, c_groupName, c_varName, c_values)
+        tmpData = f_c_string_1D_values%to_f(c_values, varSize)
+        values = tmpData
+        call c_netcdfFreeString(varSize, c_values)
     end function netcdfGetVarString
 
 end module netcdf_cxx_get_variable_mod
