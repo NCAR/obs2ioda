@@ -5,13 +5,13 @@ module netcdf_cxx_mod
     use netcdf_cxx_i_mod, only: c_netcdfCreate, c_netcdfClose, c_netcdfAddGroup, c_netcdfAddDim, &
             c_netcdfAddVar, c_netcdfPutVarInt, c_netcdfPutVarInt64, c_netcdfPutVarReal, c_netcdfPutVarChar, &
             c_netcdfSetFillInt, c_netcdfSetFillInt64, c_netcdfSetFillReal, c_netcdfSetFillString, &
-            c_netcdfPutAttInt, c_netcdfPutAttString, c_netcdfPutAttInt1D
+            c_netcdfPutAttInt, c_netcdfPutAttString, c_netcdfPutAttIntArray
     implicit none
     public
 
     interface netcdfPutAtt
-        module procedure netcdfPutAttScalar
-        module procedure netcdfPutAtt1D
+        module procedure netcdfPutAtt
+        module procedure netcdfPutAttArray
     end interface netcdfPutAtt
 
 contains
@@ -358,13 +358,13 @@ contains
     !         - -1: NetCDF operation returned an error, but the error code was 0.
     !         - -2: Unsupported type passed for attValue.
     !         - Other nonzero values: Specific NetCDF error codes.
-    function netcdfPutAttScalar(netcdfID, attName, attValue, varName, groupName)
+    function netcdfPutAtt(netcdfID, attName, attValue, varName, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: attName
         class(*), intent(in) :: attValue
         character(len = *), optional, intent(in) :: varName
         character(len = *), optional, intent(in) :: groupName
-        integer(c_int) :: netcdfPutAttScalar
+        integer(c_int) :: netcdfPutAtt
         type(f_c_string_t) :: f_c_string_attName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_varName
@@ -390,16 +390,16 @@ contains
         select type (attValue)
         type is (integer(c_int))
             c_attValue = c_loc(attValue)
-            netcdfPutAttScalar = c_netcdfPutAttInt(netcdfID, c_attName, c_attValue, c_varName, c_groupName)
+            netcdfPutAtt = c_netcdfPutAttInt(netcdfID, c_attName, c_attValue, c_varName, c_groupName)
         type is (character(len = *))
             c_attValue = f_c_string_attValue%to_c(attValue)
-            netcdfPutAttScalar = c_netcdfPutAttString(netcdfID, c_attName, c_attValue, c_varName, c_groupName)
+            netcdfPutAtt = c_netcdfPutAttString(netcdfID, c_attName, c_attValue, c_varName, c_groupName)
         class default
-            netcdfPutAttScalar = -2
+            netcdfPutAtt = -2
         end select
-    end function netcdfPutAttScalar
+    end function netcdfPutAtt
 
-    ! netcdfPutAtt1D:
+    ! netcdfPutAttArray:
     !   Writes a 1D attribute to a NetCDF variable, group, or as a global attribute.
     !
     !   Arguments:
@@ -412,7 +412,7 @@ contains
     !       supported NetCDF type, such as integer(c_int) or character(len=*).
     !       If the type is unsupported, the function will return an error
     !       status code of -2.
-    !     - len (integer(c_int), intent(in), value):
+    !     - attLen (integer(c_int), intent(in), value):
     !       The length of the attribute array.
     !     - varName (character(len=*), intent(in), optional):
     !       The name of the variable to which the attribute will be assigned.
@@ -427,14 +427,14 @@ contains
     !         - -1: NetCDF operation returned an error, but the error code was 0.
     !         - -2: Unsupported type passed for attValue.
     !         - Other nonzero values: Specific NetCDF error codes.
-    function netcdfPutAtt1D(netcdfID, attName, attValue, len, varName, groupName)
+    function netcdfPutAttArray(netcdfID, attName, attValue, attLen, varName, groupName)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: attName
         class(*), intent(in) :: attValue(:)
-        integer(c_int), intent(in), value :: len
+        integer(c_int), intent(in), value :: attLen
         character(len = *), optional, intent(in) :: varName
         character(len = *), optional, intent(in) :: groupName
-        integer(c_int) :: netcdfPutAtt1D
+        integer(c_int) :: netcdfPutAttArray
         type(f_c_string_t) :: f_c_string_attName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_varName
@@ -460,10 +460,11 @@ contains
         select type (attValue)
         type is (integer(c_int))
             c_attValue = c_loc(attValue)
-            netcdfPutAtt1D = c_netcdfPutAttInt1D(netcdfID, c_attName, c_attValue, c_varName, c_groupName, len)
+            netcdfPutAttArray = c_netcdfPutAttIntArray(netcdfID, c_attName, c_attValue, attLen, c_varName, c_groupName)
         class default
-            netcdfPutAtt1D = -2
+            netcdfPutAttArray = -2
         end select
-    end function netcdfPutAtt1D
+    end function netcdfPutAttArray
+
 
 end module netcdf_cxx_mod
