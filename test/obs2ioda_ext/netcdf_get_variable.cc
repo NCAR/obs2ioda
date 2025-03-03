@@ -85,13 +85,13 @@ namespace Obs2Ioda {
         int netcdfID,
         const char *groupName,
         const char *varName,
-        int *data
+        int **data
     ) {
         return netcdfGetVar(
             netcdfID,
             groupName,
             varName,
-            &data
+            data
         );
     }
 
@@ -99,13 +99,13 @@ namespace Obs2Ioda {
         int netcdfID,
         const char *groupName,
         const char *varName,
-        long long *data
+        long long **data
     ) {
         return netcdfGetVar(
             netcdfID,
             groupName,
             varName,
-            &data
+            data
         );
     }
 
@@ -113,13 +113,13 @@ namespace Obs2Ioda {
         int netcdfID,
         const char *groupName,
         const char *varName,
-        float *data
+        float **data
     ) {
         return netcdfGetVar(
             netcdfID,
             groupName,
             varName,
-            &data
+            data
         );
     }
 
@@ -161,6 +161,7 @@ namespace Obs2Ioda {
                 )
             );
         }
+        *data = new char *[numStrings];
         for (auto i = 0; i < numStrings; i++) {
             (*data)[i] = new char[longestStringLength + 1];
         }
@@ -189,5 +190,6 @@ namespace Obs2Ioda {
             delete [] (*data)[i];
             (*data)[i] = NULL;
         }
+        delete [] *data;
     }
 }

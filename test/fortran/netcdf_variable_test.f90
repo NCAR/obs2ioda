@@ -25,6 +25,7 @@ subroutine int_variable_test()
     integer(c_int) :: fileMode
     integer(c_int) :: result
     integer(c_int), allocatable :: data(:)
+    integer(c_int) :: dimID
 
     fileName = "test_int_variable.nc"
     fileMode = 2
@@ -33,7 +34,7 @@ subroutine int_variable_test()
     dimName = "dim"
     result = netcdfCreate(fileName, netcdfID, fileMode)
     call assertEqual(0, result, status, assert)
-    result = netcdfAddDim(netcdfID, dimName, 3)
+    result = netcdfAddDim(netcdfID, dimName, 3, dimID)
     call assertEqual(0, result, status, assert)
     result = netcdfAddGroup(netcdfID, groupName)
     call assertEqual(0, result, status, assert)
@@ -65,6 +66,7 @@ subroutine double_variable_test()
     integer(c_int) :: fileMode
     integer(c_int) :: result
     real(c_double), allocatable :: data(:)
+    integer(c_int) :: dimID
 
     fileName = "test_double_variable.nc"
     fileMode = 2
@@ -75,7 +77,7 @@ subroutine double_variable_test()
       data = [1.111, 2.222, 3.333]
     result = netcdfCreate(fileName, netcdfID, fileMode)
     call assertEqual(0, result, status, assert)
-    result = netcdfAddDim(netcdfID, dimName, 3)
+    result = netcdfAddDim(netcdfID, dimName, 3, dimID)
     call assertEqual(0, result, status, assert)
     result = netcdfAddGroup(netcdfID, groupName)
     call assertEqual(0, result, status, assert)
@@ -122,6 +124,7 @@ subroutine string_variable_test()
     integer :: i
     character(len=:), allocatable :: in_data(:)
     character(len=:), allocatable :: out_data(:)
+    integer(c_int) :: dimID
 
     fileName = "test_string_variable.nc"
     fileMode = 2
@@ -132,7 +135,7 @@ subroutine string_variable_test()
 
     result = netcdfCreate(fileName, netcdfID, fileMode)
     call assertEqual(0, result, status, assert)
-    result = netcdfAddDim(netcdfID, dimName, 3)
+    result = netcdfAddDim(netcdfID, dimName, 3, dimID)
     call assertEqual(0, result, status, assert)
     result = netcdfAddGroup(netcdfID, groupName)
     call assertEqual(0, result, status, assert)

@@ -25,6 +25,7 @@ subroutine int_attribute_test()
     integer(c_int) :: result
     integer(c_int), allocatable :: data(:)
     integer(c_int) :: attValue
+    integer(c_int) :: dimID
 
     fileName = "test_int_att.nc"
     fileMode = 2
@@ -37,7 +38,7 @@ subroutine int_attribute_test()
     call assertEqual(0, result, status, assert)
     result = netcdfPutAtt(netcdfID, attName, attValue)
     call assertEqual(0, result, status, assert)
-    result = netcdfAddDim(netcdfID, dimName, 3)
+    result = netcdfAddDim(netcdfID, dimName, 3, dimID)
     call assertEqual(0, result, status, assert)
     result = netcdfAddGroup(netcdfID, groupName)
     call assertEqual(0, result, status, assert)
@@ -68,6 +69,7 @@ subroutine string_attribute_test()
     integer(c_int) :: result
     integer(c_int), allocatable :: data(:)
     character(len=:), allocatable :: attValue
+    integer(c_int) :: dimID
 
     fileName = "test_string_att.nc"
     fileMode = 2
@@ -80,7 +82,7 @@ subroutine string_attribute_test()
     call assertEqual(0, result, status, assert)
     result = netcdfPutAtt(netcdfID, attName, attValue)
     call assertEqual(0, result, status, assert)
-    result = netcdfAddDim(netcdfID, dimName, 3)
+    result = netcdfAddDim(netcdfID, dimName, 3, dimID)
     call assertEqual(0, result, status, assert)
     result = netcdfAddGroup(netcdfID, groupName)
     call assertEqual(0, result, status, assert)

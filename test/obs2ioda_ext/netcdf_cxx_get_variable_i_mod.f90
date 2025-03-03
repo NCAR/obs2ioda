@@ -13,7 +13,7 @@ module netcdf_cxx_get_variable_i_mod
             integer(c_int), value, intent(in) :: netcdfID
             type(c_ptr), value, intent(in) :: groupName
             type(c_ptr), value, intent(in) :: varName
-            type(c_ptr), intent(out) :: data
+            integer(c_int), intent(out) :: data(:)
             integer(c_int) :: c_netcdfGetVarInt
         end function c_netcdfGetVarInt
 
@@ -21,11 +21,12 @@ module netcdf_cxx_get_variable_i_mod
                 netcdfID, groupName, varName, data) &
                 bind(C, name = "netcdfGetVarInt64")
             import :: c_int
+            import :: c_long
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
             type(c_ptr), value, intent(in) :: groupName
             type(c_ptr), value, intent(in) :: varName
-            type(c_ptr), intent(out) :: data
+            integer(c_long), intent(out) :: data(:)
             integer(c_int) :: c_netcdfGetVarInt64
         end function c_netcdfGetVarInt64
 
@@ -33,11 +34,12 @@ module netcdf_cxx_get_variable_i_mod
                 netcdfID, groupName, varName, data) &
                 bind(C, name = "netcdfGetVarReal")
             import :: c_int
+            import :: c_float
             import :: c_ptr
             integer(c_int), value, intent(in) :: netcdfID
             type(c_ptr), value, intent(in) :: groupName
             type(c_ptr), value, intent(in) :: varName
-            type(c_ptr), intent(out) :: data
+            real(c_float), intent(out) :: data(:)
             integer(c_int) :: c_netcdGetVarReal
         end function c_netcdfGetVarReal
 
