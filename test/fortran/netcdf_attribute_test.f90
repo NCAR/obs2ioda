@@ -23,6 +23,7 @@ subroutine int_attribute_test()
     character(len=:), allocatable :: attName
     integer(c_int) :: fileMode
     integer(c_int) :: result
+    integer(c_int), allocatable :: data(:)
     integer(c_int) :: attValue
     integer(c_int) :: dimID
 
@@ -49,10 +50,9 @@ subroutine int_attribute_test()
     call assertEqual(0, result, status, assert)
     result = netcdfClose(netcdfID)
     call assertEqual(0, result, status, assert)
-
 end subroutine int_attribute_test
 
-subroutine int_1d_attribute_test()
+subroutine int_array_attribute_test()
     use test_utils_mod
     use netcdf_cxx_mod
     use netcdf
@@ -67,25 +67,24 @@ subroutine int_1d_attribute_test()
     integer(c_int) :: fileMode
     integer(c_int) :: result
     integer(c_int), allocatable :: attValue(:)
-    integer(c_int) :: len
+    integer(c_int) :: attLen
     integer(c_int) :: dimID
 
-    fileName = "test_int_att_1d.nc"
+    fileName = "test_int_array_att.nc"
     fileMode = 2
     varName = "int_var"
     groupName = "group"
     dimName = "dim"
-    attName = "int_1d_att"
-    len = 5
-    attValue = (/1, 2, 3, 4, 5/)
+    attName = "int_att"
+    attValue = [1, 2, 3]
+    attLen = 3
     result = netcdfCreate(fileName, netcdfID, fileMode)
     call assertEqual(0, result, status, assert)
-    result = netcdfPutAtt(netcdfID, attName, attValue, len)
+    result = netcdfPutAtt(netcdfID, attName, attValue, attLen)
     call assertEqual(0, result, status, assert)
     result = netcdfClose(netcdfID)
     call assertEqual(0, result, status, assert)
-
-end subroutine int_1d_attribute_test
+end subroutine int_array_attribute_test
 
 subroutine string_attribute_test()
     use test_utils_mod
@@ -135,7 +134,7 @@ end subroutine string_attribute_test
 program netcdf_attribute_test
 
     call int_attribute_test()
-    call int_1d_attribute_test()
+    call int_array_attribute_test()
     call string_attribute_test()
 
 end program netcdf_attribute_test

@@ -45,19 +45,21 @@ protected:
     std::string test_int_var_name;
     std::string test_int64_var_name;
     std::string test_real_var_name;
+    std::string test_double_var_name;
     std::string test_string_var_name;
 
     std::vector<int> test_int_var_data;
     std::vector<long long> test_int64_var_data;
     std::vector<float> test_real_var_data;
+    std::vector<double> test_double_var_data;
     std::vector<const char*> test_string_var_data;
 
     std::string test_int_att_name;
-    std::string test_int_1d_att_name;
+    std::string test_int_array_att_name;
     std::string test_string_att_name;
     std::string test_string_att_data;
     int test_int_att_data = 0;
-    std::vector<int> test_int_1d_att_data;
+    std::vector<int> test_int_array_att_data;
 
     void SetUp() override;
     void TearDown() override;

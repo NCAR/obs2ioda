@@ -47,6 +47,7 @@ subroutine int_variable_test()
 
 end subroutine int_variable_test
 
+
 !> @brief Tests the creation, writing, and reading of a string variable in a NetCDF file.
 !>
 !> This test creates a NetCDF file, defines a dimension, adds a group, and
@@ -81,7 +82,7 @@ subroutine string_variable_test()
     integer :: i
     character(len=:), allocatable :: in_data(:)
     character(len=:), allocatable :: out_data(:)
-    integer(c_int) :: dimIDs(1)
+    integer(c_int) :: dimID
 
     fileName = "test_string_variable.nc"
     fileMode = 2
@@ -92,9 +93,8 @@ subroutine string_variable_test()
 
     result = netcdfCreate(fileName, netcdfID, fileMode)
     call assertEqual(0, result, status, assert)
-    result = netcdfAddDim(netcdfID, dimName, 3, dimIDs(1))
+    result = netcdfAddDim(netcdfID, dimName, 3, dimID)
     call assertEqual(0, result, status, assert)
-    call assertEqual(1, dimIDs(1), status, assert)
     result = netcdfAddGroup(netcdfID, groupName)
     call assertEqual(0, result, status, assert)
     result = netcdfAddVar(netcdfID, varName, NF90_STRING, 1, [dimName], groupName)

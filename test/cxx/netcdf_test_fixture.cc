@@ -20,18 +20,20 @@ void NetCDFTestFixture::SetUp() {
     test_int_var_name = "int_var";
     test_int64_var_name = "int64_var";
     test_real_var_name = "real_var";
+    test_double_var_name = "double_var";
     test_string_var_name = "string_var";
 
     test_int_var_data = {1, 2, 3, 4, 5};
     test_int64_var_data = {11111, 22222, 33333, 44444, 55555};
     test_real_var_data = {1.1f, 2.2f, 3.3f, 4.4f, 5.5f};
+    test_double_var_data = {1.1, 2.2, 3.3, 4.4, 5.5};
     test_string_var_data = {"one", "two", "three", "four", "five"};
 
     test_int_att_name = "int_var";
-    test_int_1d_att_name = "int_1d_att";
+    test_int_array_att_name = "int_array_att";
     test_string_att_name = "string_att";
     test_int_att_data = 2;
-    test_int_1d_att_data = {1, 2, 3, 4, 5};
+    test_int_array_att_data = {1, 2, 3, 4, 5};
     test_string_att_data = "string";
 }
 

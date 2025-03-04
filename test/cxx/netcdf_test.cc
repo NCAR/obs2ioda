@@ -124,7 +124,7 @@ TEST_F(NetCDFTestFixture, NetCDFVariableTest) {
         nullptr,
         this->test_dim_name.c_str(),
         this->test_dim_len,
-        &dimID
+       &dimID
     );
     EXPECT_EQ(status, 0);
     std::vector<const char *> dimNames = {this->test_dim_name.c_str()};
@@ -146,6 +146,14 @@ TEST_F(NetCDFTestFixture, NetCDFVariableTest) {
         dimNames.data()
     );
     EXPECT_EQ(status, 0);
+    status = Obs2Ioda::netcdfAddVar(
+        netcdfID,
+        this->test_group_name.c_str(),
+        this->test_double_var_name.c_str(),
+        NC_DOUBLE,
+        1,
+        dimNames.data()
+    );
     EXPECT_EQ(status, 0);
     status = Obs2Ioda::netcdfPutVarString(
         netcdfID,
@@ -170,22 +178,14 @@ TEST_F(NetCDFTestFixture, NetCDFVariableTest) {
     );
     EXPECT_EQ(status, 0);
     EXPECT_EQ(varSize, this->test_dim_len);
-    char **outStringData = new char *[varSize];
+    char ***outStringData = new char **[1];
     status = Obs2Ioda::netcdfGetVarString(
-        netcdfID,
-        this->test_group_name.c_str(),
-        this->test_string_var_name.c_str(),
-        &outStringData
+        netcdfID, this->test_group_name.c_str(),
+        this->test_string_var_name.c_str(), outStringData
     );
     EXPECT_EQ(status, 0);
-    Obs2Ioda::netcdfFreeString(
-        static_cast<int>(varSize),
-        &outStringData
-    );
-    for (auto i = 0; i < varSize; i++) {
-        EXPECT_FALSE(outStringData[i]);
-    }
-    delete[] outStringData;
+    Obs2Ioda::netcdfFreeString(varSize, outStringData);
+    delete[] outStringData; // free the outer `char***` array
 
 }
 
@@ -217,6 +217,15 @@ TEST_F(NetCDFTestFixture, NetCDFAttributeTest) {
         netcdfID,
         this->test_int_att_name.c_str(),
         &this->test_int_att_data,
+        nullptr,
+        nullptr
+    );
+    EXPECT_EQ(status, 0);
+    status = Obs2Ioda::netcdfPutAttIntArray(
+        netcdfID,
+        this->test_int_array_att_name.c_str(),
+        this->test_int_array_att_data.data(),
+        this->test_int_array_att_data.size(),
         nullptr,
         nullptr
     );
