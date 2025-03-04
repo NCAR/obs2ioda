@@ -20,7 +20,8 @@ namespace Obs2Ioda {
      *         - Non-zero: Failure, with an error message logged.
      */
     int netcdfPutAttInt(
-        int netcdfID, const char *attName, const int *attValue, const char *varName, const char *groupName
+        int netcdfID, const char *attName, const int *attValue,
+        const char *varName, const char *groupName
     );
 
     /**
@@ -42,11 +43,13 @@ namespace Obs2Ioda {
      *         - Non-zero: Failure, with an error message logged.
      */
     int netcdfPutAttIntArray(
-        int netcdfID, const char *attName, const int *attValue, int attLen, const char *varName, const char *groupName
+        int netcdfID, const char *attName, const int *attValue,
+        int attLen, const char *varName, const char *groupName
     );
 
     int netcdfPutAttString(
-        int netcdfID, const char *attName, const char *attValue, const char *varName, const char *groupName
+        int netcdfID, const char *attName, const char *attValue,
+        const char *varName, const char *groupName
     );
     }
 }
