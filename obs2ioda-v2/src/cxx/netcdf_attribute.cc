@@ -46,7 +46,8 @@ namespace Obs2Ioda {
     }
 
     int netcdfPutAttIntArray(
-        int netcdfID, const char *attName, const int *attValue, const int attLen, const char *varName, const char *groupName
+        int netcdfID, const char *attName, const int *attValue,
+        const int attLen, const char *varName, const char *groupName
     ) {
         return netcdfPutAtt(
             netcdfID, attName, attValue, varName, groupName,
