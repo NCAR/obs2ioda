@@ -338,7 +338,7 @@ contains
         end select
     end function netcdfSetFill
 
-    ! netcdfPutAttScalar:
+    ! netcdfPutAtt:
     !   Writes an attribute to a NetCDF variable, group, or as a global attribute.
     !
     !   Arguments:
