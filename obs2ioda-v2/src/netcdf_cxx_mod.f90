@@ -447,7 +447,6 @@ contains
         type(c_ptr) :: c_groupName
         type(c_ptr) :: c_varName
         type(c_ptr) :: c_attValue
-        type(f_c_string_t) :: f_c_string_attValue
 
         if (present(groupName)) then
             c_groupName = f_c_string_groupName%to_c(groupName)
