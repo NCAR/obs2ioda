@@ -187,8 +187,8 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          dim1 = ncid_ncdim(idim)
          idim = ufo_vars_getindex(name_ncdim, 'nlocs')
          dim2 = ncid_ncdim(idim)
-         dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
-         dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
+         dim1_name = get_dim_name(dim1, nchans_nvars_flag)
+         dim2_name = get_dim_name(dim2, nchans_nvars_flag)
          status = netcdfAddVar(netcdfID, ncname, NF90_FLOAT, 2, &
             [dim2_name, dim1_name], "ObsValue", fillValue = -999.0)
          status = netcdfPutAtt(netcdfID, "units", "K", varName = trim(ncname), groupName = "ObsValue")
@@ -209,12 +209,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          ncname = trim(name_var_info(i))
          idim = ufo_vars_getindex(name_ncdim, dim_var_info(1,i))
          dim1 = ncid_ncdim(idim)
-         dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
+         dim1_name = get_dim_name(dim1, nchans_nvars_flag)
          if ( ufo_vars_getindex(name_ncdim, dim_var_info(2,i)) > 0 ) then
             idim = ufo_vars_getindex(name_ncdim, dim_var_info(2,i))
             dim2 = ncid_ncdim(idim)
-            dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
-            status = netcdfAddVar(netcdfID, ncname, NF90_CHAR, 2, &
+            dim2_name = get_dim_name(dim2, nchans_nvars_flag)
+            status = netcdfAddVar(netcdfID, ncname, type_var_info(i), 2, &
                [dim2_name, dim1_name], "MetaData")
          else
             if (ncname == 'dateTime') then
@@ -239,27 +239,32 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
             ncname = trim(name_sen_info(i))
             idim = ufo_vars_getindex(name_ncdim, dim_sen_info(1,i))
             dim1 = ncid_ncdim(idim)
-            dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
+            dim1_name = get_dim_name(dim1, nchans_nvars_flag)
             if ( ufo_vars_getindex(name_ncdim, dim_sen_info(2,i)) > 0 ) then
                idim = ufo_vars_getindex(name_ncdim, dim_sen_info(2,i))
                dim2 = ncid_ncdim(idim)
-               dim2_name = get_dim_name(ncid_ncdim(dim2), nchans_nvars_flag)
+               dim2_name = get_dim_name(dim2, nchans_nvars_flag)
                status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 2, &
                   [dim2_name, dim1_name], "MetaData")
+               if (type_sen_info(i) == NF90_INT) then
+                  status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
+               else if (type_sen_info(i) == NF90_FLOAT) then
+                  status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
+               end if
             else
                status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
                   [dim1_name], "MetaData")
-            end if
-            if (type_sen_info(i) == NF90_INT) then
-               status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
-            else if (type_sen_info(i) == NF90_FLOAT) then
-               status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
+               if (type_sen_info(i) == NF90_INT) then
+                  status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
+               else if (type_sen_info(i) == NF90_FLOAT) then
+                  status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
+               end if
             end if
          end do ! nsen_info
          if ( has_wavenumber == itrue ) then
             idim = ufo_vars_getindex(name_ncdim, 'nvars')
             dim1 = ncid_ncdim(idim)
-            dim1_name = get_dim_name(ncid_ncdim(dim1), nchans_nvars_flag)
+            dim1_name = get_dim_name(dim1, nchans_nvars_flag)
             status = netcdfAddVar(netcdfID, 'sensor_band_central_radiation_wavenumber', NF90_FLOAT, 1, &
                [dim1_name], "MetaData", fillValue = -999.0)
          end if
