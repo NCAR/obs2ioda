@@ -435,7 +435,7 @@ contains
       integer :: idx_min_time, idx_max_time
       integer :: file_mode
       character(:), allocatable :: dim_name, var_name, group_name
-      integer :: ncid
+      integer :: ncid, dim_id
       character(:), allocatable :: output_file_name
 
       ! Identify observations in current time window
@@ -449,7 +449,7 @@ contains
 
       ! Create dimension and descriptive global attribute. All GNSSRO data use the dimension nlocs
       dim_name = 'nlocs'
-      call check(netcdfAddDim(ncid, dim_name, ndata))
+      call check(netcdfAddDim(ncid, dim_name, ndata, dim_id))
       call check(netcdfPutAtt(ncid, dim_name, ndata))
 
       ! Write other global attributes (again analogous to netcdf_mod)
@@ -471,6 +471,9 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'degree_north', var_name, group_name))
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
+      ! Floating-point variables are double-precision (see definition of r_kind in this module), but are written in
+      ! single-precision (see NF90_FLOAT data type above). We need to explicitly cast floating point variables from
+      ! double to single precision when writing the data, as is apparent by the call to real(..., r_single).
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%lat, is_in_window), r_single), group_name))
       ! MetaData/longitude
       var_name = 'longitude'
