@@ -50,8 +50,63 @@ subroutine int_attribute_test()
     call assertEqual(0, result, status, assert)
     result = netcdfClose(netcdfID)
     call assertEqual(0, result, status, assert)
-
 end subroutine int_attribute_test
+
+subroutine real_array_attribute_test()
+    use test_utils_mod
+    use netcdf_cxx_mod
+    use netcdf
+    implicit none
+    integer :: status
+    integer(c_int) :: netcdfID
+    character(len=:), allocatable :: fileName
+    character(len=:), allocatable :: attName
+    integer(c_int) :: fileMode
+    integer(c_int) :: result
+    real(c_float), allocatable :: attValue(:)
+    integer(c_int) :: attLen
+    integer(c_int) :: dimID
+
+    fileName = "test_real_array_att.nc"
+    fileMode = 2
+    attName = "real_array_att"
+    attValue = [1.111, 2.222, 3.333]
+    attLen = 3
+    result = netcdfCreate(fileName, netcdfID, fileMode)
+    call assertEqual(0, result, status, assert)
+    result = netcdfPutAtt(netcdfID, attName, attValue, attLen)
+    call assertEqual(0, result, status, assert)
+    result = netcdfClose(netcdfID)
+    call assertEqual(0, result, status, assert)
+end subroutine real_array_attribute_test
+
+subroutine int_array_attribute_test()
+    use test_utils_mod
+    use netcdf_cxx_mod
+    use netcdf
+    implicit none
+    integer :: status
+    integer(c_int) :: netcdfID
+    character(len=:), allocatable :: fileName
+    character(len=:), allocatable :: attName
+    integer(c_int) :: fileMode
+    integer(c_int) :: result
+    integer(c_int), allocatable :: attValue(:)
+    integer(c_int) :: attLen
+    integer(c_int) :: dimID
+
+    fileName = "test_int_array_att.nc"
+    fileMode = 2
+    attName = "int_array_att"
+    attValue = [1, 2, 3]
+    attLen = 3
+    result = netcdfCreate(fileName, netcdfID, fileMode)
+    call assertEqual(0, result, status, assert)
+    result = netcdfPutAtt(netcdfID, attName, attValue, attLen)
+    call assertEqual(0, result, status, assert)
+    result = netcdfClose(netcdfID)
+    call assertEqual(0, result, status, assert)
+end subroutine int_array_attribute_test
 
 subroutine string_attribute_test()
     use test_utils_mod
@@ -101,6 +156,8 @@ end subroutine string_attribute_test
 program netcdf_attribute_test
 
     call int_attribute_test()
+    call int_array_attribute_test()
+    call real_array_attribute_test()
     call string_attribute_test()
 
 end program netcdf_attribute_test
