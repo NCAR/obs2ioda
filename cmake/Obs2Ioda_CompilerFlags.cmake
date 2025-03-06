@@ -1,9 +1,13 @@
-# Set Fortran compiler flags specific to the GNU Compiler
+# Set Fortran compiler flags specific to the GNU Compiler on both Linux and macOS (Darwin)
 # -ffree-line-length-none: Remove the limit on the length of lines in the source file
-# -mcmodel=medium: Allow for larger datasets in memory
-set(FORTRAN_COMPILER_GNU_FLAGS
-    $<$<COMPILE_LANGUAGE:Fortran>:-ffree-line-length-none -mcmodel=medium>
+set(FORTRAN_COMPILER_COMMON_GNU_FLAGS
+    $<$<COMPILE_LANGUAGE:Fortran>:-ffree-line-length-none
 )
+
+# Set Fortran compiler flags specific to the GNU Compiler on Linux
+# -mcmodel=medium: Allow for larger datasets in memory
+set(FORTRAN_COMPILER_LINUX_GNU_FLAGS
+    $<$<COMPILE_LANGUAGE:Fortran>:-mcmodel=medium>)
 
 # Set Debugging Fortran compiler flags specific to the GNU Compiler
 # -fbacktrace: Provide a backtrace when an error occurs
