@@ -424,8 +424,8 @@ contains
    subroutine write_gnssro_data(gnssro_data, gnssro_bufr_info, file_output_info, idx_window)
       use netcdf, only: NF90_INT, NF90_INT64, NF90_FLOAT
       use kinds, only: r_single, i_llong
-      use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfAddGroup, &
-         netcdfAddVar, netcdfSetFill, netcdfPutVar, netcdfClose
+      use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfPutAttArray, &
+         netcdfAddGroup, netcdfAddVar, netcdfSetFill, netcdfPutVar, netcdfClose
       type(gnssro_type), intent(in) :: gnssro_data
       type(bufr_info_type), intent(in) :: gnssro_bufr_info
       type(output_info_type), intent(in) :: file_output_info
@@ -537,8 +537,8 @@ contains
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'the original occultation ascending/descending flag', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'flag_meanings', 'descending ascending', var_name, group_name))
-      !call check(netcdfPutAtt(ncid, 'valid_range', int((/ 0, 1 /)), var_name, group_name))  ! to do: add attribute
-      !call check(netcdfPutAtt(ncid, 'flag_values', int((/ 0, 1 /)), var_name, group_name))  ! to do: add attribute
+      call check(netcdfPutAttArray(ncid, 'valid_range', int((/ 0, 1 /)), 2, var_name, group_name))
+      call check(netcdfPutAttArray(ncid, 'flag_values', int((/ 0, 1 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%asce, is_in_window), group_name))
       ! MetaData/process_center
@@ -561,7 +561,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'distance from centre of curvature', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 6200000.0, 6600000.0 /)), var_name, group_name))  ! to do: add attribute
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 6200000.0, 6600000.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%impact_para, is_in_window), r_single), group_name))
       ! MetaData/impact_height
@@ -569,7 +569,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'distance from mean sea level', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 0.0, 200000.0 /)), var_name, group_name))  ! to do: add attribute
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 200000.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%impact_para - gnssro_data%rfict - gnssro_data%geoid, &
          is_in_window), r_single), group_name))
@@ -578,7 +578,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'degree', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'GNSS->LEO line of sight', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 0.0, 360.0 /)), var_name, group_name))  ! to do: add attribute
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 360.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%azim, is_in_window), r_single), group_name))
       ! MetaData/geoid_height_above_reference_ellipsoid
@@ -586,7 +586,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Geoid height above WGS-84 ellipsoid', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ -200.0, 200.0 /)), var_name, group_name))
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ -200.0, 200.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%geoid, is_in_window), r_single), group_name))
       ! MetaData/earth_radius_of_curvature
@@ -594,7 +594,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Earth’s local radius of curvature', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 6200000.0, 6600000.0 /)), var_name, group_name))  ! to do: add attribute
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 6200000.0, 6600000.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%rfict, is_in_window), r_single), group_name))
 
@@ -605,7 +605,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'N', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Atmospheric refractivity', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 0.0, 500.0 /)), var_name, group_name))  ! to do: add attribute
+      call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 500.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%ref, is_in_window), r_single), group_name))
       ! ObsValue/bending_angle
@@ -613,7 +613,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'radian', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Bending Angle', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ -0.001, 0.08 /)), var_name, group_name))  ! to do: add attribute
+      call check(netcdfPutAttArray(ncid, 'valid_range', real((/ -0.001, 0.08 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%bend_ang, is_in_window), r_single), group_name))
 
@@ -624,7 +624,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'N', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Input error in atmospheric refractivity', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 0.0, 10.0 /)), var_name, group_name))  ! to do: add attribute
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 10.0 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%refoe_gsi, is_in_window), r_single), group_name))
       ! ObsError/bending_angle
@@ -632,7 +632,7 @@ contains
       call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
       call check(netcdfPutAtt(ncid, 'units', 'radian', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Input error in Bending Angle', var_name, group_name))
-      ! call check(netcdfPutAtt(ncid, 'valid_range', real((/ 0.0, 0.008 /)), var_name, group_name))  ! to do: add attribute
+      !call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 0.008 /)), 2, var_name, group_name))  ! to do: add attribute
       call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%bndoe_gsi, is_in_window), r_single), group_name))
       
