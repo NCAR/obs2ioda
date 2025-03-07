@@ -445,7 +445,7 @@ contains
       ! create netcdf file and enter define mode
       call get_output_file_name(gnssro_bufr_info, file_output_info, idx_window, output_file_name)
       file_mode = 3  ! create file, fails if the file already exists
-      call check(netcdfCreate(trim(adjustl(outfile)), ncid, file_mode))
+      call check(netcdfCreate(trim(adjustl(output_file_name)), ncid, file_mode))
 
       ! Create dimension and descriptive global attribute. All GNSSRO data use the dimension nlocs
       dim_name = 'nlocs'
