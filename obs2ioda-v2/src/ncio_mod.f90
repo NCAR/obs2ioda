@@ -246,19 +246,14 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                dim2_name = get_dim_name(dim2, nchans_nvars_flag)
                status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 2, &
                   [dim2_name, dim1_name], "MetaData")
-               if (type_sen_info(i) == NF90_INT) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
-               else if (type_sen_info(i) == NF90_FLOAT) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
-               end if
             else
                status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
                   [dim1_name], "MetaData")
-               if (type_sen_info(i) == NF90_INT) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
-               else if (type_sen_info(i) == NF90_FLOAT) then
-                  status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
-               end if
+            end if
+            if (type_sen_info(i) == NF90_INT) then
+               status = netcdfSetFill(netcdfID, ncname, 1, -999, "MetaData")
+            else if (type_sen_info(i) == NF90_FLOAT) then
+               status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
             end if
          end do ! nsen_info
          if ( has_wavenumber == itrue ) then
