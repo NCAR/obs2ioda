@@ -2,7 +2,7 @@ module define_mod
 
 use kinds, only: r_kind, i_kind, i_llong
 use ufo_vars_mod, only: var_ps, var_prs, var_u, var_v, var_ts, var_tv, var_q, var_tb
-use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
+use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64, nf90_string
 
 implicit none
 
@@ -159,8 +159,8 @@ integer(i_kind), dimension(nvar_info) :: type_var_info = &
       nf90_float, &
       nf90_int64, &
       nf90_char,  &
-      nf90_char,  &
-      nf90_char   &
+      nf90_string,  &
+      nf90_string   &
    /)
 character(len=nstring), dimension(2,nvar_info) :: dim_var_info = reshape ( &
    (/                             &
@@ -171,8 +171,8 @@ character(len=nstring), dimension(2,nvar_info) :: dim_var_info = reshape ( &
       'nlocs     ', 'null      ', &
       'nlocs     ', 'null      ', &
       'ndatetime ', 'nlocs     ', &
-      'nstring   ', 'nlocs     ', &
-      'nstring   ', 'nvars     '  &
+      'nlocs     ', 'null      ', &
+      'nvars     ', 'null      '  &
    /), (/2, nvar_info/) )
 character(len=nstring), dimension(nsen_info) :: name_sen_info = &
    (/                         &
