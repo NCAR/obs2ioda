@@ -137,7 +137,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1), ncid_ncdim(1))
       status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(ncid_ncdim(1)))
-      if (trim(ncname) == 'nchans') then
+      if ( trim(ncname) == 'nchans' ) then
          status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)], fillValue = -999)
       else
          status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)])
