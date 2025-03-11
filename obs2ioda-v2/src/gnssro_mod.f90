@@ -425,7 +425,7 @@ contains
       use netcdf, only: NF90_INT, NF90_INT64, NF90_FLOAT
       use kinds, only: r_single, i_llong
       use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfPutAttArray, &
-         netcdfAddGroup, netcdfAddVar, netcdfSetFill, netcdfPutVar, netcdfClose
+         netcdfAddGroup, netcdfAddVar, netcdfPutVar, netcdfClose
       type(gnssro_type), intent(in) :: gnssro_data
       type(bufr_info_type), intent(in) :: gnssro_bufr_info
       type(output_info_type), intent(in) :: file_output_info
@@ -468,172 +468,151 @@ contains
       group_name = 'MetaData'
       ! MetaData/latitude
       var_name = 'latitude'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'degree_north', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       ! Floating-point variables are double-precision (see definition of r_kind in this module), but are written in
       ! single-precision (see NF90_FLOAT data type above). We need to explicitly cast floating point variables from
       ! double to single precision when writing the data, as is apparent by the call to real(..., r_single).
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%lat, is_in_window), r_single), group_name))
       ! MetaData/longitude
       var_name = 'longitude'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'degree_east', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%lon, is_in_window), r_single), group_name))
       ! MetaData/time
       var_name = 'time'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'hour', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'time offset to analysis time', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%time, is_in_window), r_single), group_name))
       ! MetaData/dateTime
       var_name = 'dateTime'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT64, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT64, 1, dim_name, group_name, i64_missing))
       call check(netcdfPutAtt(ncid, 'units', 'seconds since 1970-01-01T00:00:00Z', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i64_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, int(pack(gnssro_data%epochtime, is_in_window), i_llong), group_name))
       ! MetaData/record_number
       var_name = 'record_number'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'GNSS RO profile identifier', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%recn, is_in_window), group_name))
       ! MetaData/gnss_sat_class
       var_name = 'gnss_sat_class'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'GNSS satellite classification, e.g., 401=GPS, 402=GLONASS', &
          var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%sclf, is_in_window), group_name))
       ! MetaData/reference_sat_id
       var_name = 'reference_sat_id'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'GNSS satellite transmitter identifier (1-32)', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%ptid, is_in_window), group_name))
       ! MetaData/occulting_sat_id
       var_name = 'occulting_sat_id'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Low Earth Orbit satellite identifier, e.g., COSMIC2=750-755', &
          var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%said, is_in_window), group_name))
       ! MetaData/occulting_sat_is
       var_name = 'occulting_sat_is'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'satellite instrument', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%siid, is_in_window), group_name))
       ! MetaData/ascending_flag
       var_name = 'ascending_flag'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'the original occultation ascending/descending flag', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'flag_meanings', 'descending ascending', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', int((/ 0, 1 /)), 2, var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'flag_values', int((/ 0, 1 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%asce, is_in_window), group_name))
       ! MetaData/process_center
       var_name = 'process_center'
-      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_INT, 1, dim_name, group_name, i_missing))
       call check(netcdfPutAtt(ncid, 'units', '1', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'originally data processing_center, e.g., 60 for UCAR, 94 for DMI, 78 for GFZ', &
          var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, i_missing, group_name))
       call check(netcdfPutVar(ncid, var_name, pack(gnssro_data%ogce, is_in_window), group_name))
       ! MetaData/altitude
       var_name = 'altitude'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Geometric altitude', var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%msl_alt, is_in_window), r_single), group_name))
       ! MetaData/impact_parameter
       var_name = 'impact_parameter'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'distance from centre of curvature', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 6200000.0, 6600000.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%impact_para, is_in_window), r_single), group_name))
       ! MetaData/impact_height
       var_name = 'impact_height'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'distance from mean sea level', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 200000.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%impact_para - gnssro_data%rfict - gnssro_data%geoid, &
          is_in_window), r_single), group_name))
       ! MetaData/sensor_azimuth_angle
       var_name = 'sensor_azimuth_angle'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'degree', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'GNSS->LEO line of sight', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 360.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%azim, is_in_window), r_single), group_name))
       ! MetaData/geoid_height_above_reference_ellipsoid
       var_name = 'geoid_height_above_reference_ellipsoid'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Geoid height above WGS-84 ellipsoid', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ -200.0, 200.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%geoid, is_in_window), r_single), group_name))
       ! MetaData/earth_radius_of_curvature
       var_name = 'earth_radius_of_curvature'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'm', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Earth’s local radius of curvature', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 6200000.0, 6600000.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%rfict, is_in_window), r_single), group_name))
 
       ! Write all data sets in the ObsValue group
       group_name = 'ObsValue'
       ! ObsValue/refractivity
       var_name = 'refractivity'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'N', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Atmospheric refractivity', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 500.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%ref, is_in_window), r_single), group_name))
       ! ObsValue/bending_angle
       var_name = 'bending_angle'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'radian', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Bending Angle', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ -0.001, 0.08 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%bend_ang, is_in_window), r_single), group_name))
 
       ! Write all data sets in the ObsError group
       group_name = 'ObsError'
       ! ObsError/refractivity
       var_name = 'refractivity'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'N', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Input error in atmospheric refractivity', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 10.0 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%refoe_gsi, is_in_window), r_single), group_name))
       ! ObsError/bending_angle
       var_name = 'bending_angle'
-      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name))
+      call check(netcdfAddVar(ncid, var_name, NF90_FLOAT, 1, dim_name, group_name, real(r_missing)))
       call check(netcdfPutAtt(ncid, 'units', 'radian', var_name, group_name))
       call check(netcdfPutAtt(ncid, 'longname', 'Input error in Bending Angle', var_name, group_name))
       call check(netcdfPutAttArray(ncid, 'valid_range', real((/ 0.0, 0.008 /)), 2, var_name, group_name))
-      call check(netcdfSetFill(ncid, var_name, 1, real(r_missing), group_name))
       call check(netcdfPutVar(ncid, var_name, real(pack(gnssro_data%bndoe_gsi, is_in_window), r_single), group_name))
       
       ! close file
