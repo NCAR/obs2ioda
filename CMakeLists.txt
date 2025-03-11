@@ -22,3 +22,4 @@ find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 add_subdirectory("${CMAKE_SOURCE_DIR}/test")
+
