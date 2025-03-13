@@ -773,6 +773,10 @@ else
               else if ( trim(name_var_info(i)) == 'station_id' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
               end if
+           else if ( type_var_info(i) == nf90_string ) then
+               if ( trim(name_var_info(i)) == 'station_id' ) then
+                   xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
+               end if
            else if ( type_var_info(i) == nf90_int64 ) then
               if ( trim(name_var_info(i)) == 'dateTime' ) then
                  xdata(1,1)%xinfo_int64(iloc,i) = epochtime
