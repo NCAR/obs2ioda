@@ -9,7 +9,7 @@ use define_mod, only: nobtype, set_obtype_conv, obtype_list, xdata, &
    dtime_min, dtime_max
 use ufo_vars_mod, only: ufo_vars_getindex, var_prs, var_u, var_v, var_ts, var_tv, var_q, var_ps
 use utils_mod, only: get_julian_time, da_advance_time, da_get_time_slots
-use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_int64
+use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_int64, nf90_string
 
 implicit none
 private
@@ -825,7 +825,9 @@ subroutine sort_obs_conv(filedate, nfgat)
                   else
                      xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = plink%datetime
                   end if
-               else if ( trim(name_var_info(i)) == 'station_id' ) then
+               end if
+            else if ( type_var_info(i) == nf90_string ) then
+               if ( trim(name_var_info(i)) == 'station_id' ) then
                   xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = plink%stid
                end if
             else if ( type_var_info(i) == nf90_int64 ) then
