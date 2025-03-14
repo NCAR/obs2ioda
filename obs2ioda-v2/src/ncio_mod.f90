@@ -249,7 +249,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                   [dim2_name, dim1_name], "MetaData")
             else
                if (ncname == 'scan_position') then
-                  status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
+                  status = netcdfAddVar(netcdfID, ncname, nf90_int, 1, &
                      [dim1_name], "MetaData", fillValue = -999)
                else
                   status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
