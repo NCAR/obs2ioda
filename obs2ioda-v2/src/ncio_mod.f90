@@ -367,7 +367,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                else
                   status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_float(:, i), "MetaData")
                end if
-               status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_float(:, i), "MetaData")
             else if (type_sen_info(i) == nf90_char) then
                status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_char(:, i), "MetaData")
             end if
