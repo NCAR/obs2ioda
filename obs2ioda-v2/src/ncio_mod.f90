@@ -73,7 +73,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    logical :: nchans_nvars_flag
    character(len = nstring) :: dim1_name
    character(len = nstring) :: dim2_name
-   integer(i_kind), allocatable, dimension(:, :) :: scan_position_values
+   integer(i_kind), allocatable, dimension(:) :: scan_position_values
 
    if ( write_opt == write_nc_conv ) then
       ntype = nobtype
@@ -352,17 +352,18 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       end do var_info_loop
 
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
-         allocate(scan_position_values(xdata(ityp, itim)%nlocs, nsen_info))
          do i = 1, nsen_info
             ncname = trim(name_sen_info(i))
             if (type_sen_info(i) == nf90_int) then
                status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_int(:, i), "MetaData")
             else if (type_sen_info(i) == nf90_float) then
                if (trim(ncname) == "scan_position") then
+                  allocate(scan_position_values(xdata(ityp, itim)%nlocs))
                   do scan_position_idx = 1, xdata(ityp, itim)%nlocs
-                     scan_position_values(scan_position_idx, i) = int(xdata(ityp, itim)%xseninfo_float(scan_position_idx, i), i_kind)
+                     scan_position_values(scan_position_idx) = int(xdata(ityp, itim)%xseninfo_float(scan_position_idx, i), i_kind)
                   end do
-                  status = netcdfPutVar(netcdfID, ncname, scan_position_values(:, i), "MetaData")
+                  status = netcdfPutVar(netcdfID, ncname, scan_position_values(:), "MetaData")
+                  deallocate(scan_position_values)
                else
                   status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_float(:, i), "MetaData")
                end if
@@ -377,7 +378,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          end if
          deallocate (ichan)
          deallocate (obserr)
-         deallocate (scan_position_values)
       end if ! write_nc_radiance
 
       status = netcdfClose(netcdfID)
