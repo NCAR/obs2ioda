@@ -73,7 +73,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
    logical :: nchans_nvars_flag
    character(len = nstring) :: dim1_name
    character(len = nstring) :: dim2_name
-   integer(i_kind), allocatable, dimension(:, :) :: scan_position_values
+   integer(i_kind), allocatable, dimension(:) :: scan_position_values
 
    if ( write_opt == write_nc_conv ) then
       ntype = nobtype
@@ -138,13 +138,12 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
 
       status = netcdfAddDim(netcdfID, trim(ncname), val_ncdim(1), ncid_ncdim(1))
       status = netcdfPutAtt(netcdfID, trim(ncname), val_ncdim(ncid_ncdim(1)))
-      if ( trim(ncname) == 'nchans' ) then
-         status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)], fillValue = -999)
-      end if
+      status = netcdfAddVar(netcdfID, trim(ncname), NF90_INT, 1, [trim(ncname)])
 
       do i = 2, n_ncdim
          status = netcdfAddDim(netcdfID, trim(name_ncdim(i)), val_ncdim(i), ncid_ncdim(i))
-         status = netcdfPutAtt(netcdfID, trim(name_ncdim(ncid_ncdim(i))), val_ncdim(i))
+         status = netcdfPutAtt(netcdfID, trim(name_ncdim(i)), val_ncdim(i))
+         status = netcdfAddVar(netcdfID, trim(name_ncdim(i)), NF90_INT, 1, [trim(name_ncdim(i))])
       end do
 
       ! define global attributes
@@ -249,7 +248,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                   [dim2_name, dim1_name], "MetaData")
             else
                if (ncname == 'scan_position') then
-                  status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
+                  status = netcdfAddVar(netcdfID, ncname, nf90_int, 1, &
                      [dim1_name], "MetaData", fillValue = -999)
                else
                   status = netcdfAddVar(netcdfID, ncname, type_sen_info(i), 1, &
@@ -359,14 +358,15 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_int(:, i), "MetaData")
             else if (type_sen_info(i) == nf90_float) then
                if (trim(ncname) == "scan_position") then
+                  allocate(scan_position_values(xdata(ityp, itim)%nlocs))
                   do scan_position_idx = 1, xdata(ityp, itim)%nlocs
-                     scan_position_values(scan_position_idx, i) = int(xdata(ityp, itim)%xseninfo_float(scan_position_idx, i), i_kind)
+                     scan_position_values(scan_position_idx) = int(xdata(ityp, itim)%xseninfo_float(scan_position_idx, i), i_kind)
                   end do
-                  status = netcdfPutVar(netcdfID, ncname, scan_position_values(:, i), "MetaData")
+                  status = netcdfPutVar(netcdfID, ncname, scan_position_values(:), "MetaData")
+                  deallocate(scan_position_values)
                else
                   status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_float(:, i), "MetaData")
                end if
-               status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_float(:, i), "MetaData")
             else if (type_sen_info(i) == nf90_char) then
                status = netcdfPutVar(netcdfID, ncname, xdata(ityp, itim)%xseninfo_char(:, i), "MetaData")
             end if
