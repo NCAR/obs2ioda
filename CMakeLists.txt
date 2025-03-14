@@ -1,6 +1,7 @@
 # Check CMake version
 cmake_minimum_required(VERSION 3.10)
 
+include(FetchContent)
 include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_Functions.cmake")
 enable_testing()
 include(FetchContent)
@@ -20,6 +21,14 @@ set(NCEP_BUFR_LIB CACHE STRING "" )
 
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
+
+FetchContent_Declare(
+        yaml-cpp
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+        GIT_TAG master
+)
+FetchContent_MakeAvailable(yaml-cpp)
+
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 
