@@ -5,10 +5,12 @@ set(obs2ioda_cxx_SOURCES
     netcdf_dimension.cc
     netcdf_variable.cc
     netcdf_attribute.cc
+    ioda_schema.cc
 )
 set(obs2ioda_cxx_LIBRARIES
     NetCDF::NetCDF_CXX
     NetCDF::NetCDF_C
+    yaml-cpp::yaml-cpp
 )
 set(obs2ioda_cxx_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}

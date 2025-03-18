@@ -231,7 +231,7 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
                else if (type_var_info(i) == NF90_FLOAT) then
                   status = netcdfSetFill(netcdfID, ncname, 1, -999.0, "MetaData")
                end if
-            end if
+            endif
          end if
       end do var_info_def_loop ! nvar_info
 
