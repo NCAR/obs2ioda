@@ -19,7 +19,7 @@ use define_mod, only: missing_r, missing_i, nstring, ndatetime, &
    ninst, inst_list, set_name_satellite, set_name_sensor, xdata, name_sen_info, &
    nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, set_brit_obserr, strlen
 use ufo_vars_mod, only: ufo_vars_getindex
-use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
+use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64, nf90_string
 use utils_mod, only: get_julian_time
 
 implicit none
@@ -663,9 +663,11 @@ if ( do_superob ) then
            else if ( type_var_info(i) == nf90_char ) then
               if ( trim(name_var_info(i)) == 'datetime' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = datetime
-              else if ( trim(name_var_info(i)) == 'station_id' ) then
-                 xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
               end if
+           else if ( type_var_info(i) == nf90_string ) then
+               if ( trim(name_var_info(i)) == 'station_id' ) then
+                   xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
+               end if
            else if ( type_var_info(i) == nf90_int64 ) then
               if ( trim(name_var_info(i)) == 'dateTime' ) then
                  xdata(1,1)%xinfo_int64(iloc,i) = epochtime
@@ -768,9 +770,11 @@ else
            else if ( type_var_info(i) == nf90_char ) then
               if ( trim(name_var_info(i)) == 'datetime' ) then
                  xdata(1,1)%xinfo_char(iloc,i) = datetime
-              else if ( trim(name_var_info(i)) == 'station_id' ) then
-                 xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
               end if
+           else if ( type_var_info(i) == nf90_string ) then
+               if ( trim(name_var_info(i)) == 'station_id' ) then
+                   xdata(1,1)%xinfo_char(iloc,i) = 'ahi_himawari8'
+               end if
            else if ( type_var_info(i) == nf90_int64 ) then
               if ( trim(name_var_info(i)) == 'dateTime' ) then
                  xdata(1,1)%xinfo_int64(iloc,i) = epochtime

@@ -65,6 +65,9 @@ void checkAllGroupVariableTypes(
         if (refType == "char") {
             refType = "string";
         }
+        if (varName == "scan_position") {
+            refType = "int";
+        }
         EXPECT_EQ(refType, testTypes[varName]) << "Variable type for "
  << varName;
     }
