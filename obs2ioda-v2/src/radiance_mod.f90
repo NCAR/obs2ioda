@@ -6,7 +6,7 @@ use define_mod, only: missing_r, missing_i, nstring, ndatetime, &
    nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, &
    dtime_min, dtime_max, strlen
 use ufo_vars_mod, only: ufo_vars_getindex
-use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64, nf90_string
+use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
 use utils_mod, only: get_julian_time, da_advance_time, da_get_time_slots
 
 implicit none
@@ -1122,9 +1122,7 @@ subroutine sort_obs_radiance(filedate, nfgat)
          else if ( type_var_info(i) == nf90_char ) then
             if ( trim(name_var_info(i)) == 'datetime' ) then
                xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%datetime
-            end if
-         else if ( type_var_info(i) == nf90_string ) then
-            if ( trim(name_var_info(i)) == 'station_id' ) then
+            else if ( trim(name_var_info(i)) == 'station_id' ) then
                xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%inst
             end if
          else if ( type_var_info(i) == nf90_int64 ) then
