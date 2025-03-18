@@ -158,7 +158,7 @@ integer(i_kind), dimension(nvar_info) :: type_var_info = &
       nf90_float, &
       nf90_float, &
       nf90_int64, &
-      nf90_string,  &
+      nf90_char,  &
       nf90_string,  &
       nf90_string   &
    /)
@@ -170,7 +170,7 @@ character(len=nstring), dimension(2,nvar_info) :: dim_var_info = reshape ( &
       'nlocs     ', 'null      ', &
       'nlocs     ', 'null      ', &
       'nlocs     ', 'null      ', &
-      'nlocs     ', 'null      ', &
+      'ndatetime ', 'nlocs     ', &
       'nlocs     ', 'null      ', &
       'nvars     ', 'null      '  &
    /), (/2, nvar_info/) )
