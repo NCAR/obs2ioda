@@ -2,7 +2,14 @@
 #include "netcdf_error.h"
 #include <memory>
 
+// Define schema yaml file path macro
+#ifndef IODA_SCHEMA_PATH
+#define IODA_SCHEMA_PATH
+#endif
+
 namespace Obs2Ioda {
+    IodaSchema iodaSchema(YAML::LoadFile(std::string(IODA_SCHEMA_PATH)));
+
     FileMap &FileMap::getInstance() {
         static FileMap instance;
         return instance;
