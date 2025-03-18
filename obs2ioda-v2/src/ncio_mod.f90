@@ -345,7 +345,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
       end do var_info_loop
 
       if ( write_opt == write_nc_radiance .or. write_opt == write_nc_radiance_geo ) then
-         allocate(scan_position_values(xdata(ityp, itim)%nlocs, nsen_info))
          do i = 1, nsen_info
             ncname = trim(name_sen_info(i))
             if (type_sen_info(i) == nf90_int) then
