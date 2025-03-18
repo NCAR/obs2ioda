@@ -7,7 +7,7 @@ use define_mod, only: nobtype, set_obtype_conv, obtype_list, xdata, &
    dtime_min, dtime_max
 use ufo_vars_mod, only: ufo_vars_getindex, var_prs, var_u, var_v
 use utils_mod, only: get_julian_time, da_advance_time, da_get_time_slots
-use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_string, nf90_int64
+use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_int64
 
 implicit none
 private
@@ -489,9 +489,7 @@ subroutine sort_obs_satwnd(filedate, nfgat)
             else if ( type_var_info(i) == nf90_char ) then
                if ( trim(name_var_info(i)) == 'datetime' ) then
                   xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%datetime
-               end if
-            else if ( type_var_info(i) == nf90_string ) then
-               if ( trim(name_var_info(i)) == 'station_id' ) then
+               else if ( trim(name_var_info(i)) == 'station_id' ) then
                   xdata(ityp,itim)%xinfo_char(iloc(ityp,itim),i) = rlink%stid
                end if
             else if ( type_var_info(i) == nf90_int64 ) then
