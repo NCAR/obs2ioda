@@ -370,7 +370,6 @@ subroutine write_obs (filedate, write_opt, outdir, itim)
          end if
          deallocate (ichan)
          deallocate (obserr)
-         deallocate (scan_position_values)
       end if ! write_nc_radiance
 
       status = netcdfClose(netcdfID)
