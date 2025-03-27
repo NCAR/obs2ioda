@@ -2,13 +2,9 @@
 #include "netcdf_error.h"
 #include <memory>
 
-#ifndef IODA_SCHEMA_YAML
-#define IODA_SCHEMA_YAML
-#endif
 
 namespace Obs2Ioda {
-    const std::string iodaSchemaYaml = std::string(IODA_SCHEMA_YAML);
-    IodaObsSchema iodaSchema(YAML::LoadFile(iodaSchemaYaml));
+    IodaObsSchema iodaSchema(YAML::LoadFile(IODA_SCHEMA_YAML));
 
     FileMap &FileMap::getInstance() {
         static FileMap instance;
