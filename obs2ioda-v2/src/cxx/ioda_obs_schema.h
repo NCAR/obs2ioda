@@ -8,6 +8,9 @@
 #include <vector>
 #include "yaml-cpp/yaml.h"
 
+const std::string IODA_SCHEMA_YAML = "../../../share/ObsSpace.yaml";
+
+
 /**
  * @brief Base class for all components of an IODA observation schema.
  *

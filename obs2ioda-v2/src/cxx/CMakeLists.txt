@@ -23,5 +23,4 @@ set(obs2ioda_cxx_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 add_library(obs2ioda_cxx SHARED ${obs2ioda_cxx_SOURCES})
-target_compile_definitions(obs2ioda_cxx PUBLIC -DIODA_SCHEMA_YAML="${CMAKE_SOURCE_DIR}/share/ObsSpace.yaml")
 obs2ioda_cxx_library(obs2ioda_cxx "${obs2ioda_cxx_INCLUDE_DIRS}" "${obs2ioda_cxx_LIBRARIES}")
