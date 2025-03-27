@@ -23,14 +23,6 @@ set(NCEP_BUFR_LIB CACHE STRING "" )
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
 
-FetchContent_Declare(
-        yaml-cpp
-        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-        GIT_TAG master
-)
-FetchContent_MakeAvailable(yaml-cpp)
-
-
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v2")
 add_subdirectory("${CMAKE_SOURCE_DIR}/test")
 
