@@ -130,9 +130,7 @@ public:
      * @brief Constructor for a variable component.
      * @param name Optional name used as the canonical name.
      */
-    explicit IodaObsVariable(std::string name = "") :
-        IodaObsSchemaComponent("Variable", std::move(name)) {
-    }
+    explicit IodaObsVariable(std::string name = "");
 
     /**
      * @brief Loads the variable definition from a YAML node.
