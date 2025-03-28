@@ -8,7 +8,12 @@
 #include <vector>
 #include "yaml-cpp/yaml.h"
 
-const std::string IODA_SCHEMA_YAML = "../../../share/ObsSpace.yaml";
+#ifndef OBS2IODA_ROOT_DIR
+#define OBS2IODA_ROOT_DIR
+#endif
+
+const std::string IODA_SCHEMA_YAML =
+        std::string(OBS2IODA_ROOT_DIR) + "/share/ObsSpace.yaml";
 
 
 /**
