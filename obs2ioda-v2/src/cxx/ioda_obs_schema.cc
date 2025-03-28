@@ -46,6 +46,10 @@ IodaObsDimension::IodaObsDimension(std::string name):
     IodaObsSchemaComponent("Dimension", std::move(name)) {
 }
 
+IodaObsVariable::IodaObsVariable(std::string name):
+    IodaObsSchemaComponent("Variable", std::move(name)) {
+}
+
 void IodaObsVariable::load(const YAML::Node &node) {
     static constexpr std::array<const char *, 2> keys = {
         "Variable", "Dimension"
