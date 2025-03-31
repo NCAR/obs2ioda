@@ -1,6 +1,4 @@
-Here's an updated version of the README that includes the note about `ctest`:
 
----
 
 # Integration Test Data Setup
 
