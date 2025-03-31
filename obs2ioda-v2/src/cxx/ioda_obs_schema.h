@@ -4,16 +4,10 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 #include "yaml-cpp/yaml.h"
+#include "FilePathConfig.h"
 
-#ifndef OBS2IODA_ROOT_DIR
-#define OBS2IODA_ROOT_DIR
-#endif
-
-const std::string IODA_SCHEMA_YAML =
-        std::string(OBS2IODA_ROOT_DIR) + "/share/ObsSpace.yaml";
 
 
 /**

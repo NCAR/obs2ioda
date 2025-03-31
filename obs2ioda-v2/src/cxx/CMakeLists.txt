@@ -20,7 +20,7 @@ set(obs2ioda_cxx_LIBRARIES
     yaml-cpp::yaml-cpp
 )
 set(obs2ioda_cxx_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated
 )
 add_library(obs2ioda_cxx SHARED ${obs2ioda_cxx_SOURCES})
 target_compile_definitions(obs2ioda_cxx PUBLIC OBS2IODA_ROOT_DIR="${CMAKE_SOURCE_DIR}")
