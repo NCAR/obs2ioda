@@ -275,7 +275,8 @@ contains
                ref_error = data2a(4, k)
                ref_pccf = data2a(6, k)
 
-               if ( rlon < 360. .and. rlon > 180. ) rlon = rlon - 360. ! longitude range in (-180, 180)
+               ! longitude range (-180, 180)
+               if ( rlon <= 360. .and. rlon > 180. ) rlon = rlon - 360.
                
                ! Loop over number of replications of ROSEQ2 nested inside this particular replication of ROSEQ1
                nreps_ROSEQ2_int = nreps_this_ROSEQ2(k)
