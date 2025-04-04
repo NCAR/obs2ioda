@@ -464,6 +464,9 @@ subroutine read_prepbufr(filename, filedate)
       plink % dhr           = hdr(4)    ! difference in hour
       plink % elv           = hdr(6)
 
+      ! longtitude range in (-180, 180)
+      if ( plink % lon <= 360. .and. plink % lon > 180. ) plink % lon = plink % lon - 360.
+
       write(unit=plink%datetime, fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a)')  &
          iyear, '-', imonth, '-', iday, 'T', ihour, ':', imin, ':', isec, 'Z'
 

@@ -497,6 +497,9 @@ subroutine read_airs_colocate_amsua (filename, filedate)
            if ( sensorspot%clath < r8bfms ) rlink % lat  = sensorspot%clath
            if ( sensorspot%clonh < r8bfms ) rlink % lon  = sensorspot%clonh
 
+           ! longtitude range in (-180, 180)
+           if ( rlink % lon <= 360. .and. rlink % lon > 180. ) rlink % lon = rlink % lon - 360.
+
            if ( sensorspot%fovn      < r8bfms ) rlink % scanpos  = nint( sensorspot%fovn )
            if ( sensorspot%saza      < r8bfms ) rlink % satzen   = sensorspot%saza
            if ( satellitespot%slnm   < r8bfms ) rlink % scanline = nint(satellitespot%slnm)
