@@ -2,7 +2,7 @@
 add_subdirectory(src/cxx)
 
 # Define sources
-set(v2_SOURCES
+set(v3_SOURCES
         define_mod.f90
         gnssro_mod.f90
         hsd.f90
@@ -19,15 +19,15 @@ set(v2_SOURCES
         netcdf_cxx_i_mod.f90
         netcdf_cxx_mod.f90
 )
-list(TRANSFORM v2_SOURCES PREPEND "src/")
-set(obs2ioda_v2_SOURCES
+list(TRANSFORM v3_SOURCES PREPEND "src/")
+set(obs2ioda_v3_SOURCES
         main.f90
 )
-list(TRANSFORM obs2ioda_v2_SOURCES PREPEND "src/")
-set(v2_PUBLIC_LINK_LIBRARIES NetCDF::NetCDF_Fortran "${NCEP_BUFR_LIB}" obs2ioda_cxx)
-add_library(v2 SHARED ${v2_SOURCES})
-obs2ioda_fortran_library(v2 "${v2_PUBLIC_LINK_LIBRARIES}")
-set(obs2ioda_v2_PUBLIC_LINK_LIBRARIES v2)
-add_executable(obs2ioda_v2 ${obs2ioda_v2_SOURCES})
-obs2ioda_fortran_executable(obs2ioda_v2 "${obs2ioda_v2_PUBLIC_LINK_LIBRARIES}")
+list(TRANSFORM obs2ioda_v3_SOURCES PREPEND "src/")
+set(v3_PUBLIC_LINK_LIBRARIES NetCDF::NetCDF_Fortran "${NCEP_BUFR_LIB}" obs2ioda_cxx)
+add_library(v3 SHARED ${v3_SOURCES})
+obs2ioda_fortran_library(v3 "${v3_PUBLIC_LINK_LIBRARIES}")
+set(obs2ioda_v3_PUBLIC_LINK_LIBRARIES v3)
+add_executable(obs2ioda_v3 ${obs2ioda_v3_SOURCES})
+obs2ioda_fortran_executable(obs2ioda_v3 "${obs2ioda_v3_PUBLIC_LINK_LIBRARIES}")
 
