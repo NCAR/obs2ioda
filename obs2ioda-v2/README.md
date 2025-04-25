@@ -1,6 +1,6 @@
-# obs2ioda-v2.x
+# obs2ioda-v3
 ## Installation
-obs2ioda-v2 utilizes CMake as its primary build system. Follow the steps below to build the project:
+obs2ioda-v3 utilizes CMake as its primary build system. Follow the steps below to build the project:
 
 ### Prerequisites
 Please make sure the following libraries are installed:
@@ -30,7 +30,7 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    make
    ```
-The `obs2ioda-v2` executable will reside in the `bin` directory within the build directory.
+The `obs2ioda-v3` executable will reside in the `bin` directory within the build directory.
 
 ---
 ## Installing NCEP BUFR Library
@@ -56,24 +56,18 @@ To install the NCEP BUFR library, follow these steps:
    ```bash
    find . -name *libbufr*
    ```
-Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the build process of `obs2ioda-v2`.
-## caveate
-NetCDF-Fortran interface does not allow reading/writing NF90_STRING, so ``station_id`` and ``variable_names`` are still written out as  
-``char station_id(nlocs, nstring)``  
-``char variable_names(nvars, nstring)``  
-rather than  
-``string station_id(nlocs)``  
-``string variable_names(nvars)``
+Remember to note down the library path (`<NCEP_BUFR_LIB_PATH>`) required for the build process of `obs2ioda-v3`.
+
 
 ## Converting PREPBUFR and BUFR files
 ```
-Usage: obs2ioda-v2.x [-i input_dir] [-o output_dir] [bufr_filename(s)_to_convert] [-split]
+Usage: obs2ioda-v3 [-i input_dir] [-o output_dir] [bufr_filename(s)_to_convert] [-split]
 ```
 If [-i input_dir] [-o output_dir] are not specified in the command line, the default is the current working directory.  
 If [bufr_filename(s)_to_convert] is not specified in the command line, the code looks for file name, **prepbufr.bufr** (also **satwnd.bufr**, **gnssro.bufr**, **amsua.bufr**, **airs.bufr**, **mhs.bufr**, **iasi.bufr**, **cris.bufr**), in the input/working directory. If the file exists, do the conversion, otherwise skip it.  
 If specify ``-split``, the converted file will contain hourly data.
 
-> obs2ioda-v2.x -i input_dir -o output_dir prepbufr.gdas.YYYYMMDD.tHHz.nr
+> obs2ioda-v3 -i input_dir -o output_dir prepbufr.gdas.YYYYMMDD.tHHz.nr
 
 Example output files (date in the output filename is extracted from the input bufr files):  
   aircraft_obs_YYYYMMDDHH.h5  
@@ -83,12 +77,12 @@ Example output files (date in the output filename is extracted from the input bu
   sfc_obs_YYYYMMDDHH.h5  
   sondes_obs_YYYYMMDDHH.h5  
 
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.satwnd.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.satwnd.tHHz.YYYYMMDD.bufr
 
 Example output files (date in the output filename is extracted from the input bufr files):  
   satwnd_obs_YYYYMMDDHH.h5  (GOES-16/GOES-17, AVHRR (METOP/NOAA), VIIRS (NPP/NOAA), LEOGEO AMVs)  
   
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.1bamua.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.1bamua.tHHz.YYYYMMDD.bufr
 
 Example output files:  
   amsua_metop-a_obs_YYYYMMDDHH.h5  
@@ -97,12 +91,12 @@ Example output files:
   amsua_n18_obs_YYYYMMDDHH.h5  
   amsua_n19_obs_YYYYMMDDHH.h5  
 
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.airsev.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.airsev.tHHz.YYYYMMDD.bufr
 
 Example output files:  
   amsua_aqua_obs_YYYYMMDDHH.h5  
 
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.1bmhs.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.1bmhs.tHHz.YYYYMMDD.bufr
 
 Example output files:  
   mhs_metop-a_obs_YYYYMMDDHH.h5  
@@ -110,7 +104,7 @@ Example output files:
   mhs_n18_obs_YYYYMMDDHH.h5  
   mhs_n19_obs_YYYYMMDDHH.h5  
 
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.mtiasi.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.mtiasi.tHHz.YYYYMMDD.bufr
 
 **the following CRTM SpcCoeff files in little_endian must be present in the working directory for IASI radiance to brightness temperature conversion**  
 iasi_metop-a.SpcCoeff.bin -> iasi616_metop-a.SpcCoeff.bin  
@@ -122,7 +116,7 @@ Example output files:
   iasi_metop-b_obs_YYYYMMDDHH.h5  
   iasi_metop-c_obs_YYYYMMDDHH.h5  
 
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.crisf4.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.crisf4.tHHz.YYYYMMDD.bufr
 
 **the following CRTM SpcCoeff files in little_endian must be present in the working directory for CrIS radiance to brightness temperature conversion**  
 _for **cris** bufr file_  
@@ -136,14 +130,14 @@ Example output files:
   cris_npp_obs_YYYYMMDDHH.h5  
   cris_n20_obs_YYYYMMDDHH.h5  
 
-> obs2ioda-v2.x -i input_dir -o output_dir gdas.gpsro.tHHz.YYYYMMDD.bufr
+> obs2ioda-v3 -i input_dir -o output_dir gdas.gpsro.tHHz.YYYYMMDD.bufr
 
 Example output files:  
   gnssro_obs_YYYYMMDDHH.h5  
 
 ## Converting Himawari Standard Data (HSD) FLDK files
 ```
-Usage: obs2ioda-v2.x -i input_dir -ahi -t YYYYMMDDHHNN [-s 1]
+Usage: obs2ioda-v3 -i input_dir -ahi -t YYYYMMDDHHNN [-s 1]
 ```
 
 Input files are a list of Himawari Standard Data, e.g. HS_H08_20200815_0000_B14_FLDK_R20_S0210.DAT in the input_dir.  
