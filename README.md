@@ -31,11 +31,11 @@ File types that obs2ioda can handle:
 ## Contributors
 * Primary original developer: Jamie Bresch (@jamiebresch)
 * Current developers
+  * Junmei Ban (@junmeiban)  
   * Ivette Hernández Baños (@ibanos90)
-  * Simon Toedtli (@st-ncar)
   * Jake Liu (@liujake)
-  * Junmei Ban (@junmeiban)
-  * Zhuming Ying (@zhumingying)
   * Andy Stokely (@amstokely)
+  * Simon Toedtli (@st-ncar)
+  * Zhuming Ying (@zhumingying)
 
 Original repository can be found at https://github.com/jamiebresch/obs2ioda
