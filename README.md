@@ -19,7 +19,7 @@ File types that obs2ioda can handle:
 
 ## See [obs2ioda-v3/README.md](https://github.com/NCAR/obs2ioda/blob/main/obs2ioda-v3/README.md) for compilation and usage.
 
-## See [goes_abi/README.md](https://github.com/jamiebresch/obs2ioda/blob/main/goes_abi/README.md) for compilation and usage.
+## See [goes_abi/README.md](https://github.com/NCAR/obs2ioda/blob/main/goes_abi/README.md) for compilation and usage.
 
 ## Observation data sources:
 * https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/
