@@ -1,6 +1,6 @@
 # obs2ioda
 
-### To convert NCEP PREPBUFR/BUFR files and Himawari Standard Data FLDK files to ioda-v1 or ioda-v2 format.  
+### To convert NCEP PREPBUFR/BUFR files and Himawari Standard Data FLDK files to ioda-v3 format.  
 
 ### To convert GOES-ABI netCDF to ioda-v1 format.  
 
