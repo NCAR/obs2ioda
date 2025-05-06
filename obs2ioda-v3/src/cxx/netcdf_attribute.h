@@ -1,7 +1,111 @@
 #ifndef NETCDF_ATTRIBUTE_H
 #define NETCDF_ATTRIBUTE_H
+#include <netcdf_error.h>
+#include <netcdf_file.h>
 
 namespace Obs2Ioda {
+    template<typename T> int netcdfGetAtt(
+        const int netcdfID, const char *attName, T values,
+        const char *varName, const char *groupName
+    ) {
+        try {
+            auto file = FileMap::getInstance().getFile(netcdfID);
+            std::shared_ptr<netCDF::NcGroup> group =
+                    (groupName && *groupName)
+                        ? std::make_shared<netCDF::NcGroup>(
+                            file->getGroup(groupName)
+                        ) : file;
+
+            auto getAttValues = [&](auto &ncEntity) {
+                auto attLength = ncEntity.getAtt(attName).getAttLength();
+                if constexpr (std::is_same_v<T, char **>) {
+                    auto att = ncEntity.getAtt(attName);
+                    auto tmpBuffer = new char *[attLength];
+                    att.getValues(tmpBuffer);
+                    auto stringLength = strlen(tmpBuffer[0]) + 1;
+                    for (size_t i = 0; i < attLength; ++i) {
+                        std::copy(
+                            tmpBuffer[i], tmpBuffer[i] + stringLength,
+                            values[i]
+                        );
+                    }
+                    for (size_t i = 0; i < attLength; ++i) {
+                        free(tmpBuffer[i]);
+                    }
+                    delete[] tmpBuffer;
+                } else {
+                    if constexpr (std::is_same_v<T, char *>) {
+                        values[attLength] = '\0';
+                    }
+                    ncEntity.getAtt(attName).getValues(values);
+                }
+            };
+
+            if (varName) {
+                const auto iodaVarName = iodaSchema.getVariable(varName)
+                        ->getValidName();
+                auto var = group->getVar(iodaVarName);
+                getAttValues(var);
+            } else {
+                getAttValues(*group);
+            }
+
+            return 0;
+        } catch (const netCDF::exceptions::NcException &e) {
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
+        }
+    }
+
+
+    template<typename T> int netcdfPutAtt(
+        int netcdfID, const char *attName, T values,
+        const char *varName, const char *groupName,
+        const netCDF::NcType &netcdfDataType, size_t len
+    ) {
+        try {
+            auto file = FileMap::getInstance().getFile(netcdfID);
+            std::shared_ptr<netCDF::NcGroup> group =
+                    (groupName && *groupName)
+                        ? std::make_shared<netCDF::NcGroup>(
+                            file->getGroup(groupName)
+                        ) : file;
+
+            auto putVarAtt = [&](auto &var) {
+                if constexpr (std::is_same_v<T, const char *>) {
+                    var.putAtt(attName, std::string(values));
+                } else if constexpr (std::is_same_v<T, const char **>) {
+                    var.putAtt(attName, len, values);
+                } else {
+                    var.putAtt(attName, netcdfDataType, len, values);
+                }
+            };
+
+            auto putGroupAtt = [&](auto &grp) {
+                if constexpr (std::is_same_v<T, const char *>) {
+                    grp.putAtt(attName, std::string(values));
+                } else if constexpr (std::is_same_v<T, const char **>) {
+                    grp.putAtt(attName, len, values);
+                } else {
+                    grp.putAtt(attName, netcdfDataType, len, values);
+                }
+            };
+
+            if (varName) {
+                auto iodaVarName = iodaSchema.getVariable(varName)->
+                        getValidName();
+                auto var = group->getVar(iodaVarName);
+                putVarAtt(var);
+            } else {
+                putGroupAtt(*group);
+            }
+
+            return 0;
+        } catch (const netCDF::exceptions::NcException &e) {
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
+        }
+    }
+
+
     extern "C" {
     /**
      * @brief Writes an attribute to a variable, group, or as a global attribute in a NetCDF file.
