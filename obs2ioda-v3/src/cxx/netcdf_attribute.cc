@@ -3,6 +3,48 @@
 #include "netcdf_error.h"
 
 namespace Obs2Ioda {
+    template<typename T> int netcdfPutAtt(
+        int netcdfID, const char *attName, T values,
+        const char *varName, const char *groupName,
+        const netCDF::NcType &netcdfDataType, size_t len
+    ) {
+        try {
+            auto file = FileMap::getInstance().getFile(netcdfID);
+            std::shared_ptr<netCDF::NcGroup> group = (groupName && *
+                groupName)
+                ? std::make_shared<netCDF::NcGroup>(
+                    file->getGroup(groupName)
+                ) : file;
+
+            if (varName) {
+                auto iodaVarName = iodaSchema.getVariable(varName)->getValidName();
+                auto var = group->getVar(iodaVarName);
+                if (netcdfDataType == netCDF::ncString) {
+                    var.putAtt(
+                        attName, std::string(
+                            reinterpret_cast<const char *>(values)
+                        )
+                    );
+                } else {
+                    var.putAtt(attName, netcdfDataType, len, values);
+                }
+            } else {
+                if (netcdfDataType == netCDF::ncString) {
+                    group->putAtt(
+                        attName, std::string(
+                            reinterpret_cast<const char *>(values)
+                        )
+                    );
+                } else {
+                    group->putAtt(attName, netcdfDataType, len, values);
+                }
+            }
+
+            return 0;
+        } catch (const netCDF::exceptions::NcException &e) {
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
+        }
+    }
 
     int netcdfPutAttIntArray(
         int netcdfID, const char *attName, const int *attValue,
