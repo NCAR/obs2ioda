@@ -32,6 +32,32 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```
 The `obs2ioda-v3` executable will reside in the `bin` directory within the build directory.
 
+### Running the Validation Test Suite
+
+1. **Create and activate a virtual environment** in the `obs2ioda` root directory:
+
+   ```bash
+   python3 -m venv .obs2ioda
+   source .obs2ioda/bin/activate
+   ```
+
+2. **Install required dependencies**:
+
+   ```bash
+   pip install pytest netcdf4 requests
+   ```
+
+3. **Run the test suite** from the `obs2ioda` root directory:
+
+   ```bash
+   pytest
+   ```
+
+---
+
+Let me know if you’d like to include instructions for deactivating the environment or running specific tests.
+
+
 ---
 ## Installing NCEP BUFR Library
 To install the NCEP BUFR library, follow these steps:
