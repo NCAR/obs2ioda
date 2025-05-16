@@ -34,8 +34,8 @@ def format_netcdf_assert_msg(file: str, group: str, variable: str, detail: str,
     return (
         f"[NetCDF Mismatch] File: '{file}' | Group: '{group}' | Variable: '{variable}'\n"
         f"Reason: {detail}\n"
-        f"Reference: {ref_val}\n"
-        f"Test:      {test_val}"
+        f"Expected: {ref_val}\n"
+        f"Actual:      {test_val}"
     )
 
 

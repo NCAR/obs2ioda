@@ -7,7 +7,6 @@
 #include "ioda_obs_schema.h"
 
 namespace Obs2Ioda {
-    extern IodaObsSchema iodaSchema;
     /**
      * @class FileMap
      * @brief Singleton class for managing a mapping of NetCDF file IDs to file objects.

@@ -3,6 +3,7 @@
 #include "netcdf_error.h"
 #include <algorithm>
 #include <cstring>
+#include "ioda_obs_schema_map/ioda_obs_schema_map.h"
 
 namespace Obs2Ioda {
 
@@ -27,18 +28,19 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
+            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           iodaSchema.getGroup(groupName)->getValidName()));
+                                           iodaSchema->getGroup(groupName)->getValidName()));
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
-                dims.push_back(file->getDim(iodaSchema.getDimension(dimNames[i])->getValidName()));;
+                dims.push_back(file->getDim(iodaSchema->getDimension(dimNames[i])->getValidName()));;
             }
-            auto iodaVarName = iodaSchema.getVariable(varName)->getValidName();
+            auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
             auto var = group->addVar(
                 iodaVarName,
                 netCDF::NcType(netcdfDataType),
@@ -63,13 +65,14 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
+            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           iodaSchema.getGroup(groupName)->getValidName()));
-            auto iodaVarName = iodaSchema.getVariable(varName)->getValidName();
+                                           iodaSchema->getGroup(groupName)->getValidName()));
+            auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
             const auto var = group->getVar(iodaVarName);
             auto varType = var.getType();
             // Special handling for char arrays
@@ -187,13 +190,14 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
+            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           iodaSchema.getGroup(groupName)->getValidName()));
-            auto iodaVarName = iodaSchema.getVariable(varName)->getValidName();
+                                           iodaSchema->getGroup(groupName)->getValidName()));
+            auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
             auto var = group->getVar(iodaVarName);
             var.setFill(
                 fillMode,

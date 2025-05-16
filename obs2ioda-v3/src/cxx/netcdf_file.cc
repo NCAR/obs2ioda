@@ -1,10 +1,10 @@
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 #include <memory>
+#include <ioda_obs_schema_map/ioda_obs_schema_map.h>
 
 
 namespace Obs2Ioda {
-    IodaObsSchema iodaSchema(YAML::LoadFile(IODA_SCHEMA_YAML));
 
     FileMap &FileMap::getInstance() {
         static FileMap instance;
@@ -68,7 +68,11 @@ namespace Obs2Ioda {
                 *netcdfID,
                 file
             );
-
+            const auto iodaObsSchema = std::make_shared<IodaObsSchema>(YAML::LoadFile(IODA_SCHEMA_YAML));
+            IodaObsSchemaMap::getInstance().addIodaObsSchema(
+                *netcdfID,
+                iodaObsSchema
+            );
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(

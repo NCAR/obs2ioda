@@ -1,6 +1,7 @@
 #include "netcdf_group.h"
 #include "netcdf_file.h"
 #include "netcdf_error.h"
+#include "ioda_obs_schema_map/ioda_obs_schema_map.h"
 
 namespace Obs2Ioda {
     int netcdfAddGroup(
@@ -10,6 +11,7 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
+            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             // Use the root group (the netCDF::NcFile object) if parentGroupName is null;
             // otherwise, use the group with the specified name.
             const auto parentGroup = !parentGroupName
@@ -18,7 +20,7 @@ namespace Obs2Ioda {
                                              netCDF::NcGroup>(
                                              file->getGroup(
                                                  parentGroupName));
-            auto iodaGroupName = iodaSchema.getGroup(groupName)->getValidName();
+            auto iodaGroupName = iodaSchema->getGroup(groupName)->getValidName();
             const auto group = parentGroup->addGroup(iodaGroupName);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
