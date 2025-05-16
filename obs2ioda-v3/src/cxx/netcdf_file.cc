@@ -87,6 +87,7 @@ namespace Obs2Ioda {
         try {
             FileMap::getInstance().getFile(netcdfID)->close();
             FileMap::getInstance().removeFile(netcdfID);
+            IodaObsSchemaMap::getInstance().removeIodaObsSchema(netcdfID);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(

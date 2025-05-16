@@ -5,9 +5,6 @@
 #include "ioda_obs_schema_map.h"
 #include "ioda_obs_schema.h"
 
-namespace Obs2Ioda {
-    class IodaObsSchemaMap;
-}
 
 TEST(IodaObsSchemaMap, IodaObsSchemaMapAddFile) {
     int iodaObsSchemaID = 1;
