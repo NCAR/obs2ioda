@@ -1,7 +1,8 @@
 # Check CMake version
 cmake_minimum_required(VERSION 3.10)
-
-include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_Functions.cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include("Obs2Ioda_Functions")
+include("Obs2Ioda_Test_Functions")
 enable_testing()
 include(FetchContent)
 # Define the project

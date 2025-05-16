@@ -1,95 +1,37 @@
-#include "netcdf_file_map.h"
-#include "netcdf_error.h"
-#include "FilePathConfig.h"
+#include "ioda_obs_schema_map.h"
 
 
 namespace Obs2Ioda {
-    IodaObsSchema iodaSchema(YAML::LoadFile(IODA_SCHEMA_YAML));
 
-    FileMap &FileMap::getInstance() {
-        static FileMap instance;
+    IodaObsSchemaMap &IodaObsSchemaMap::getInstance() {
+        static IodaObsSchemaMap instance;
         return instance;
     }
 
-    void FileMap::addFile(
-        const int netcdfID,
-        const std::shared_ptr<netCDF::NcFile> &file
-    ) {
-        auto netcdfFileIterator = this->fileMap.find(netcdfID);
-        if (netcdfFileIterator != this->fileMap.end()) {
-            throw netCDF::exceptions::NcCantCreate(
-                "NetCDF ID already exists in the NetCDF file map",
-                __FILE__,
-                __LINE__
-            );
-        }
-        this->fileMap[netcdfID] = file;
+    void IodaObsSchemaMap::addIodaObsSchema(int iodaObsSchemaID,
+        const std::shared_ptr<IodaObsSchema> &iodaObsSchema) {
+        iodaObsSchemaMap[iodaObsSchemaID] = iodaObsSchema;
     }
 
-
-    void FileMap::removeFile(
-        const int netcdfID
-    ) {
-        auto netcdfFileIterator = this->fileMap.find(netcdfID);
-        if (netcdfFileIterator == this->fileMap.end()) {
-            throw netCDF::exceptions::NcBadId(
-                "NetCDF ID not found in the NetCDF file map",
-                __FILE__,
-                __LINE__
+    std::shared_ptr<IodaObsSchema> IodaObsSchemaMap::getIodaObsSchema(const int iodaObsSchemaID) {
+        const auto it = iodaObsSchemaMap.find(iodaObsSchemaID);
+        if (it == iodaObsSchemaMap.end()) {
+            throw std::runtime_error(
+                "IodaObsSchema ID not found in the IodaObsSchema map: " +
+                std::to_string(iodaObsSchemaID)
             );
         }
-        this->fileMap.erase(netcdfFileIterator);
+        return it->second;
     }
 
-    std::shared_ptr<netCDF::NcFile> FileMap::getFile(const int netcdfID) {
-        const auto netcdfFileIterator = this->fileMap.find(netcdfID);
-        if (netcdfFileIterator == this->fileMap.end()) {
-            throw netCDF::exceptions::NcBadId(
-                "NetCDF ID not found in the NetCDF file map",
-                __FILE__,
-                __LINE__
+    void IodaObsSchemaMap::removeIodaObsSchema(int iodaObsSchemaID) {
+        auto iodaObsSchemaIterator = this->iodaObsSchemaMap.find(iodaObsSchemaID);
+        if (iodaObsSchemaIterator == this->iodaObsSchemaMap.end()) {
+            throw std::runtime_error(
+                "IodaObsSchema ID not found in the IodaObsSchema map: " +
+                std::to_string(iodaObsSchemaID)
             );
         }
-        return netcdfFileIterator->second;
-    }
-
-    int netcdfCreate(
-        const char *path,
-        int *netcdfID,
-        int fileMode
-    ) {
-        try {
-            const auto file = std::make_shared<netCDF::NcFile>(
-                path,
-                static_cast<netCDF::NcFile::FileMode>(fileMode)
-            );
-            *netcdfID = file->getId();
-            FileMap::getInstance().addFile(
-                *netcdfID,
-                file
-            );
-
-            return 0;
-        } catch (netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
-        }
-    }
-
-    int netcdfClose(const int netcdfID) {
-        try {
-            FileMap::getInstance().getFile(netcdfID)->close();
-            FileMap::getInstance().removeFile(netcdfID);
-            return 0;
-        } catch (netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
-        }
+        this->iodaObsSchemaMap.erase(iodaObsSchemaIterator);
     }
 }

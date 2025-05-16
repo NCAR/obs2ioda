@@ -1,4 +1,5 @@
 #include "netcdf_attribute.h"
+#include "ioda_obs_schema_map.h"
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 
@@ -10,6 +11,7 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
+            auto iodaSchema = Obs2Ioda::IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             std::shared_ptr<netCDF::NcGroup> group = (groupName && *
                 groupName)
                 ? std::make_shared<netCDF::NcGroup>(
@@ -17,7 +19,7 @@ namespace Obs2Ioda {
                 ) : file;
 
             if (varName) {
-                auto iodaVarName = iodaSchema.getVariable(varName)->getValidName();
+                auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
                 auto var = group->getVar(iodaVarName);
                 if (netcdfDataType == netCDF::ncString) {
                     var.putAtt(

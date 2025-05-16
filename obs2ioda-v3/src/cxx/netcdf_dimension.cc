@@ -1,5 +1,6 @@
 #include "netcdf_dimension.h"
 #include "netcdf_file.h"
+#include "ioda_obs_schema_map.h"
 #include "netcdf_error.h"
 
 namespace Obs2Ioda {
@@ -12,13 +13,14 @@ namespace Obs2Ioda {
     ) {
         try {
             const auto file = FileMap::getInstance().getFile(netcdfID);
+            const auto iodaSchema = Obs2Ioda::IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
                                            groupName));
-            auto iodaDimName = iodaSchema.getDimension(dimName)->getValidName();
+            auto iodaDimName = iodaSchema->getDimension(dimName)->getValidName();
             auto dim = group->addDim(iodaDimName, len);
             *dimID = dim.getId();
             return 0;

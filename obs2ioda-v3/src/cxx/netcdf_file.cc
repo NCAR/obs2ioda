@@ -1,11 +1,12 @@
 #include "netcdf_file.h"
+
+#include <FilePathConfig.h>
+
 #include "netcdf_error.h"
-#include <memory>
+#include "ioda_obs_schema_map.h"
 
 
 namespace Obs2Ioda {
-    IodaObsSchema iodaSchema(YAML::LoadFile(IODA_SCHEMA_YAML));
-
     FileMap &FileMap::getInstance() {
         static FileMap instance;
         return instance;
@@ -41,7 +42,8 @@ namespace Obs2Ioda {
         this->fileMap.erase(netcdfFileIterator);
     }
 
-    std::shared_ptr<netCDF::NcFile> FileMap::getFile(const int netcdfID) {
+    std::shared_ptr<netCDF::NcFile>
+    FileMap::getFile(const int netcdfID) {
         const auto netcdfFileIterator = this->fileMap.find(netcdfID);
         if (netcdfFileIterator == this->fileMap.end()) {
             throw netCDF::exceptions::NcBadId(
@@ -68,7 +70,17 @@ namespace Obs2Ioda {
                 *netcdfID,
                 file
             );
-
+            auto iodaSchema = std::make_shared<IodaObsSchema>(
+                YAML::LoadFile(IODA_SCHEMA_YAML)
+            );
+            iodaSchema->addVariableRegexPattern(R"(([a-zA-Z0-9_]+)@)");
+            iodaSchema->addVariableRegexPattern(
+                R"(^(.*)_\d+@[a-zA-Z0-9_]+$)");
+            iodaSchema->addGroupRegexPattern(R"(@([a-zA-Z0-9_]+))");
+            IodaObsSchemaMap::getInstance().addIodaObsSchema(
+                *netcdfID,
+                iodaSchema
+            );
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
