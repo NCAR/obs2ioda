@@ -1,0 +1,17 @@
+set(ioda_obs_schema_test_SOURCES
+        "ioda_obs_schema.test.cc"
+)
+set(ioda_obs_schema_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(ioda_obs_schema_test_LIBRARY_DEPENDENCIES
+        ioda_file
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cpp_test(ioda_obs_schema_test
+        "${ioda_obs_schema_test_SOURCES}"
+        "${ioda_obs_schema_test_INCLUDE_DIRECTORIES}"
+        "${ioda_obs_schema_test_LIBRARY_DEPENDENCIES}"
+)
