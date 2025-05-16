@@ -1,7 +1,7 @@
 
 .DS_Store
 .DS_Store
-*/pycache
+**/__pycache__
 test/validation/data
 test/validation/data.tar.gz
 test/validation/FilePathConfig.py
