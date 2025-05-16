@@ -5,7 +5,8 @@ import numpy as np
 import pytest
 from pathlib import Path
 from netCDF4 import Dataset, Variable, Group
-from typing import List, Tuple, Set, Dict, Any
+from typing import List, Tuple, Dict, Any
+from FilePathConfig import OBS2IODA_V3_EXECUTABLE_PATH
 
 def obs2ioda_test_directory() -> Path:
     """
@@ -131,7 +132,7 @@ def pytest_generate_tests(metafunc: Any) -> None:
 
     input_dir = extracted_dir / "bufr"
     output_dir = extracted_dir / "v3/output"
-    executable = Path("build/bin/obs2ioda_v3")
+    executable = Path(OBS2IODA_V3_EXECUTABLE_PATH)
 
     if not executable.exists():
         raise FileNotFoundError(f"obs2ioda_v3 executable not found at {executable}")
