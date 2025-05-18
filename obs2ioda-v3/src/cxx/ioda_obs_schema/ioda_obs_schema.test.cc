@@ -97,6 +97,28 @@ TEST_F(IodaObsSchemaFixture, CombinedVariableAndGroupResolution) {
     }
 }
 
+TEST_F(IodaObsSchemaFixture, VariableDimensions) {
+    std::string v3VariableName = "yECEFPosition";
+    std::vector<std::vector<std::string> > v3VariableDimensions = {
+        { "Location" }, { "Location", "Level" }
+    };
+
+    for (size_t i = 0; i < v3VariableDimensions.size(); ++i) {
+        for (size_t j = 0; j < v3VariableDimensions[i].size(); ++j) {
+            EXPECT_EQ(
+                iodaObsSchema->getVariable(v3VariableName)
+                    ->getDimensions().at(i).at(j),
+                v3VariableDimensions[i].at(j));
+        }
+    }
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v3VariableName)
+            ->getValidDimensions().at(0),
+        v3VariableDimensions.at(0).at(0));
+
+
+}
+
 int main(int argc,
          char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

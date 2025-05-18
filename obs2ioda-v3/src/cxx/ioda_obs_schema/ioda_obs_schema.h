@@ -26,6 +26,17 @@ protected:
     std::string componentType;
     /**< Type of schema component ("Variable", "Attribute", etc.). */
 
+    template<typename T>
+    static T setSequence(
+        const YAML::Node &node,
+        const std::string &key
+    ) {
+        if (node[key] && node[key].IsSequence()) {
+            return node[key].as<T>();
+        }
+        return T();
+    }
+
     /**
      * @brief Extracts names from a YAML node and sets the internal name fields.
      *
@@ -35,7 +46,8 @@ protected:
      * @param node The YAML node containing schema definitions.
      * @param category Key used to identify component names (e.g., "Variable").
      */
-    void setNames(const YAML::Node &node, const std::string &category);
+    void setNames(const YAML::Node &node,
+                  const std::string &category);
 
     /**
      * @brief Constructor for a schema component.
@@ -44,7 +56,8 @@ protected:
      * @param name Optional single name, used as the canonical name if provided.
      */
     explicit IodaObsSchemaComponent(
-        std::string componentType, std::string name = ""
+        std::string componentType,
+        std::string name = ""
     );
 
 public:
@@ -119,6 +132,14 @@ public:
  * @brief Represents a Variable component in the IODA schema.
  */
 class IodaObsVariable final : public IodaObsSchemaComponent {
+    std::vector<std::vector<std::string> > m_dimensions;
+    /**< Dimensions of the variable. */
+    std::vector<std::string> m_validDimensions;
+
+    void setDimensions(
+        const YAML::Node &node
+    );
+
 public:
     /**
      * @brief Constructor for a variable component.
@@ -140,6 +161,10 @@ public:
      * @param node The YAML node describing the variable or dimension.
      */
     void load(const YAML::Node &node) override;
+
+    [[nodiscard]] std::vector<std::vector<std::string>> getDimensions() const;
+
+    [[nodiscard]] std::vector<std::string> getValidDimensions() const;
 };
 
 /**
@@ -175,8 +200,10 @@ class IodaObsSchema {
      * @param key The name used to find aliases inside each item.
      * @param componentMap Storage for created components.
      */
-    template<typename T> void loadComponent(
-        const YAML::Node &schema, const std::string &category,
+    template<typename T>
+    void loadComponent(
+        const YAML::Node &schema,
+        const std::string &category,
         const std::string &key,
         std::unordered_map<std::string, std::shared_ptr<T> > &
         componentMap
@@ -207,7 +234,8 @@ class IodaObsSchema {
      * @param regexPattern Optional regex pattern for matching names.
      * @return Shared pointer to the component.
      */
-    template<typename T> std::shared_ptr<const T> getComponent(
+    template<typename T>
+    std::shared_ptr<const T> getComponent(
         const std::string &name,
         std::unordered_map<std::string, std::shared_ptr<T> > &
         componentMap,
@@ -217,9 +245,10 @@ class IodaObsSchema {
         if (it != componentMap.end()) {
             return it->second;
         }
-        for (const auto& regexPattern : regexPatterns) {
+        for (const auto &regexPattern: regexPatterns) {
             std::smatch match;
-            if (std::regex_search(name, match, std::regex(regexPattern))) {
+            if (std::regex_search(name, match,
+                                  std::regex(regexPattern))) {
                 auto it = componentMap.find(match[1]);
                 if (it != componentMap.end()) {
                     return it->second;

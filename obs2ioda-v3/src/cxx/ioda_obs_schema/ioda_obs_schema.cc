@@ -1,5 +1,16 @@
 #include "ioda_obs_schema.h"
 
+void IodaObsSchemaComponent::setNames(const YAML::Node &node,
+                                      const std::string &category) {
+    this->names =
+            setSequence<std::vector<std::string> >(
+                node, category);
+
+    if (!names.empty()) {
+        this->validName = this->names.at(0);
+    }
+}
+
 IodaObsSchemaComponent::IodaObsSchemaComponent(
     std::string componentType,
     std::string name
@@ -23,17 +34,6 @@ void IodaObsSchemaComponent::load(const YAML::Node &node) {
     setNames(node, this->componentType);
 }
 
-void IodaObsSchemaComponent::setNames(
-    const YAML::Node &node,
-    const std::string &category
-) {
-    if (node[category] && node[category].IsSequence()) {
-        this->names = node[category].as<std::vector<std::string> >();
-    }
-    if (!names.empty()) {
-        this->validName = this->names.at(0);
-    }
-}
 
 IodaObsAttribute::IodaObsAttribute(
     std::string name): IodaObsSchemaComponent(
@@ -50,6 +50,15 @@ IodaObsDimension::IodaObsDimension(
     "Dimension", std::move(name)) {
 }
 
+void IodaObsVariable::setDimensions(const YAML::Node &node) {
+    this->m_dimensions =
+            setSequence<std::vector<std::vector<std::string> > >(
+                node, "Dimensions");
+    if (!this->m_dimensions.empty()) {
+        this->m_validDimensions = this->m_dimensions.at(0);
+    }
+}
+
 IodaObsVariable::IodaObsVariable(
     std::string name): IodaObsSchemaComponent(
     "Variable", std::move(name)) {
@@ -62,9 +71,19 @@ void IodaObsVariable::load(const YAML::Node &node) {
     for (const auto &key: keys) {
         if (node[key] && node[key].begin() != node[key].end()) {
             this->setNames(node, key);
+            this->setDimensions(node);
             break;
         }
     }
+}
+
+std::vector<std::vector<std::string> >
+IodaObsVariable::getDimensions() const {
+    return m_dimensions;
+}
+
+std::vector<std::string> IodaObsVariable::getValidDimensions() const {
+    return m_validDimensions;
 }
 
 IodaObsSchema::IodaObsSchema(const YAML::Node &schema) {
