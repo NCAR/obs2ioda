@@ -12,6 +12,10 @@ namespace Obs2Ioda {
 
     void IodaObsSchemaMap::addIodaObsSchema(int iodaObsSchemaID,
         const std::shared_ptr<IodaObsSchema> &iodaObsSchema) {
+        iodaObsSchema->addVariableRegexPattern(R"(([a-zA-Z0-9_]+)@)");
+        iodaObsSchema->addVariableRegexPattern(
+            R"(^(.*)_\d+@[a-zA-Z0-9_]+$)");
+        iodaObsSchema->addGroupRegexPattern(R"(@([a-zA-Z0-9_]+))");
         iodaObsSchemaMap[iodaObsSchemaID] = iodaObsSchema;
     }
 

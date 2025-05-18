@@ -1,7 +1,8 @@
 #include "ioda_obs_schema.h"
 
 IodaObsSchemaComponent::IodaObsSchemaComponent(
-    std::string componentType, std::string name
+    std::string componentType,
+    std::string name
 ): componentType(std::move(componentType)) {
     if (!name.empty()) {
         this->names.push_back(std::move(name));
@@ -23,7 +24,8 @@ void IodaObsSchemaComponent::load(const YAML::Node &node) {
 }
 
 void IodaObsSchemaComponent::setNames(
-    const YAML::Node &node, const std::string &category
+    const YAML::Node &node,
+    const std::string &category
 ) {
     if (node[category] && node[category].IsSequence()) {
         this->names = node[category].as<std::vector<std::string> >();
@@ -33,8 +35,9 @@ void IodaObsSchemaComponent::setNames(
     }
 }
 
-IodaObsAttribute::IodaObsAttribute(std::string name):
-    IodaObsSchemaComponent("Attribute", std::move(name)) {
+IodaObsAttribute::IodaObsAttribute(
+    std::string name): IodaObsSchemaComponent(
+    "Attribute", std::move(name)) {
 }
 
 IodaObsGroup::IodaObsGroup(std::string name): IodaObsSchemaComponent(
@@ -42,12 +45,14 @@ IodaObsGroup::IodaObsGroup(std::string name): IodaObsSchemaComponent(
 ) {
 }
 
-IodaObsDimension::IodaObsDimension(std::string name):
-    IodaObsSchemaComponent("Dimension", std::move(name)) {
+IodaObsDimension::IodaObsDimension(
+    std::string name): IodaObsSchemaComponent(
+    "Dimension", std::move(name)) {
 }
 
-IodaObsVariable::IodaObsVariable(std::string name):
-    IodaObsSchemaComponent("Variable", std::move(name)) {
+IodaObsVariable::IodaObsVariable(
+    std::string name): IodaObsSchemaComponent(
+    "Variable", std::move(name)) {
 }
 
 void IodaObsVariable::load(const YAML::Node &node) {
@@ -66,7 +71,8 @@ IodaObsSchema::IodaObsSchema(const YAML::Node &schema) {
     this->loadComponent<IodaObsAttribute>(
         schema, "Attributes", "Attribute", this->attributes
     );
-    this->loadComponent<IodaObsGroup>(schema, "Groups", "Group", groups);
+    this->loadComponent<
+        IodaObsGroup>(schema, "Groups", "Group", groups);
     this->loadComponent<IodaObsDimension>(
         schema, "Dimensions", "Dimension", this->dimensions
     );
@@ -81,23 +87,46 @@ IodaObsSchema::IodaObsSchema(const YAML::Node &schema) {
 std::shared_ptr<const IodaObsAttribute> IodaObsSchema::getAttribute(
     const std::string &name
 ) {
-    return this->getComponent(name, this->attributes);
+    return this->getComponent(name, this->attributes,
+                              this->attributeRegexPatterns);
 }
 
 std::shared_ptr<const IodaObsGroup> IodaObsSchema::getGroup(
     const std::string &name
 ) {
-    return this->getComponent(name, this->groups);
+    return this->getComponent(name, this->groups,
+                              this->groupRegexPatterns);
 }
 
 std::shared_ptr<const IodaObsDimension> IodaObsSchema::getDimension(
     const std::string &name
 ) {
-    return this->getComponent(name, this->dimensions);
+    return this->getComponent(name, this->dimensions,
+                              this->dimensionRegexPatterns);
 }
 
 std::shared_ptr<const IodaObsVariable> IodaObsSchema::getVariable(
     const std::string &name
 ) {
-    return this->getComponent(name, this->variables);
+    return this->getComponent(name, this->variables,
+                              this->variableRegexPatterns);
+}
+
+void IodaObsSchema::
+addVariableRegexPattern(const std::string &pattern) {
+    variableRegexPatterns.push_back(pattern);
+}
+
+void IodaObsSchema::addGroupRegexPattern(const std::string &pattern) {
+    groupRegexPatterns.push_back(pattern);
+}
+
+void IodaObsSchema::
+addAttributeRegexPattern(const std::string &pattern) {
+    attributeRegexPatterns.push_back(pattern);
+}
+
+void IodaObsSchema::
+addDimensionRegexPattern(const std::string &pattern) {
+    dimensionRegexPatterns.push_back(pattern);
 }

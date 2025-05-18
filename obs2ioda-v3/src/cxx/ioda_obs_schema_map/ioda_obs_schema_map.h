@@ -1,7 +1,7 @@
 #ifndef OBS2IODA_IODA_OBS_SCHEMA_FILE_MAP_H
 #define OBS2IODA_IODA_OBS_SCHEMA_FILE_MAP_H
 
-#include "ioda_obs_schema.h"
+#include "ioda_obs_schema/ioda_obs_schema.h"
 
 namespace Obs2Ioda {
     class IodaObsSchemaMap {

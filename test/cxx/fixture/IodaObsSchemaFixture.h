@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "yaml-cpp/yaml.h"
-#include "ioda_obs_schema.h"
+#include "ioda_obs_schema/ioda_obs_schema.h"
 
 class IodaObsSchemaFixture : public ::testing::Test {
 protected:

@@ -1,6 +1,6 @@
 #include "netcdf_file.h"
 #include "netcdf_error.h"
-#include <memory>
+#include "FilePathConfig.h"
 #include <ioda_obs_schema_map/ioda_obs_schema_map.h>
 
 

@@ -1,18 +1,16 @@
-include("/Users/astokely/projects/obs2ioda/test/cmake/Obs2Ioda_Test_Functions.cmake")
-set(ioda_obs_schema_test_SOURCES
+set(ioda_obs_schema_map_test_SOURCES
         "ioda_obs_schema_map.test.cc"
 )
-set(ioda_obs_schema_test_INCLUDE_DIRECTORIES
-        "../"
+set(ioda_obs_schema_map_test_INCLUDE_DIRECTORIES
         "${CMAKE_BINARY_DIR}/generated"
 )
-set(ioda_obs_schema_test_LIBRARY_DEPENDENCIES
+set(ioda_obs_schema_map_test_LIBRARY_DEPENDENCIES
         obs2ioda_cxx
         yaml-cpp::yaml-cpp
         GTest::gtest_main
 )
-add_cxx_ctest(ioda_obs_schema_test
-        "${ioda_obs_schema_test_SOURCES}"
-        "${ioda_obs_schema_test_INCLUDE_DIRECTORIES}"
-        "${ioda_obs_schema_test_LIBRARY_DEPENDENCIES}"
+add_cxx_ctest(ioda_obs_schema_map_test
+        "${ioda_obs_schema_map_test_SOURCES}"
+        "${ioda_obs_schema_map_test_INCLUDE_DIRECTORIES}"
+        "${ioda_obs_schema_map_test_LIBRARY_DEPENDENCIES}"
 )

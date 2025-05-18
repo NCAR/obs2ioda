@@ -3,7 +3,8 @@
 #include <ncException.h>
 
 #include "ioda_obs_schema_map.h"
-#include "ioda_obs_schema.h"
+#include "ioda_obs_schema/ioda_obs_schema.h"
+#include "FilePathConfig.h"
 
 
 TEST(IodaObsSchemaMap, IodaObsSchemaMapAddFile) {
