@@ -231,7 +231,7 @@ class IodaObsSchema {
      * @tparam T Component type.
      * @param name Name or alias of the component.
      * @param componentMap Map from name to shared component.
-     * @param regexPattern Optional regex pattern for matching names.
+     * @param regexPatterns Optional regex pattern for matching names.
      * @return Shared pointer to the component.
      */
     template<typename T>
