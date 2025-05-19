@@ -6,17 +6,25 @@
 #include "ioda_dimension/ioda_dimension.h"
 
 class IodaDimension {
-public:
     std::string m_name;
     int m_size;
     IodaObsSchema m_schema = IodaObsSchema(
         YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML));
-    IodaDimension(const std::string& name, int size) : m_size(size) {
-        m_schema.addVariableRegexPattern(R"(([a-zA-Z0-9_]+)@)");
-        m_schema.addVariableRegexPattern(
-            R"(^(.*)_\d+@[a-zA-Z0-9_]+$)");
-        m_schema.addGroupRegexPattern(R"(@([a-zA-Z0-9_]+))");
+public:
+
+    IodaDimension(const std::string &name,
+                  int size) : m_size(size) {
         m_name = m_schema.getDimension(name)->getValidName();
+    }
+
+    [[nodiscard]] std::string getName() const {
+        return m_name;
+    }
+    void setSize(int size) {
+        m_size = size;
+    }
+    [[nodiscard]] int getSize() const {
+        return m_size;
     }
 };
 #endif // IODA_DIMENSION_H

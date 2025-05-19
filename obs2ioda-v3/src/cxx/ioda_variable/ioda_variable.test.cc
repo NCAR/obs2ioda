@@ -15,6 +15,10 @@ protected:
     std::string stationIdentificationVariableName = "stationIdentification";
     std::string brightness_temperature_1VariableName = "brightness_temperature_1@ObsValue";
     std::string brightnessTemperatureVariableName = "brightnessTemperature";
+    std::string nlocsDimensionName = "nlocs";
+    int nlocsDimensionSize = 80820;
+    IodaObsSchema schema = IodaObsSchema(
+        YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML));
 
 
     void SetUp() override {
@@ -29,13 +33,35 @@ protected:
 
     TEST_F(IodaVariableFixture, V1StandardIodaVariable) {
         IodaVariable iodaVariable(station_idVariableName);
-        EXPECT_EQ(iodaVariable.m_name, stationIdentificationVariableName);
+        EXPECT_EQ(iodaVariable.getName(), stationIdentificationVariableName);
     }
 
     TEST_F(IodaVariableFixture, V1ChannelIodaVariable) {
         IodaVariable iodaVariable(brightness_temperature_1VariableName);
-        EXPECT_EQ(iodaVariable.m_name, brightnessTemperatureVariableName);
+        EXPECT_EQ(iodaVariable.getName(), brightnessTemperatureVariableName);
     }
+
+    TEST_F(IodaVariableFixture, AddDimension) {
+        IodaVariable iodaVariable(brightness_temperature_1VariableName);
+        iodaVariable.addDimension(
+            std::make_shared<IodaDimension>(nlocsDimensionName, nlocsDimensionSize));
+        ASSERT_EQ(iodaVariable.numDimensions(), 1);
+        EXPECT_EQ(iodaVariable.getDimension(nlocsDimensionName)->getName(),
+                  schema.getDimension(nlocsDimensionName)->getValidName());
+        EXPECT_THROW(iodaVariable.addDimension(
+            std::make_shared<IodaDimension>("nstring", 50)),
+                     std::runtime_error);
+
+    }
+
+    TEST_F(IodaVariableFixture, ChannelVariable) {
+        IodaVariable iodaChannelVariable(brightness_temperature_1VariableName);
+        IodaVariable iodaStandardVariable(station_idVariableName);
+        EXPECT_TRUE(iodaChannelVariable.isChannelVariable());
+        EXPECT_FALSE(iodaStandardVariable.isChannelVariable());
+
+    }
+
 
     int main(int argc,
              char **argv) {

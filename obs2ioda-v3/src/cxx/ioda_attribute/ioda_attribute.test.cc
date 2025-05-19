@@ -26,7 +26,7 @@ protected:
 
     TEST_F(IodaAttributeFixture, IodaAttribute) {
         IodaAttribute iodaAttribute(satelliteAttributeName);
-        EXPECT_EQ(iodaAttribute.m_name, platformAttributeName);
+        EXPECT_EQ(iodaAttribute.getName(), platformAttributeName);
     }
 
     int main(int argc,

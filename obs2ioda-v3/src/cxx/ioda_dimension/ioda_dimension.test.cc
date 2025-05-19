@@ -13,6 +13,8 @@ protected:
     std::shared_ptr<netCDF::NcFile> netcdfFile;
     std::string referenceDimensionName = "nlocs";
     int referenceDimensionSize = 80820;
+    IodaObsSchema schema = IodaObsSchema(
+        YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML));
 
     void SetUp() override {
         netcdfFile = std::make_shared<netCDF::NcFile>(
@@ -26,7 +28,15 @@ protected:
 
     TEST_F(IodaDimensionFixture, IodaDimension) {
         IodaDimension iodaDimension(referenceDimensionName, referenceDimensionSize);
-        EXPECT_EQ(iodaDimension.m_name, iodaDimension.m_schema.getDimension(referenceDimensionName)->getValidName());
+        EXPECT_EQ(iodaDimension.getName(), schema.getDimension(referenceDimensionName)->getValidName());
+    }
+
+    TEST_F(IodaDimensionFixture, UpdateSize) {
+        IodaDimension iodaDimension(referenceDimensionName, 0);
+        iodaDimension.setSize(1);
+        EXPECT_EQ(iodaDimension.getSize(), 1);
+        iodaDimension.setSize(iodaDimension.getSize() + 1);
+        EXPECT_EQ(iodaDimension.getSize(), 2);
     }
 
     int main(int argc,
