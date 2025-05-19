@@ -1,0 +1,17 @@
+set(ioda_group_test_SOURCES
+        "ioda_group.test.cc"
+)
+set(ioda_group_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(ioda_group_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(ioda_group_test
+        "${ioda_group_test_SOURCES}"
+        "${ioda_group_test_INCLUDE_DIRECTORIES}"
+        "${ioda_group_test_LIBRARY_DEPENDENCIES}"
+)

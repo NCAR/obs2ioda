@@ -14,6 +14,10 @@ set(obs2ioda_cxx_SOURCES
     netcdf_attribute.cc
     ioda_obs_schema/ioda_obs_schema.cc
     ioda_obs_schema_map/ioda_obs_schema_map.cc
+    ioda_attribute/ioda_attribute.cc
+    ioda_dimension/ioda_dimension.cc
+    ioda_group/ioda_group.cc
+    ioda_variable/ioda_variable.cc
 )
 set(obs2ioda_cxx_LIBRARIES
     NetCDF::NetCDF_CXX
@@ -28,3 +32,7 @@ target_compile_definitions(obs2ioda_cxx PUBLIC OBS2IODA_ROOT_DIR="${CMAKE_SOURCE
 obs2ioda_cxx_library(obs2ioda_cxx "${obs2ioda_cxx_INCLUDE_DIRS}" "${obs2ioda_cxx_LIBRARIES}")
 add_subdirectory("ioda_obs_schema_map")
 add_subdirectory("ioda_obs_schema")
+add_subdirectory("ioda_group")
+add_subdirectory("ioda_dimension")
+add_subdirectory("ioda_variable")
+add_subdirectory("ioda_attribute")
