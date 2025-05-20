@@ -1,5 +1,5 @@
 #include "IodaObsSchemaFixture.h"
-
+#include "FilePathConfig.h"
 
 void IodaObsSchemaFixture::SetUp() {
     this->schema = YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML);

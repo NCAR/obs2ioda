@@ -77,8 +77,16 @@ TEST_F(NetcdfV1GroupTest, WriteData) {
     for (size_t i = 0; i < column.size(); ++i) {
         column[i] = static_cast<double>(i);
     }
-    // var.putVar(start, count, column.data());
+    std::vector<double> reverseColumn(10, 0.0);
+    for (size_t i = 0; i < column.size(); ++i) {
+        reverseColumn[i] = static_cast<double>(column.size() - i);
+    }
     Obs2Ioda::netcdfPutVarDouble(netcdfID, "ObsValue",
-        v1VariableNames.at(1), column.data());
+        v1VariableNames.at(0), column.data());
+    Obs2Ioda::netcdfPutVarDouble(netcdfID, "ObsValue",
+        v1VariableNames.at(1), reverseColumn.data());
+    Obs2Ioda::netcdfPutVarDouble(netcdfID, "ObsValue",
+        v1VariableNames.at(2), column.data());
+//TODO: Formally check the data.
 
 }
