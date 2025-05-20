@@ -1,0 +1,3 @@
+[submodule "external/NCEPLIBS-bufr"]
+	path = external/NCEPLIBS-bufr
+	url = https://github.com/NOAA-EMC/NCEPLIBS-bufr

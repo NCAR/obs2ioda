@@ -18,11 +18,15 @@ set(OBS2IODA_MODULE_DIR ${PROJECT_NAME}/module/${CMAKE_Fortran_COMPILER_ID}/${CM
 install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/${OBS2IODA_MODULE_DIR}/)
 
 
-# Set the Fortran compiler and flags
-set(NCEP_BUFR_LIB CACHE STRING "" )
-
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
+# Try to find bufr. If not found, build it from source. It is a git submodule located in the external directory. It can be built via cmake.
+find_package(bufr)
+if (NOT bufr_FOUND)
+  message(STATUS "Could NOT find bufr. Building from source.")
+  set(BUILD_TESTING OFF CACHE BOOL "Disable testing for bufr")
+  add_subdirectory("${CMAKE_SOURCE_DIR}/external/NCEPLIBS-bufr")
+endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v3")
 add_subdirectory("${CMAKE_SOURCE_DIR}/config")

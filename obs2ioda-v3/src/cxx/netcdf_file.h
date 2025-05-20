@@ -3,9 +3,11 @@
 
 #include <netcdf>
 #include <unordered_map>
-#include "ioda_obs_schema/ioda_obs_schema.h"
+#include <memory>
+#include "ioda_obs_schema.h"
 
 namespace Obs2Ioda {
+    extern IodaObsSchema iodaSchema;
     /**
      * @class FileMap
      * @brief Singleton class for managing a mapping of NetCDF file IDs to file objects.

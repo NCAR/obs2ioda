@@ -1,0 +1,108 @@
+set(ioda_group_test_SOURCES
+        "ioda_group.test.cc"
+)
+set(ioda_group_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(ioda_group_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(ioda_group_test
+        "${ioda_group_test_SOURCES}"
+        "${ioda_group_test_INCLUDE_DIRECTORIES}"
+        "${ioda_group_test_LIBRARY_DEPENDENCIES}"
+)
+
+set(ioda_variable_test_SOURCES
+        "ioda_variable.test.cc"
+)
+set(ioda_variable_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(ioda_variable_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(ioda_variable_test
+        "${ioda_variable_test_SOURCES}"
+        "${ioda_variable_test_INCLUDE_DIRECTORIES}"
+        "${ioda_variable_test_LIBRARY_DEPENDENCIES}"
+)
+
+
+set(ioda_obs_schema_test_SOURCES
+        "ioda_obs_schema.test.cc"
+)
+set(ioda_obs_schema_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(ioda_obs_schema_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(ioda_obs_schema_test
+        "${ioda_obs_schema_test_SOURCES}"
+        "${ioda_obs_schema_test_INCLUDE_DIRECTORIES}"
+        "${ioda_obs_schema_test_LIBRARY_DEPENDENCIES}"
+)
+
+set(ioda_obs_schema_map_test_SOURCES
+        "ioda_obs_schema_map.test.cc"
+)
+set(ioda_obs_schema_map_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(ioda_obs_schema_map_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(ioda_obs_schema_map_test
+        "${ioda_obs_schema_map_test_SOURCES}"
+        "${ioda_obs_schema_map_test_INCLUDE_DIRECTORIES}"
+        "${ioda_obs_schema_map_test_LIBRARY_DEPENDENCIES}"
+)
+
+set(global_object_map_test_SOURCES
+        "object_registry.test.cc"
+)
+set(global_object_map_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(global_object_map_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(global_object_map_test
+        "${global_object_map_test_SOURCES}"
+        "${global_object_map_test_INCLUDE_DIRECTORIES}"
+        "${global_object_map_test_LIBRARY_DEPENDENCIES}"
+)
+
+set(netcdf_group_test_SOURCES
+        "netcdf_group.test.cc"
+)
+set(netcdf_group_test_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/generated"
+)
+set(netcdf_group_test_LIBRARY_DEPENDENCIES
+        obs2ioda_cxx
+        yaml-cpp::yaml-cpp
+        GTest::gtest_main
+)
+add_cxx_ctest(netcdf_group_test
+        "${netcdf_group_test_SOURCES}"
+        "${netcdf_group_test_INCLUDE_DIRECTORIES}"
+        "${netcdf_group_test_LIBRARY_DEPENDENCIES}"
+)

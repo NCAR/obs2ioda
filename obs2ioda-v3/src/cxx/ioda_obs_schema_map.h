@@ -1,7 +1,9 @@
 #ifndef OBS2IODA_IODA_OBS_SCHEMA_FILE_MAP_H
 #define OBS2IODA_IODA_OBS_SCHEMA_FILE_MAP_H
 
-#include "ioda_obs_schema/ioda_obs_schema.h"
+#include "object_registry.h"
+
+#include "ioda_obs_schema.h"
 
 namespace Obs2Ioda {
     class IodaObsSchemaMap {
@@ -32,8 +34,7 @@ namespace Obs2Ioda {
     private:
         IodaObsSchemaMap() = default;
 
-        std::unordered_map<int, std::shared_ptr<IodaObsSchema> >
-        iodaObsSchemaMap;
+        ObjectRegistry<IodaObsSchema> m_objectRegistry;
     };
 } // namespace Obs2Ioda
 

@@ -10,38 +10,40 @@ namespace Obs2Ioda {
         return instance;
     }
 
-    void IodaObsSchemaMap::addIodaObsSchema(int iodaObsSchemaID,
+    void IodaObsSchemaMap::addIodaObsSchema(const int iodaObsSchemaID,
         const std::shared_ptr<IodaObsSchema> &iodaObsSchema) {
         iodaObsSchema->addVariableRegexPattern(R"(([a-zA-Z0-9_]+)@)");
         iodaObsSchema->addVariableRegexPattern(
             R"(^(.*)_\d+@[a-zA-Z0-9_]+$)");
         iodaObsSchema->addGroupRegexPattern(R"(@([a-zA-Z0-9_]+))");
-        iodaObsSchemaMap[iodaObsSchemaID] = iodaObsSchema;
+        m_objectRegistry.addObject(iodaObsSchemaID, iodaObsSchema);
     }
 
     std::shared_ptr<IodaObsSchema> IodaObsSchemaMap::getIodaObsSchema(const int iodaObsSchemaID) {
-        const auto it = iodaObsSchemaMap.find(iodaObsSchemaID);
-        if (it == iodaObsSchemaMap.end()) {
+        try {
+            return m_objectRegistry.getObject(iodaObsSchemaID);
+        }
+        catch (const std::runtime_error &e) {
             throw netCDF::exceptions::NcBadId(
                 ("IodaObsSchema ID not found in the IodaObsSchema map: " +
                  std::to_string(iodaObsSchemaID)).c_str(),
-               __FILE__,
-               __LINE__
-           );
+                __FILE__,
+                __LINE__
+            );
         }
-        return it->second;
     }
 
     void IodaObsSchemaMap::removeIodaObsSchema(int iodaObsSchemaID) {
-        auto iodaObsSchemaIterator = this->iodaObsSchemaMap.find(iodaObsSchemaID);
-        if (iodaObsSchemaIterator == this->iodaObsSchemaMap.end()) {
+        try {
+            m_objectRegistry.removeObject(iodaObsSchemaID);
+        }
+        catch (const std::runtime_error &e) {
             throw netCDF::exceptions::NcBadId(
                 ("IodaObsSchema ID not found in the IodaObsSchema map: " +
                  std::to_string(iodaObsSchemaID)).c_str(),
-               __FILE__,
-               __LINE__
-           );
+                __FILE__,
+                __LINE__
+            );
         }
-        this->iodaObsSchemaMap.erase(iodaObsSchemaIterator);
     }
 }

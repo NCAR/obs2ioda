@@ -1,9 +1,9 @@
-#include <gtest/gtest.h>
 #include <memory>
 #include <ncException.h>
 
 #include "ioda_obs_schema_map.h"
-#include "ioda_obs_schema/ioda_obs_schema.h"
+#include "ioda_obs_schema.h"
+#include <gtest/gtest.h>
 #include "FilePathConfig.h"
 
 

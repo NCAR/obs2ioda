@@ -3,16 +3,20 @@
 #include "netcdf_error.h"
 #include <algorithm>
 #include <cstring>
-#include "ioda_obs_schema_map/ioda_obs_schema_map.h"
+#include <ioda_group.h>
+#include <ioda_variable.h>
 
 namespace Obs2Ioda {
-
-    std::vector<char> flattenCharPtrArray(const char *const *values, const int numStrings, const int stringSize) {
-        std::vector<char> contiguousValues(numStrings * stringSize + numStrings, ' ');
+    std::vector<char> flattenCharPtrArray(const char *const *values,
+                                          const int numStrings,
+                                          const int stringSize) {
+        std::vector<char> contiguousValues(
+            numStrings * stringSize + numStrings, ' ');
 
         for (int i = 0; i < numStrings; ++i) {
             int len = std::strlen(values[i]);
-            std::copy_n(values[i], std::min(len, stringSize), contiguousValues.begin() + i * stringSize);
+            std::copy_n(values[i], std::min(len, stringSize),
+                        contiguousValues.begin() + i * stringSize);
             contiguousValues[i * stringSize + stringSize] = '\0';
         }
         return contiguousValues;
@@ -28,19 +32,43 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
+            auto iodaVariable = IodaVariable(varName);
+            if (iodaVariable.isV1Variable()) {
+                auto iodaGroup = IodaGroup(varName);
+                netCDF::NcGroup v1Group;
+                if (file->getGroup(iodaGroup.getName()).isNull()) {
+                    v1Group =
+                            file->addGroup(iodaGroup.getName());
+                } else {
+                    v1Group = file->getGroup(iodaGroup.getName());
+                }
+                groupName = v1Group.getName().c_str();
+                if (iodaVariable.isChannelVariable()) {
+                    if (!file->getGroup(groupName).getVar(
+                        iodaVariable.getName()).isNull()) {
+                        return 0;
+                    }
+                }
+            }
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           iodaSchema->getGroup(groupName)->getValidName()));
+                                           iodaSchema.getGroup(
+                                               groupName)->
+                                           getValidName()));
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
-                dims.push_back(file->getDim(iodaSchema->getDimension(dimNames[i])->getValidName()));;
+                dims.push_back(file->getDim(
+                    iodaSchema.getDimension(dimNames[i])->
+                    getValidName()));;
             }
-            auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
+            if (iodaVariable.isChannelVariable()) {
+                dims.push_back(file->getDim("Channel"));
+            }
+            auto iodaVarName = iodaVariable.getName();
             auto var = group->addVar(
                 iodaVarName,
                 netCDF::NcType(netcdfDataType),
@@ -65,14 +93,16 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           iodaSchema->getGroup(groupName)->getValidName()));
-            auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
+                                           iodaSchema.getGroup(
+                                               groupName)->
+                                           getValidName()));
+            auto iodaVariable = IodaVariable(varName);
+            auto iodaVarName = iodaVariable.getName();
             const auto var = group->getVar(iodaVarName);
             auto varType = var.getType();
             // Special handling for char arrays
@@ -85,8 +115,21 @@ namespace Obs2Ioda {
                 var.putVar(contiguousValues.data());
                 return 0;
             }
-            var.putVar(values);
-            return 0;
+            std::vector<size_t> start;
+            std::vector<size_t> count;
+            if (iodaVariable.isChannelVariable()) {
+                start = {0, 0};
+                count = {var.getDim(0).getSize(), 1};
+                start[1] = iodaVariable.getChannelIndex(varName);
+                var.putVar(start, count, values);
+                return 0;
+            }
+            for (auto dim: var.getDims()) {
+                start.push_back(0);
+                count.push_back(dim.getSize());
+                var.putVar(start, count, values);
+                return 0;
+            }
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(
                 e,
@@ -190,14 +233,16 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto iodaSchema = IodaObsSchemaMap::getInstance().getIodaObsSchema(netcdfID);
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
                                        netCDF::NcGroup>(
                                        file->getGroup(
-                                           iodaSchema->getGroup(groupName)->getValidName()));
-            auto iodaVarName = iodaSchema->getVariable(varName)->getValidName();
+                                           iodaSchema.getGroup(
+                                               groupName)->
+                                           getValidName()));
+            auto iodaVarName = iodaSchema.getVariable(varName)->
+                    getValidName();
             auto var = group->getVar(iodaVarName);
             var.setFill(
                 fillMode,
