@@ -1,0 +1,126 @@
+#include <../../../cmake-build-debug-coverage/_deps/googletest-src/googletest/include/gtest/gtest.h>
+#include "ioda_obs_schema.h"
+#include "../../../cmake-build-debug-coverage/generated/FilePathConfig.h"
+#include <memory>
+
+class IodaObsSchemaFixture : public ::testing::Test {
+protected:
+    std::unique_ptr<IodaObsSchema> iodaObsSchema;
+
+    void SetUp() override {
+        iodaObsSchema = std::make_unique<IodaObsSchema>(
+            YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML));
+        iodaObsSchema->addVariableRegexPattern(R"(([a-zA-Z0-9_]+)@)");
+        iodaObsSchema->addVariableRegexPattern(
+            R"(^(.*)_\d+@[a-zA-Z0-9_]+$)");
+        iodaObsSchema->addGroupRegexPattern(R"(@([a-zA-Z0-9_]+))");
+    }
+};
+
+TEST_F(IodaObsSchemaFixture, VariableGroupNameResolution_StationId) {
+    std::string groupName = "MetaData";
+    std::string v1VariableName = "station_id@MetaData";
+    std::string v2VariableName = "station_id";
+    std::string v3VariableName = "stationIdentification";
+
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v1VariableName)->getValidName(),
+        v3VariableName);
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v2VariableName)->getValidName(),
+        v3VariableName);
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v3VariableName)->getValidName(),
+        v3VariableName);
+    EXPECT_EQ(iodaObsSchema->getGroup(v1VariableName)->getValidName(),
+              groupName);
+    EXPECT_EQ(iodaObsSchema->getGroup(groupName)->getValidName(),
+              groupName);
+}
+
+TEST_F(IodaObsSchemaFixture,
+       VariableGroupNameResolution_BrightnessTemp) {
+    std::string groupName = "ObsValue";
+    std::string v1VariableName = "brightness_temperature_15@ObsValue";
+    std::string v2VariableName = "brightness_temperature";
+    std::string v3VariableName = "brightnessTemperature";
+
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v1VariableName)->getValidName(),
+        v3VariableName);
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v2VariableName)->getValidName(),
+        v3VariableName);
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v3VariableName)->getValidName(),
+        v3VariableName);
+    EXPECT_EQ(iodaObsSchema->getGroup(v1VariableName)->getValidName(),
+              groupName);
+    EXPECT_EQ(iodaObsSchema->getGroup(groupName)->getValidName(),
+              groupName);
+}
+
+TEST_F(IodaObsSchemaFixture, CombinedVariableAndGroupResolution) {
+    struct TestCase {
+        std::string groupName;
+        std::string v1VariableName;
+        std::string v2VariableName;
+        std::string v3VariableName;
+    };
+
+    std::vector<TestCase> testCases = {
+        {
+            "MetaData", "station_id@MetaData", "station_id",
+            "stationIdentification"
+        },
+        {
+            "ObsValue", "brightness_temperature_15@ObsValue",
+            "brightness_temperature", "brightnessTemperature"
+        }
+    };
+
+    for (const auto &tc: testCases) {
+        EXPECT_EQ(
+            iodaObsSchema->getVariable(tc.v1VariableName)->getValidName(
+            ), tc.v3VariableName);
+        EXPECT_EQ(
+            iodaObsSchema->getVariable(tc.v2VariableName)->getValidName(
+            ), tc.v3VariableName);
+        EXPECT_EQ(
+            iodaObsSchema->getVariable(tc.v3VariableName)->getValidName(
+            ), tc.v3VariableName);
+        EXPECT_EQ(
+            iodaObsSchema->getGroup(tc.v1VariableName)->getValidName(),
+            tc.groupName);
+        EXPECT_EQ(iodaObsSchema->getGroup(tc.groupName)->getValidName(),
+                  tc.groupName);
+    }
+}
+
+TEST_F(IodaObsSchemaFixture, VariableDimensions) {
+    std::string v3VariableName = "yECEFPosition";
+    std::vector<std::vector<std::string> > v3VariableDimensions = {
+        { "Location" }, { "Location", "Level" }
+    };
+
+    for (size_t i = 0; i < v3VariableDimensions.size(); ++i) {
+        for (size_t j = 0; j < v3VariableDimensions[i].size(); ++j) {
+            EXPECT_EQ(
+                iodaObsSchema->getVariable(v3VariableName)
+                    ->getDimensions().at(i).at(j),
+                v3VariableDimensions[i].at(j));
+        }
+    }
+    EXPECT_EQ(
+        iodaObsSchema->getVariable(v3VariableName)
+            ->getValidDimensions().at(0),
+        v3VariableDimensions.at(0).at(0));
+
+
+}
+
+int main(int argc,
+         char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

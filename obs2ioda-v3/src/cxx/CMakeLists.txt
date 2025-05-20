@@ -25,3 +25,4 @@ set(obs2ioda_cxx_INCLUDE_DIRS
 add_library(obs2ioda_cxx SHARED ${obs2ioda_cxx_SOURCES})
 target_compile_definitions(obs2ioda_cxx PUBLIC OBS2IODA_ROOT_DIR="${CMAKE_SOURCE_DIR}")
 obs2ioda_cxx_library(obs2ioda_cxx "${obs2ioda_cxx_INCLUDE_DIRS}" "${obs2ioda_cxx_LIBRARIES}")
+add_subdirectory(tests)

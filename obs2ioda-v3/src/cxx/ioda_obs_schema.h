@@ -1,13 +1,13 @@
 #ifndef IODASCHEMA_H
 #define IODASCHEMA_H
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "yaml-cpp/yaml.h"
-#include "FilePathConfig.h"
-
+#include <yaml-cpp/yaml.h>
+#include <regex>
 
 
 /**
@@ -26,6 +26,17 @@ protected:
     std::string componentType;
     /**< Type of schema component ("Variable", "Attribute", etc.). */
 
+    template<typename T>
+    static T setSequence(
+        const YAML::Node &node,
+        const std::string &key
+    ) {
+        if (node[key] && node[key].IsSequence()) {
+            return node[key].as<T>();
+        }
+        return T();
+    }
+
     /**
      * @brief Extracts names from a YAML node and sets the internal name fields.
      *
@@ -35,7 +46,8 @@ protected:
      * @param node The YAML node containing schema definitions.
      * @param category Key used to identify component names (e.g., "Variable").
      */
-    void setNames(const YAML::Node &node, const std::string &category);
+    void setNames(const YAML::Node &node,
+                  const std::string &category);
 
     /**
      * @brief Constructor for a schema component.
@@ -44,7 +56,8 @@ protected:
      * @param name Optional single name, used as the canonical name if provided.
      */
     explicit IodaObsSchemaComponent(
-        std::string componentType, std::string name = ""
+        std::string componentType,
+        std::string name = ""
     );
 
 public:
@@ -119,6 +132,14 @@ public:
  * @brief Represents a Variable component in the IODA schema.
  */
 class IodaObsVariable final : public IodaObsSchemaComponent {
+    std::vector<std::vector<std::string> > m_dimensions;
+    /**< Dimensions of the variable. */
+    std::vector<std::string> m_validDimensions;
+
+    void setDimensions(
+        const YAML::Node &node
+    );
+
 public:
     /**
      * @brief Constructor for a variable component.
@@ -140,6 +161,10 @@ public:
      * @param node The YAML node describing the variable or dimension.
      */
     void load(const YAML::Node &node) override;
+
+    [[nodiscard]] std::vector<std::vector<std::string>> getDimensions() const;
+
+    [[nodiscard]] std::vector<std::string> getValidDimensions() const;
 };
 
 /**
@@ -159,6 +184,10 @@ class IodaObsSchema {
     groups;
     std::unordered_map<std::string, std::shared_ptr<IodaObsAttribute> >
     attributes;
+    std::vector<std::string> variableRegexPatterns;
+    std::vector<std::string> groupRegexPatterns;
+    std::vector<std::string> attributeRegexPatterns;
+    std::vector<std::string> dimensionRegexPatterns;
 
     /**
      * @brief Loads a specific component category (e.g., Variables) from the schema.
@@ -171,8 +200,10 @@ class IodaObsSchema {
      * @param key The name used to find aliases inside each item.
      * @param componentMap Storage for created components.
      */
-    template<typename T> void loadComponent(
-        const YAML::Node &schema, const std::string &category,
+    template<typename T>
+    void loadComponent(
+        const YAML::Node &schema,
+        const std::string &category,
         const std::string &key,
         std::unordered_map<std::string, std::shared_ptr<T> > &
         componentMap
@@ -200,16 +231,29 @@ class IodaObsSchema {
      * @tparam T Component type.
      * @param name Name or alias of the component.
      * @param componentMap Map from name to shared component.
+     * @param regexPatterns Optional regex pattern for matching names.
      * @return Shared pointer to the component.
      */
-    template<typename T> std::shared_ptr<const T> getComponent(
+    template<typename T>
+    std::shared_ptr<const T> getComponent(
         const std::string &name,
         std::unordered_map<std::string, std::shared_ptr<T> > &
-        componentMap
+        componentMap,
+        const std::vector<std::string> &regexPatterns
     ) {
         auto it = componentMap.find(name);
         if (it != componentMap.end()) {
             return it->second;
+        }
+        for (const auto &regexPattern: regexPatterns) {
+            std::smatch match;
+            if (std::regex_search(name, match,
+                                  std::regex(regexPattern))) {
+                auto it = componentMap.find(match[1]);
+                if (it != componentMap.end()) {
+                    return it->second;
+                }
+            }
         }
         auto component = std::make_shared<T>(name);
         componentMap[name] = component;
@@ -258,6 +302,30 @@ public:
     std::shared_ptr<const IodaObsVariable> getVariable(
         const std::string &name
     );
+
+    /**
+     * @brief Sets the regex pattern for variable names.
+     * @param pattern Regex pattern for matching variable names.
+     */
+    void addVariableRegexPattern(const std::string &pattern);
+
+    /**
+     * @brief Sets the regex pattern for group names.
+     * @param pattern Regex pattern for matching group names.
+     */
+    void addGroupRegexPattern(const std::string &pattern);
+
+    /**
+     * @brief Sets the regex pattern for attribute names.
+     * @param pattern Regex pattern for matching attribute names.
+     */
+    void addAttributeRegexPattern(const std::string &pattern);
+
+    /**
+     * @brief Sets the regex pattern for dimension names.
+     * @param pattern Regex pattern for matching dimension names.
+     */
+    void addDimensionRegexPattern(const std::string &pattern);
 };
 
 #endif // IODASCHEMA_H

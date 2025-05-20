@@ -4,6 +4,7 @@
 #include <netcdf>
 #include <unordered_map>
 #include <memory>
+#include "FilePathConfig.h"
 #include "ioda_obs_schema.h"
 
 namespace Obs2Ioda {
