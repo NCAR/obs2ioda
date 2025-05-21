@@ -26,6 +26,17 @@ protected:
     std::string componentType;
     /**< Type of schema component ("Variable", "Attribute", etc.). */
 
+    /**
+    * @brief Extracts a typed sequence from a YAML node using a given key.
+    *
+    * This utility function looks for a sequence in the YAML node and converts it
+    * to the specified container type (e.g., `std::vector<std::string>`).
+    *
+    * @tparam T The container type to extract (must support YAML `as<T>()`).
+    * @param node The parent YAML node.
+    * @param key The key corresponding to the desired sequence node.
+    * @return Parsed sequence of type T if present; otherwise, an empty container.
+    */
     template<typename T>
     static T setSequence(
         const YAML::Node &node,
@@ -162,7 +173,8 @@ public:
      */
     void load(const YAML::Node &node) override;
 
-    [[nodiscard]] std::vector<std::vector<std::string>> getDimensions() const;
+    [[nodiscard]] std::vector<std::vector<std::string> >
+    getDimensions() const;
 
     [[nodiscard]] std::vector<std::string> getValidDimensions() const;
 };

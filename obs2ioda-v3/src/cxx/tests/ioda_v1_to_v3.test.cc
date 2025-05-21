@@ -6,48 +6,61 @@
 #include "netcdf_group.h"
 #include "netcdf_variable.h"
 
-
-#include <netcdf_dimension.h>
-#include <gtest/gtest.h>
-#include <__filesystem/operations.h>
-
-#include "netcdf_file.h"
-#include "netcdf_group.h"
-#include "netcdf_variable.h"
-
-class NetcdfV1GroupTest : public ::testing::Test {
+/**
+ * @brief Unit test fixture for validating v1-to-v3 NetCDF IODA variable translation.
+ *
+ * This fixture sets up a synthetic NetCDF file with legacy v1-style variable names
+ * and validates that they are correctly mapped and accessible via their v3 representations.
+ */
+class IodaV1ToV3Test : public ::testing::Test {
 protected:
     std::string testFilePath = "test_group.nc";
+    /**< Path to the temporary NetCDF test file. */
+
     std::vector<const char *> v1ChannelVariableNames = {
         "brightness_temperature_1@ObsValue",
         "brightness_temperature_2@ObsValue",
         "brightness_temperature_3@ObsValue"
-    };
-    std::string v1StandardVariableName = "solar_zenith_angle@MetaData";
-    std::string v3StandardVariableName = "solarZenithAngle";
-    std::string v3ChannelVariableName = "brightnessTemperature";
-    std::string v1LocationDimName = "nlocs";
-    std::string v2ChannelDimName = "nchans";
-    std::string ObsValueGroupName = "ObsValue";
-    std::string MetaDataGroupName = "MetaData";
-    int locationDimSize = 10;
-    int channelDimSize = 3;
+    }; /**< Legacy v1-style channel variable names. */
 
-    int netcdfID{};
+    std::string v1StandardVariableName = "solar_zenith_angle@MetaData";
+    /**< Legacy v1-style standard variable name. */
+    std::string v3StandardVariableName = "solarZenithAngle";
+    /**< v3-style standard variable name. */
+    std::string v3ChannelVariableName = "brightnessTemperature";
+    /**< v3-style channel variable name. */
+    std::string v1LocationDimName = "nlocs";
+    /**< Dimension name for number of locations. */
+    std::string v2ChannelDimName = "nchans";
+    /**< Dimension name for number of channels. */
+    std::string ObsValueGroupName = "ObsValue";
+    /**< Name of the group for observed values. */
+    std::string MetaDataGroupName = "MetaData";
+    /**< Name of the group for metadata. */
+    int locationDimSize = 10; /**< Size of the location dimension. */
+    int channelDimSize = 3; /**< Size of the channel dimension. */
+
+    int netcdfID{}; /**< NetCDF file ID. */
     int locationDimID{};
-    int channelDimID{};
-    //Allocate channelVariableData upon construction
+    /**< ID of the location dimension in the file. */
+    int channelDimID{}; /**< ID of the channel dimension in the file. */
 
     std::vector<double> standardVariableData = std::vector<double>(
         locationDimSize, 0);
-    std::vector<std::vector<double> > channelVariableData =
-    {
+    /**< Data to be written/read from the standard variable. */
+
+    std::vector<std::vector<double> > channelVariableData = {
         std::vector<double>(10, 0),
         std::vector<double>(10, 0),
         std::vector<double>(10, 0)
-    };
-    std::shared_ptr<netCDF::NcFile> file;
+    }; /**< Data to be written/read from the channel variable. */
 
+    std::shared_ptr<netCDF::NcFile> file;
+    /**< Shared pointer to the opened NetCDF file. */
+
+    /**
+     * @brief Sets up a test NetCDF file with v1-style variable names and writes sample data.
+     */
     void SetUp() override {
         ASSERT_EQ(
             Obs2Ioda::netcdfCreate(testFilePath.c_str(), &netcdfID,
@@ -103,6 +116,9 @@ protected:
             ), 0);
     }
 
+    /**
+     * @brief Closes the NetCDF file after the test and performs cleanup.
+     */
     void TearDown() override {
         ASSERT_EQ(Obs2Ioda::netcdfClose(netcdfID), 0);
         // std::error_code ec;
@@ -111,24 +127,36 @@ protected:
     }
 };
 
-TEST_F(NetcdfV1GroupTest, GroupObsValueExists) {
+/**
+ * @test Validates that the ObsValue group exists in the output NetCDF file.
+ */
+TEST_F(IodaV1ToV3Test, GroupObsValueExists) {
     const auto group = file->getGroup(ObsValueGroupName);
     ASSERT_FALSE(group.isNull());
 }
 
-TEST_F(NetcdfV1GroupTest, BrightnessTemperatureVariableExists) {
+/**
+ * @test Ensures that the brightnessTemperature variable was created correctly in the v3 format.
+ */
+TEST_F(IodaV1ToV3Test, BrightnessTemperatureVariableExists) {
     const auto variable = file->getGroup(ObsValueGroupName).getVar(
         v3ChannelVariableName);
     ASSERT_FALSE(variable.isNull());
 }
 
-TEST_F(NetcdfV1GroupTest, BrightnessTemperatureSecondDimIsChannel) {
+/**
+ * @test Checks that the second dimension of the brightnessTemperature variable is named "Channel".
+ */
+TEST_F(IodaV1ToV3Test, BrightnessTemperatureSecondDimIsChannel) {
     const auto variable = file->getGroup(ObsValueGroupName).getVar(
         v3ChannelVariableName);
     ASSERT_EQ(variable.getDim(1).getName(), "Channel");
 }
 
-TEST_F(NetcdfV1GroupTest, WriteDataToChannelVariable) {
+/**
+ * @test Validates that channel data is written correctly to the brightnessTemperature variable.
+ */
+TEST_F(IodaV1ToV3Test, WriteDataToChannelVariable) {
     const auto variable = file->getGroup(ObsValueGroupName).getVar(
         v3ChannelVariableName);
     std::vector<double> data(locationDimSize * channelDimSize);
@@ -142,7 +170,10 @@ TEST_F(NetcdfV1GroupTest, WriteDataToChannelVariable) {
     }
 }
 
-TEST_F(NetcdfV1GroupTest, WriteDataToStandardVariable) {
+/**
+ * @test Validates that standard (non-channel) variable data is written and retrieved correctly.
+ */
+TEST_F(IodaV1ToV3Test, WriteDataToStandardVariable) {
     const auto variable = file->getGroup(MetaDataGroupName).getVar(
         v3StandardVariableName);
     std::vector<double> data(locationDimSize);
@@ -152,6 +183,9 @@ TEST_F(NetcdfV1GroupTest, WriteDataToStandardVariable) {
     }
 }
 
+/**
+ * @brief Main entry point for running all GoogleTest unit tests in this suite.
+ */
 int main(int argc,
          char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
