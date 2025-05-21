@@ -93,6 +93,11 @@ namespace Obs2Ioda {
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
+            auto iodaVariable = IodaVariable(varName);
+            if (iodaVariable.isV1Variable()) {
+                auto iodaGroup = IodaGroup(varName);
+                groupName = iodaGroup.getName().c_str();
+            }
             const auto group = !groupName
                                    ? file
                                    : std::make_shared<
@@ -101,7 +106,6 @@ namespace Obs2Ioda {
                                            iodaSchema.getGroup(
                                                groupName)->
                                            getValidName()));
-            auto iodaVariable = IodaVariable(varName);
             auto iodaVarName = iodaVariable.getName();
             const auto var = group->getVar(iodaVarName);
             auto varType = var.getType();

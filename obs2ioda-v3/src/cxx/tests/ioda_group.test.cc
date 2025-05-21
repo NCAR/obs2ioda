@@ -7,61 +7,56 @@
 
 class IodaGroupFixture : public ::testing::Test {
 protected:
-    std::string testFilePath =
-            "/Users/astokely/projects/obs2ioda/build/test/validation/data/v1/amsua_n15_obs_2018041500.nc4";
-    std::shared_ptr<netCDF::NcFile> netcdfFile;
-    std::vector<std::string> referenceGroupNames = {
-        "MetaData", "VarMetaData", "ObsValue", "ObsError", "PreQC"
-    };
-    std::vector<std::string> referenceDimensionNames = {
-        "nvars", "nlocs", "nstring", "ndatetime"
-    };
-    std::vector<std::string> brightness_temperature_VariableNames = {
+    std::vector<std::string> v1VariableNames = {
         "brightness_temperature_1@ObsValue",
-        "brightness_temperature_2@ObsValue",
-        "brightness_temperature_3@ObsValue",
+        "brightness_temperature_1@ObsError",
+        "brightness_temperature_1@PreQC",
+    };
+    std::vector<std::string> v2VariableNames = {
+        "brightness_temperature_1",
+        "brightness_temperature_1",
+        "brightness_temperature_1",
+    };
+    std::vector<std::string> v3VariableNames = {
+        "brightnessTemperature",
+        "brightnessTemperature",
+        "brightnessTemperature",
+    };
+    std::vector<std::string> groupNames = {
+        "ObsValue",
+        "ObsError",
+        "PreQC"
     };
     IodaObsSchema schema = IodaObsSchema(
         YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML));
 
     void SetUp() override {
-        netcdfFile = std::make_shared<netCDF::NcFile>(
-            testFilePath, netCDF::NcFile::read);
     }
 
     void TearDown() override {
-        netcdfFile->close();
     }
 };
 
-TEST_F(IodaGroupFixture, IodaGroup) {
-    IodaGroup iodaFile("/");
-    EXPECT_EQ(iodaFile.getName(), "/");
-    for (const auto &var: netcdfFile->getVars()) {
-        std::string groupName = var.first;
-        std::shared_ptr<IodaGroup> group = std::make_shared<IodaGroup>(
-            groupName);
-        iodaFile.addGroup(group);
-    }
-    EXPECT_EQ(iodaFile.getNumGroups(), referenceGroupNames.size());
-    for (const auto &groupName: referenceGroupNames) {
-        EXPECT_EQ(iodaFile.getGroup(groupName)->getName(),
-                  schema.getGroup(groupName)->getValidName(
-                  ));
+TEST_F(IodaGroupFixture, GroupNameFromV1VariableName) {
+    for (size_t i = 0; i < v1VariableNames.size(); ++i) {
+        IodaGroup iodaGroup(v1VariableNames[i]);
+        EXPECT_EQ(iodaGroup.getName(), groupNames[i]);
     }
 }
 
-TEST_F(IodaGroupFixture, ChannelVariables) {
-    IodaGroup root("/");
-    for (const auto &name: brightness_temperature_VariableNames) {
-        IodaVariable iodaVariable(name);
-        root.addVariable(std::make_shared<IodaVariable>(name));
+TEST_F(IodaGroupFixture, SchemaRegex) {
+    IodaGroup iodaGroup("/");
+    auto schema = iodaGroup.getSchema();
+    for (int i = 0; i < v1VariableNames.size(); ++i) {
+        ASSERT_EQ(
+            schema.getVariable(v1VariableNames[i])->getValidName(),
+            v3VariableNames[i]);
+        ASSERT_EQ(
+            schema.getVariable(v3VariableNames[i])->getValidName(),
+            v3VariableNames[i]);
     }
-    EXPECT_EQ(root.getNumVariables(), 1);
-    EXPECT_EQ(
-        root.getVariable(brightness_temperature_VariableNames[0])->
-        getNumChannels(), brightness_temperature_VariableNames.size());
 }
+
 
 int main(int argc,
          char **argv) {

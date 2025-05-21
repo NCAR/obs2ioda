@@ -21,65 +21,10 @@ class IodaGroup {
 
 public:
 
-    explicit IodaGroup(const std::string &name) {
-        m_schema.addVariableRegexPattern(v1VariableRegexPattern);
-        m_schema.addVariableRegexPattern(channelVariableRegexPattern);
-        m_schema.addGroupRegexPattern(v1GroupRegexPattern);
-        m_name = m_schema.getGroup(name)->getValidName();
-    }
+    explicit IodaGroup(const std::string &name);
 
-    void addGroup(const std::shared_ptr<IodaGroup>& group) {
-        if (m_groups.count(group->m_name) == 0) {
-            m_groups[group->m_name] = group;
-        }
-    }
-    [[nodiscard]] unsigned long getNumGroups() const {
-        return m_groups.size();
-    }
-    std::shared_ptr<IodaGroup> getGroup(const std::string &name) {
-        try {
-            return m_groups.at(m_schema.getGroup(name)->getValidName());
-        } catch (const std::out_of_range &e) {
-            throw std::runtime_error("Group not found: " + name);
-        }
-    }
+    [[nodiscard]] const std::string &getName() const;
 
-    void addVariable(const std::shared_ptr<IodaVariable>& variable) {
-        if (m_variables.count(variable->getName()) == 0) {
-            m_variables[variable->getName()] = variable;
-        }
-        if (variable->isChannelVariable()) {
-            m_variables[variable->getName()]->setNumChannels(
-                m_variables[variable->getName()]->getNumChannels() + 1);
-        }
-    }
-
-    std::shared_ptr<IodaVariable> getVariable(const std::string &name) {
-        try {
-            return m_variables.at(m_schema.getVariable(name)->getValidName());
-        } catch (const std::out_of_range &e) {
-            throw std::runtime_error("Variable not found: " + name);
-        }
-    }
-    [[nodiscard]] unsigned long getNumVariables() const {
-        return m_variables.size();
-    }
-
-    [[nodiscard]] const std::string &getName() const {
-        return m_name;
-    }
-
-    [[nodiscard]] const IodaObsSchema &getSchema() const {
-        return m_schema;
-    }
-    [[nodiscard]] const std::unordered_map<std::string,
-        std::shared_ptr<IodaGroup>> &getGroups() const {
-        return m_groups;
-    }
-
-    [[nodiscard]] const std::unordered_map<std::string,
-        std::shared_ptr<IodaVariable>> &getVariables() const {
-        return m_variables;
-    }
+    [[nodiscard]] const IodaObsSchema &getSchema() const;
 };
 #endif // IODA_GROUP_H

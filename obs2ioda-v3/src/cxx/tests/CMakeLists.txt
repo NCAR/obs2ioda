@@ -35,7 +35,6 @@ add_cxx_ctest(ioda_variable_test
         "${ioda_variable_test_LIBRARY_DEPENDENCIES}"
 )
 
-
 set(ioda_obs_schema_test_SOURCES
         "ioda_obs_schema.test.cc"
 )

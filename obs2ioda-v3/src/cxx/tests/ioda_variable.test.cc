@@ -45,8 +45,8 @@ protected:
         IodaVariable iodaStandardVariable(station_id_VariableName);
         EXPECT_TRUE(iodaChannelVariable.isChannelVariable());
         EXPECT_FALSE(iodaStandardVariable.isChannelVariable());
-        EXPECT_EQ(iodaChannelVariable.getNumChannels(), 0);
     }
+
     TEST_F(IodaVariableFixture, IsV1Variable) {
         IodaVariable iodaV1Variable(brightness_temperature_1_VariableName);
         IodaVariable iodaV3Variable(stationIdentification_VariableName);
