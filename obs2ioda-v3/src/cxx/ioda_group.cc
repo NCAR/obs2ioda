@@ -11,6 +11,6 @@ const std::string & IodaGroup::getName() const {
     return m_name;
 }
 
-const IodaObsSchema & IodaGroup::getSchema() const {
-    return m_schema;
+const std::shared_ptr<IodaObsSchema> IodaGroup::getSchema() const {
+    return std::make_shared<IodaObsSchema>(m_schema);
 }

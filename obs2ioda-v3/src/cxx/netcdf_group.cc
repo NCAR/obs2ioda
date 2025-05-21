@@ -1,4 +1,7 @@
 #include "netcdf_group.h"
+
+#include <ioda_group.h>
+
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 
@@ -18,8 +21,8 @@ namespace Obs2Ioda {
                                              netCDF::NcGroup>(
                                              file->getGroup(
                                                  parentGroupName));
-            auto iodaGroupName = iodaSchema.getGroup(groupName)->getValidName();
-            const auto group = parentGroup->addGroup(iodaGroupName);
+            auto iodaGroup = IodaGroup(groupName);
+            const auto group = parentGroup->addGroup(iodaGroup.getName());
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
             return netcdfErrorMessage(

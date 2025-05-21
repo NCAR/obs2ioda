@@ -33,14 +33,16 @@ namespace Obs2Ioda {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
             auto iodaVariable = IodaVariable(varName);
+            std::unique_ptr<IodaGroup> iodaGroup;
             if (iodaVariable.isV1Variable()) {
-                auto iodaGroup = IodaGroup(varName);
+                iodaGroup =
+                        std::make_unique<IodaGroup>(varName);
                 netCDF::NcGroup v1Group;
-                if (file->getGroup(iodaGroup.getName()).isNull()) {
+                if (file->getGroup(iodaGroup->getName()).isNull()) {
                     v1Group =
-                            file->addGroup(iodaGroup.getName());
+                            file->addGroup(iodaGroup->getName());
                 } else {
-                    v1Group = file->getGroup(iodaGroup.getName());
+                    v1Group = file->getGroup(iodaGroup->getName());
                 }
                 groupName = v1Group.getName().c_str();
                 if (iodaVariable.isChannelVariable()) {
@@ -50,20 +52,26 @@ namespace Obs2Ioda {
                     }
                 }
             }
-            const auto group = !groupName
-                                   ? file
-                                   : std::make_shared<
-                                       netCDF::NcGroup>(
-                                       file->getGroup(
-                                           iodaSchema.getGroup(
-                                               groupName)->
-                                           getValidName()));
+            std::shared_ptr<netCDF::NcGroup> group;
+            if (!groupName) {
+                group = file;
+            } else {
+                if (!iodaGroup) {
+                    iodaGroup =
+                            std::make_unique<IodaGroup>(groupName);
+                }
+                group = std::make_shared<
+                    netCDF::NcGroup>(
+                    file->getGroup(
+                        iodaGroup->getName()));
+            }
             std::vector<netCDF::NcDim> dims;
             dims.reserve(numDims);
             for (int i = 0; i < numDims; i++) {
+                auto iodaDimName = iodaGroup->getSchema()->
+                        getDimension(dimNames[i])->getValidName();
                 dims.push_back(file->getDim(
-                    iodaSchema.getDimension(dimNames[i])->
-                    getValidName()));;
+                    iodaDimName));
             }
             if (iodaVariable.isChannelVariable()) {
                 dims.push_back(file->getDim("Channel"));

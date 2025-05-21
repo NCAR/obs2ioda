@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <netcdf_dimension.h>
-#include <__filesystem/operations.h>
 
 #include "netcdf_file.h"
 #include "netcdf_group.h"

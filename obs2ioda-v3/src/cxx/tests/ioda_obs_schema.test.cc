@@ -1,6 +1,6 @@
-#include <../../../cmake-build-debug-coverage/_deps/googletest-src/googletest/include/gtest/gtest.h>
+#include <gtest/gtest.h>
 #include "ioda_obs_schema.h"
-#include "../../../cmake-build-debug-coverage/generated/FilePathConfig.h"
+#include "FilePathConfig.h"
 #include <memory>
 
 class IodaObsSchemaFixture : public ::testing::Test {

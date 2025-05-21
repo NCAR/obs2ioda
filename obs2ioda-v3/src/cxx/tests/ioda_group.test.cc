@@ -53,8 +53,8 @@ TEST_F(IodaGroupFixture, SchemaRegex) {
     IodaGroup iodaGroup("/");
     auto schema = iodaGroup.getSchema();
     for (int i : std::views::iota(0, numV1Variables)) {
-        ASSERT_EQ(schema.getVariable(v1VariableNames[i])->getValidName(), v3VariableNames[i]);
-        ASSERT_EQ(schema.getVariable(v3VariableNames[i])->getValidName(), v3VariableNames[i]);
+        ASSERT_EQ(schema->getVariable(v1VariableNames[i])->getValidName(), v3VariableNames[i]);
+        ASSERT_EQ(schema->getVariable(v3VariableNames[i])->getValidName(), v3VariableNames[i]);
     }
 }
 
