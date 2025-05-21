@@ -53,20 +53,20 @@ add_cxx_ctest(ioda_obs_schema_test
         "${ioda_obs_schema_test_LIBRARY_DEPENDENCIES}"
 )
 
-set(netcdf_group_test_SOURCES
-        "netcdf_group.test.cc"
+set(ioda_v1_to_v3_test_SOURCES
+        "ioda_v1_to_v3.test.cc"
 )
-set(netcdf_group_test_INCLUDE_DIRECTORIES
+set(ioda_v1_to_v3_test_INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${CMAKE_BINARY_DIR}/generated"
 )
-set(netcdf_group_test_LIBRARY_DEPENDENCIES
+set(ioda_v1_to_v3_test_LIBRARY_DEPENDENCIES
         obs2ioda_cxx
         yaml-cpp::yaml-cpp
         GTest::gtest_main
 )
-add_cxx_ctest(netcdf_group_test
-        "${netcdf_group_test_SOURCES}"
-        "${netcdf_group_test_INCLUDE_DIRECTORIES}"
-        "${netcdf_group_test_LIBRARY_DEPENDENCIES}"
+add_cxx_ctest(ioda_v1_to_v3_test
+        "${ioda_v1_to_v3_test_SOURCES}"
+        "${ioda_v1_to_v3_test_INCLUDE_DIRECTORIES}"
+        "${ioda_v1_to_v3_test_LIBRARY_DEPENDENCIES}"
 )

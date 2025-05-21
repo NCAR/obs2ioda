@@ -30,4 +30,4 @@ obs2ioda_fortran_library(v3 "${v3_PUBLIC_LINK_LIBRARIES}")
 set(obs2ioda_v3_PUBLIC_LINK_LIBRARIES v3)
 add_executable(obs2ioda_v3 ${obs2ioda_v3_SOURCES})
 obs2ioda_fortran_executable(obs2ioda_v3 "${obs2ioda_v3_PUBLIC_LINK_LIBRARIES}")
-
+add_subdirectory(src/tests)
