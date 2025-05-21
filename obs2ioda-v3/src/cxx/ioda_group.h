@@ -44,7 +44,7 @@ public:
      * @brief Access the IODA observation schema used by the group.
      * @return Reference to the internal IodaObsSchema object.
      */
-    [[nodiscard]] const std::shared_ptr<IodaObsSchema> getSchema() const;
+    [[nodiscard]] const IodaObsSchema &getSchema() const;
 };
 
 #endif // IODA_GROUP_H

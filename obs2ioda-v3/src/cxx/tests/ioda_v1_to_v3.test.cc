@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <netcdf_dimension.h>
-
+#include <filesystem>
 #include "netcdf_file.h"
 #include "netcdf_group.h"
 #include "netcdf_variable.h"
@@ -120,9 +120,9 @@ protected:
      */
     void TearDown() override {
         ASSERT_EQ(Obs2Ioda::netcdfClose(netcdfID), 0);
-        // std::error_code ec;
-        // std::filesystem::remove(testFilePath, ec);
-        // ASSERT_FALSE(ec) << "Failed to delete file: " << ec.message();
+        std::error_code ec;
+        std::filesystem::remove(testFilePath, ec);
+        ASSERT_FALSE(ec) << "Failed to delete file: " << ec.message();
     }
 };
 
