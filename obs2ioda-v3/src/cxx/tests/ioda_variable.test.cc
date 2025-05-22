@@ -8,8 +8,6 @@
 
 class IodaVariableFixture : public ::testing::Test {
 protected:
-    std::string testFilePath =
-            "/Users/astokely/projects/obs2ioda/build/test/validation/data/v1/amsua_n15_obs_2018041500.nc4";
     std::shared_ptr<netCDF::NcFile> netcdfFile;
     std::string station_id_VariableName = "station_id@MetaData";
     std::string stationIdentification_VariableName = "stationIdentification";
@@ -20,12 +18,9 @@ protected:
 
 
     void SetUp() override {
-        netcdfFile = std::make_shared<netCDF::NcFile>(
-            testFilePath, netCDF::NcFile::read);
     }
 
     void TearDown() override {
-        netcdfFile->close();
     }
 };
 

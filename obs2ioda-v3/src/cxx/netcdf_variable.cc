@@ -7,101 +7,104 @@
 #include <ioda_variable.h>
 
 namespace Obs2Ioda {
-    std::vector<char> flattenCharPtrArray(const char *const *values,
-                                          const int numStrings,
-                                          const int stringSize) {
+    std::vector<char> flattenCharPtrArray(
+        const char *const *values, const int numStrings,
+        const int stringSize
+    ) {
         std::vector<char> contiguousValues(
-            numStrings * stringSize + numStrings, ' ');
+            numStrings * stringSize + numStrings, ' '
+        );
 
         for (int i = 0; i < numStrings; ++i) {
             int len = std::strlen(values[i]);
-            std::copy_n(values[i], std::min(len, stringSize),
-                        contiguousValues.begin() + i * stringSize);
+            std::copy_n(
+                values[i], std::min(len, stringSize),
+                contiguousValues.begin() + i * stringSize
+            );
             contiguousValues[i * stringSize + stringSize] = '\0';
         }
         return contiguousValues;
     }
 
     int netcdfAddVar(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        nc_type netcdfDataType,
-        int numDims,
-        const char **dimNames
+        int netcdfID, const char *groupName, const char *varName,
+        nc_type netcdfDataType, int numDims, const char **dimNames
+    ) {
+        try {
+            auto file = FileMap::getInstance().getFile(netcdfID);
+            auto iodaVariable = IodaVariable(varName);
+            std::string iodaGroupName;
+            if (iodaVariable.isV1Variable()) {
+                IodaGroup iodaGroup(varName);
+                const auto& v1DerivedGroupName = iodaGroup.getName();
+                auto v1Group = file->getGroup(v1DerivedGroupName);
+
+                if (v1Group.isNull()) {
+                    v1Group = file->addGroup(v1DerivedGroupName);
+                }
+
+                iodaGroupName = v1Group.getName();
+
+                if (iodaVariable.isChannelVariable()) {
+                    if (!file->getGroup(iodaGroupName).getVar(
+                        iodaVariable.getName()
+                    ).isNull()) {
+                        return 0;
+                    }
+                }
+            }
+            if (iodaGroupName.empty() && groupName != nullptr) {
+                iodaGroupName = iodaSchema.getGroup(groupName)->
+                        getValidName();
+            }
+            const auto group = iodaGroupName.empty() ? file
+                                   : std::make_shared<netCDF::NcGroup>(
+                                       file->getGroup(iodaGroupName)
+                                   );
+            std::vector<netCDF::NcDim> dims;
+            dims.reserve(numDims);
+            for (int i = 0; i < numDims; ++i) {
+                dims.push_back(
+                    file->getDim(
+                        iodaSchema.getDimension(dimNames[i])->
+                        getValidName()
+                    )
+                );
+            }
+            if (iodaVariable.isChannelVariable()) {
+                dims.push_back(file->getDim("Channel"));
+            }
+            auto iodaVarName = iodaVariable.getName();
+            group->addVar(
+                iodaVarName, netCDF::NcType(netcdfDataType), dims
+            );
+
+            return 0;
+        } catch (netCDF::exceptions::NcException &e) {
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
+        }
+    }
+
+
+    template<typename T> int netcdfPutVar(
+        int netcdfID, const char *groupName, const char *varName,
+        const T *values
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
             auto iodaVariable = IodaVariable(varName);
             if (iodaVariable.isV1Variable()) {
                 auto iodaGroup = IodaGroup(varName);
-                netCDF::NcGroup v1Group;
-                if (file->getGroup(iodaGroup.getName()).isNull()) {
-                    v1Group =
-                            file->addGroup(iodaGroup.getName());
-                } else {
-                    v1Group = file->getGroup(iodaGroup.getName());
-                }
-                groupName = v1Group.getName().c_str();
-                if (iodaVariable.isChannelVariable()) {
-                    if (!file->getGroup(groupName).getVar(
-                        iodaVariable.getName()).isNull()) {
-                        return 0;
-                    }
-                }
+                groupName = iodaGroup.getName().c_str();
             }
-            const auto group = !groupName
-                                   ? file
-                                   : std::make_shared<
-                                       netCDF::NcGroup>(
+            const auto group = !groupName ? file
+                                   : std::make_shared<netCDF::NcGroup>(
                                        file->getGroup(
                                            iodaSchema.getGroup(
-                                               groupName)->
-                                           getValidName()));
-            std::vector<netCDF::NcDim> dims;
-            dims.reserve(numDims);
-            for (int i = 0; i < numDims; i++) {
-                dims.push_back(file->getDim(
-                    iodaSchema.getDimension(dimNames[i])->
-                    getValidName()));;
-            }
-            if (iodaVariable.isChannelVariable()) {
-                dims.push_back(file->getDim("Channel"));
-            }
-            auto iodaVarName = iodaVariable.getName();
-            auto var = group->addVar(
-                iodaVarName,
-                netCDF::NcType(netcdfDataType),
-                dims
-            );
-            return 0;
-        } catch (netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
-        }
-    }
-
-    template<typename T>
-    int netcdfPutVar(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        const T *values
-    ) {
-        try {
-            auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto group = !groupName
-                                   ? file
-                                   : std::make_shared<
-                                       netCDF::NcGroup>(
-                                       file->getGroup(
-                                           iodaSchema.getGroup(
-                                               groupName)->
-                                           getValidName()));
-            auto iodaVariable = IodaVariable(varName);
+                                               groupName
+                                           )->getValidName()
+                                       )
+                                   );
             auto iodaVarName = iodaVariable.getName();
             const auto var = group->getVar(iodaVarName);
             auto varType = var.getType();
@@ -131,195 +134,109 @@ namespace Obs2Ioda {
                 return 0;
             }
         } catch (netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
         }
     }
 
     int netcdfPutVarInt(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
+        int netcdfID, const char *groupName, const char *varName,
         const int *values
     ) {
-        return netcdfPutVar(
-            netcdfID,
-            groupName,
-            varName,
-            values
-        );
+        return netcdfPutVar(netcdfID, groupName, varName, values);
     }
 
     int netcdfPutVarInt64(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
+        int netcdfID, const char *groupName, const char *varName,
         const long long *values
     ) {
-        return netcdfPutVar(
-            netcdfID,
-            groupName,
-            varName,
-            values
-        );
+        return netcdfPutVar(netcdfID, groupName, varName, values);
     }
 
     int netcdfPutVarReal(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
+        int netcdfID, const char *groupName, const char *varName,
         const float *values
     ) {
-        return netcdfPutVar(
-            netcdfID,
-            groupName,
-            varName,
-            values
-        );
+        return netcdfPutVar(netcdfID, groupName, varName, values);
     }
 
     int netcdfPutVarDouble(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
+        int netcdfID, const char *groupName, const char *varName,
         const double *values
     ) {
-        return netcdfPutVar(
-            netcdfID,
-            groupName,
-            varName,
-            values
-        );
+        return netcdfPutVar(netcdfID, groupName, varName, values);
     }
 
     int netcdfPutVarChar(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
+        int netcdfID, const char *groupName, const char *varName,
         const char **values
     ) {
-        return netcdfPutVar(
-            netcdfID,
-            groupName,
-            varName,
-            values
-        );
+        return netcdfPutVar(netcdfID, groupName, varName, values);
     }
 
     int netcdfPutVarString(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
+        int netcdfID, const char *groupName, const char *varName,
         const char **values
     ) {
-        return netcdfPutVar(
-            netcdfID,
-            groupName,
-            varName,
-            values
-        );
+        return netcdfPutVar(netcdfID, groupName, varName, values);
     }
 
-    template<typename T>
-    int netcdfSetFill(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        int fillMode,
-        T fillValue
+    template<typename T> int netcdfSetFill(
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, T fillValue
     ) {
         try {
             auto file = FileMap::getInstance().getFile(netcdfID);
-            const auto group = !groupName
-                                   ? file
-                                   : std::make_shared<
-                                       netCDF::NcGroup>(
+            const auto group = !groupName ? file
+                                   : std::make_shared<netCDF::NcGroup>(
                                        file->getGroup(
                                            iodaSchema.getGroup(
-                                               groupName)->
-                                           getValidName()));
+                                               groupName
+                                           )->getValidName()
+                                       )
+                                   );
             auto iodaVarName = iodaSchema.getVariable(varName)->
                     getValidName();
             auto var = group->getVar(iodaVarName);
-            var.setFill(
-                fillMode,
-                fillValue
-            );
+            var.setFill(fillMode, fillValue);
             return 0;
         } catch (netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(
-                e,
-                __LINE__,
-                __FILE__
-            );
+            return netcdfErrorMessage(e, __LINE__, __FILE__);
         }
     }
 
     int netcdfSetFillInt(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        int fillMode,
-        int fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, int fillValue
     ) {
         return netcdfSetFill(
-            netcdfID,
-            groupName,
-            varName,
-            fillMode,
-            fillValue
+            netcdfID, groupName, varName, fillMode, fillValue
         );
     }
 
     int netcdfSetFillReal(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        int fillMode,
-        float fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, float fillValue
     ) {
         return netcdfSetFill(
-            netcdfID,
-            groupName,
-            varName,
-            fillMode,
-            fillValue
+            netcdfID, groupName, varName, fillMode, fillValue
         );
     }
 
     int netcdfSetFillInt64(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        int fillMode,
-        long long fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, long long fillValue
     ) {
         return netcdfSetFill(
-            netcdfID,
-            groupName,
-            varName,
-            fillMode,
-            fillValue
+            netcdfID, groupName, varName, fillMode, fillValue
         );
     }
 
     int netcdfSetFillString(
-        int netcdfID,
-        const char *groupName,
-        const char *varName,
-        int fillMode,
-        const char *fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, const char *fillValue
     ) {
         return netcdfSetFill(
-            netcdfID,
-            groupName,
-            varName,
-            fillMode,
-            fillValue
-
+            netcdfID, groupName, varName, fillMode, fillValue
         );
     }
 }
