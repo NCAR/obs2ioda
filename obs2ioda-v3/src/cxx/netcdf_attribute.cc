@@ -1,50 +1,75 @@
 #include "netcdf_attribute.h"
+
+#include <ioda_group.h>
+#include <ioda_variable.h>
+
 #include "netcdf_file.h"
 #include "netcdf_error.h"
 
 namespace Obs2Ioda {
-    template<typename T> int netcdfPutAtt(
-        int netcdfID, const char *attName, T values,
-        const char *varName, const char *groupName,
-        const netCDF::NcType &netcdfDataType, size_t len
-    ) {
-        try {
-            auto file = FileMap::getInstance().getFile(netcdfID);
-            std::shared_ptr<netCDF::NcGroup> group = (groupName && *
-                groupName)
-                ? std::make_shared<netCDF::NcGroup>(
-                    file->getGroup(groupName)
-                ) : file;
+    template<typename T>
+int netcdfPutAtt(
+    int netcdfID, const char *attName, T values,
+    const char *varName, const char *groupName,
+    const netCDF::NcType &netcdfDataType, size_t len
+) {
+    try {
+        auto file = FileMap::getInstance().getFile(netcdfID);
+        std::string iodaGroupName;
 
-            if (varName) {
-                auto iodaVarName = iodaSchema.getVariable(varName)->getValidName();
-                auto var = group->getVar(iodaVarName);
-                if (netcdfDataType == netCDF::ncString) {
-                    var.putAtt(
-                        attName, std::string(
-                            reinterpret_cast<const char *>(values)
-                        )
-                    );
-                } else {
-                    var.putAtt(attName, netcdfDataType, len, values);
+        if (varName) {
+            IodaVariable iodaVariable(varName);
+            if (iodaVariable.isV1Variable()) {
+                IodaGroup iodaGroup(varName);
+                const auto& v1DerivedGroupName = iodaGroup.getName();
+                auto v1Group = file->getGroup(v1DerivedGroupName);
+                if (v1Group.isNull()) {
+                    v1Group = file->addGroup(v1DerivedGroupName);
                 }
-            } else {
-                if (netcdfDataType == netCDF::ncString) {
-                    group->putAtt(
-                        attName, std::string(
-                            reinterpret_cast<const char *>(values)
-                        )
-                    );
-                } else {
-                    group->putAtt(attName, netcdfDataType, len, values);
-                }
+                iodaGroupName = v1Group.getName();
             }
-
-            return 0;
-        } catch (const netCDF::exceptions::NcException &e) {
-            return netcdfErrorMessage(e, __LINE__, __FILE__);
         }
+
+        if (iodaGroupName.empty() && groupName != nullptr) {
+            iodaGroupName = iodaSchema.getGroup(groupName)->getValidName();
+        }
+
+        std::shared_ptr<netCDF::NcGroup> group = iodaGroupName.empty()
+            ? file
+            : std::make_shared<netCDF::NcGroup>(file->getGroup(iodaGroupName));
+
+        if (varName) {
+            IodaVariable iodaVariable(varName);
+            auto iodaVarName = iodaVariable.getName();
+            auto var = group->getVar(iodaVarName);
+
+            if (netcdfDataType == netCDF::ncString) {
+                var.putAtt(
+                    attName, std::string(
+                        reinterpret_cast<const char *>(values)
+                    )
+                );
+            } else {
+                var.putAtt(attName, netcdfDataType, len, values);
+            }
+        } else {
+            if (netcdfDataType == netCDF::ncString) {
+                group->putAtt(
+                    attName, std::string(
+                        reinterpret_cast<const char *>(values)
+                    )
+                );
+            } else {
+                group->putAtt(attName, netcdfDataType, len, values);
+            }
+        }
+
+        return 0;
+    } catch (const netCDF::exceptions::NcException &e) {
+        return netcdfErrorMessage(e, __LINE__, __FILE__);
     }
+}
+
 
     int netcdfPutAttIntArray(
         int netcdfID, const char *attName, const int *attValue,

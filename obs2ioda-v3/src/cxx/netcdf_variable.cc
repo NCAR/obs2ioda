@@ -121,9 +121,16 @@ namespace Obs2Ioda {
             std::vector<size_t> start;
             std::vector<size_t> count;
             if (iodaVariable.isChannelVariable()) {
+                auto numChannels = var.getDim(1).getSize();
+                std::vector<int> channels(numChannels);
+                auto metaDataGroup = file->getGroup(
+                    "MetaData");
+                auto sensorChannels = metaDataGroup.getVar(
+                    "SensorChannels");
+                sensorChannels.getVar(channels.data());
                 start = {0, 0};
                 count = {var.getDim(0).getSize(), 1};
-                start[1] = iodaVariable.getChannelIndex(varName);
+                start[1] = iodaVariable.getChannelIndex(varName, channels);
                 var.putVar(start, count, values);
                 return 0;
             }

@@ -784,8 +784,20 @@ subroutine get_date(ccyy, jday, month, day)
    return
 end subroutine get_date
 
-subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
+subroutine check(status)
+   integer, intent(in) :: status
+   integer, parameter :: success = 0
+   if(status /= success) then
+      print *, 'Error in write_obs_netcdf. Error code = ', status
+      stop "Stopped"
+   end if
+end subroutine check
 
+
+   subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
+   use netcdf_cxx_mod
+   use netcdf
+   use define_mod, only: i_kind, r_kind, missing_i, missing_r
    implicit none
 
    character(len=*),   intent(in) :: fname
@@ -831,6 +843,7 @@ subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon,
    integer(i_kind) :: iline, isample, iband
    integer(i_kind) :: iloc
    integer(i_kind) :: iyear, imonth, iday, ihour, imin, isec
+   integer(i_kind) :: ndatetimeDimID, nlocsDimID, nvarsDimID, nstringDimID
 
    character(len=60), parameter :: var_tb = "brightness_temperature"
 
@@ -1027,77 +1040,52 @@ subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon,
       end do scan_loop
    end if
 
-   call open_netcdf_for_write(trim(fname),ncfileid)
-   call def_netcdf_dims(ncfileid,'nvars',nvars,ncid_nvars)
-   call def_netcdf_dims(ncfileid,'nlocs',nlocs,ncid_nlocs)
-   call def_netcdf_dims(ncfileid,'nstring',nstring,ncid_nstring)
-   call def_netcdf_dims(ncfileid,'ndatetime',ndatetime,ncid_ndatetime)
+   call check(netcdfCreate(fname, ncid))
+   call check(netcdfAddGroup(ncid, 'ObsValue'))
+   call check(netcdfAddGroup(ncid, 'ObsError'))
+   call check(netcdfAddGroup(ncid, 'PreQC'))
+   call check(netcdfAddGroup(ncid, 'MetaData'))
+   call check(netcdfAddGroup(ncid, 'VarMetaData'))
+   call check(netcdfAddDim(ncid, 'nvars', nvars, nvarsDimID))
+   call check(netcdfAddDim(ncid, 'nlocs', nlocs, nlocsDimID))
+   call check(netcdfAddDim(ncid, 'nstring', nstring, nstringDimID))
+   call check(netcdfAddDim(ncid, 'ndatetime', ndatetime, ndatetimeDimID))
    do i = 1, nvars
-      write(unit=c4, fmt='(i4)') i+6
+      write(c4, '(i4)') i + 6
       name_var_tb(i) = trim(var_tb)//'_'//trim(adjustl(c4))
-      ncname = trim(name_var_tb(i))//'@ObsValue'
-      call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT,'units','K')
-      ncname = trim(name_var_tb(i))//'@ObsError'
-      call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-      ncname = trim(name_var_tb(i))//'@PreQC'
-      call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_INT)
+      call check(netcdfAddVar(ncid, name_var_tb(i), NF90_REAL, 1, ['nlocs'], 'ObsValue', fillValue=missing_r))
+      call check(netcdfPutAtt(ncid, 'units', 'K', name_var_tb(i), 'ObsValue'))
+      call check(netcdfAddVar(ncid, name_var_tb(i), NF90_REAL, 1, ['nlocs'], 'ObsError', fillValue=missing_r))
+      call check(netcdfAddVar(ncid, name_var_tb(i), NF90_INT, 1, ['nlocs'], 'PreQC', fillValue=missing_i))
    end do
-   ncname = 'latitude@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'longitude@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'solar_azimuth_angle@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'scan_position@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'sensor_azimuth_angle@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'solar_zenith_angle@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'sensor_zenith_angle@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'sensor_view_angle@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nlocs/),NF_FLOAT)
-   ncname = 'sensor_channel@VarMetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nvars/),NF_INT)
-   ncname = 'datetime@MetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_ndatetime,ncid_nlocs/),NF_CHAR)
-   ncname = 'variable_names@VarMetaData'
-   call def_netcdf_var(ncfileid,ncname,(/ncid_nstring,ncid_nvars/),NF_CHAR)
-   call def_netcdf_end(ncfileid)
-
+   call check(netcdfAddVar(ncid, 'latitude', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'longitude', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'solar_azimuth_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'scan_position', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'sensor_azimuth_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'solar_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'sensor_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'sensor_view_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
+   call check(netcdfAddVar(ncid, 'datetime', NF90_STRING, 1, ['nlocs'], 'MetaData', fillValue=" "))
+   call check(netcdfAddVar(ncid, 'sensor_channel', NF90_INT, 1, ['nvars'], 'VarMetaData', fillValue=missing_i))
+   call check(netcdfAddVar(ncid, 'variable_names', NF90_STRING, 1, ['nvars'], 'VarMetaData', fillValue=" "))
    do i = 1, nvars
-      ncname = trim(name_var_tb(i))//'@ObsValue'
-      call put_netcdf_var(ncfileid,ncname,bt_out(i,:))
-      ncname = trim(name_var_tb(i))//'@ObsError'
-      call put_netcdf_var(ncfileid,ncname,err_out(i,:))
-      ncname = trim(name_var_tb(i))//'@PreQC'
-      call put_netcdf_var(ncfileid,ncname,qf_out(i,:))
+      call check(netcdfPutVar(ncid, name_var_tb(i), bt_out(i, :), 'ObsValue'))
+      call check(netcdfPutVar(ncid, name_var_tb(i), err_out(i, :), 'ObsError'))
+      call check(netcdfPutVar(ncid, name_var_tb(i), qf_out(i, :), 'PreQC'))
    end do
-
-   ncname = 'latitude@MetaData'
-   call put_netcdf_var(ncfileid,ncname,lat_out)
-   ncname = 'longitude@MetaData'
-   call put_netcdf_var(ncfileid,ncname,lon_out)
-   ncname = 'solar_azimuth_angle@MetaData'
-   call put_netcdf_var(ncfileid,ncname,sun_azi_out)
-   ncname = 'scan_position@MetaData'
-   call put_netcdf_var(ncfileid,ncname,scan_pos_out)
-   ncname = 'sensor_azimuth_angle@MetaData'
-   call put_netcdf_var(ncfileid,ncname,sat_azi_out)
-   ncname = 'solar_zenith_angle@MetaData'
-   call put_netcdf_var(ncfileid,ncname,sun_zen_out)
-   ncname = 'sensor_zenith_angle@MetaData'
-   call put_netcdf_var(ncfileid,ncname,sat_zen_out)
-   ncname = 'sensor_view_angle@MetaData'
-   call put_netcdf_var(ncfileid,ncname,sat_zen_out)
-   ncname = 'sensor_channel@VarMetaData'
-   call put_netcdf_var(ncfileid,ncname,(/7,8,9,10,11,12,13,14,15,16/))
-   ncname = 'datetime@MetaData'
-   call put_netcdf_var(ncfileid,ncname,datetime)
-   ncname = 'variable_names@VarMetaData'
-   call put_netcdf_var(ncfileid,ncname,name_var_tb(1:nband))
-   call close_netcdf(trim(fname),ncfileid)
+   call check(netcdfPutVar(ncid, 'latitude', lat_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'longitude', lon_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'solar_azimuth_angle', sun_azi_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'scan_position', scan_pos_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'sensor_azimuth_angle', sat_azi_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'solar_zenith_angle', sun_zen_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'sensor_zenith_angle', sat_zen_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'sensor_view_angle', sat_zen_out, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'sensor_channel', (/7,8,9,10,11,12,13,14,15,16/), 'VarMetaData'))
+   call check(netcdfPutVar(ncid, 'datetime', datetime, 'MetaData'))
+   call check(netcdfPutVar(ncid, 'variable_names', name_var_tb, 'VarMetaData'))
+   call check(netcdfClose(ncid))
 
    deallocate (name_var_tb)
    deallocate (datetime)

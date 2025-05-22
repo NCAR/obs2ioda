@@ -12,9 +12,11 @@ protected:
     std::string station_id_VariableName = "station_id@MetaData";
     std::string stationIdentification_VariableName = "stationIdentification";
     std::string brightness_temperature_1_VariableName = "brightness_temperature_1@ObsValue";
+    std::string brightness_temperature_5_VariableName = "brightness_temperature_5@ObsValue";
     std::string brightnessTemperature_VariableName = "brightnessTemperature";
     IodaObsSchema schema = IodaObsSchema(
         YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML));
+    std::vector<int> channels = {1, 5};
 
 
     void SetUp() override {
@@ -53,13 +55,19 @@ protected:
         IodaVariable iodaChannelVariable(brightness_temperature_1_VariableName);
         IodaVariable iodaStandardVariable(station_id_VariableName);
         EXPECT_EQ(iodaChannelVariable.getChannelIndex(
-            brightness_temperature_1_VariableName), 0);
+            brightness_temperature_1_VariableName, channels), 0);
+    }
+
+    TEST_F(IodaVariableFixture, GetNonStandardChannelIndex) {
+        IodaVariable iodaChannelVariable(brightness_temperature_1_VariableName);
+        EXPECT_EQ(iodaChannelVariable.getChannelIndex(
+            brightness_temperature_5_VariableName, channels), 1);
     }
 
     TEST_F(IodaVariableFixture, GetChannelIndexThrow) {
         IodaVariable iodaStandardVariable(station_id_VariableName);
         EXPECT_THROW(iodaStandardVariable.getChannelIndex(
-            station_id_VariableName), std::runtime_error);
+            station_id_VariableName, channels), std::runtime_error);
     }
 
 

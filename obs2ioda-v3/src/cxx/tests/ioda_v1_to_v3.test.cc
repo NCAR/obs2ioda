@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <netcdf_dimension.h>
 #include <filesystem>
+#include <netcdf_attribute.h>
+
 #include "netcdf_file.h"
 #include "netcdf_group.h"
 #include "netcdf_variable.h"
@@ -15,6 +17,8 @@ class IodaV1ToV3Test : public ::testing::Test {
 protected:
     std::string testFilePath = "test_group.nc";
     /**< Path to the temporary NetCDF test file. */
+
+    std::string v1SensorChannelVariableName = "sensor_channel@MetaData";
 
     std::vector<const char *> v1ChannelVariableNames = {
         "brightness_temperature_1@ObsValue",
@@ -45,12 +49,12 @@ protected:
     int channelDimID{}; /**< ID of the channel dimension in the file. */
 
     std::vector<double> standardVariableData = std::vector<double>(
-        locationDimSize, 0);
+        locationDimSize, 0
+    );
     /**< Data to be written/read from the standard variable. */
 
     std::vector<std::vector<double> > channelVariableData = {
-        std::vector<double>(10, 0),
-        std::vector<double>(10, 0),
+        std::vector<double>(10, 0), std::vector<double>(10, 0),
         std::vector<double>(10, 0)
     }; /**< Data to be written/read from the channel variable. */
 
@@ -63,29 +67,33 @@ protected:
     void SetUp() override {
         ASSERT_EQ(
             Obs2Ioda::netcdfCreate(testFilePath.c_str(), &netcdfID,
-                netCDF::NcFile::replace), 0);
+                netCDF::NcFile::replace), 0
+        );
         file = Obs2Ioda::FileMap::getInstance().getFile(netcdfID);
         ASSERT_EQ(
-            Obs2Ioda::netcdfAddDim(netcdfID, nullptr,
-                v1LocationDimName.c_str(),
-                locationDimSize, &
-                locationDimID), 0);
+            Obs2Ioda::netcdfAddDim(netcdfID, nullptr, v1LocationDimName.
+                c_str(), locationDimSize, & locationDimID), 0
+        );
         ASSERT_EQ(
-            Obs2Ioda::netcdfAddDim(netcdfID, nullptr,
-                v2ChannelDimName.c_str(), channelDimSize, &
-                channelDimID), 0);
+            Obs2Ioda::netcdfAddDim(netcdfID, nullptr, v2ChannelDimName.
+                c_str(), channelDimSize, & channelDimID), 0
+        );
 
         std::vector dimNames = {v1LocationDimName.c_str()};
         ASSERT_EQ(
             Obs2Ioda::netcdfAddVar(netcdfID, nullptr,
-                v1StandardVariableName.c_str(),
-                NC_DOUBLE,
-                dimNames.size(), dimNames.data()), 0);
+                v1StandardVariableName.c_str(), NC_DOUBLE, dimNames.size
+                (), dimNames.data()), 0
+        );
         for (const auto varName: v1ChannelVariableNames) {
             ASSERT_EQ(
                 Obs2Ioda::netcdfAddVar(netcdfID, nullptr, varName,
-                    NC_DOUBLE,
-                    dimNames.size(), dimNames.data()), 0);
+                    NC_DOUBLE, dimNames.size(), dimNames.data()), 0
+            );
+            ASSERT_EQ(
+                Obs2Ioda::netcdfPutAttString( netcdfID, "units", "K",
+                    varName, nullptr), 0
+            );
         }
         for (size_t i = 0; i < locationDimSize; ++i) {
             channelVariableData.at(0).at(i) = i * 1.0;
@@ -96,23 +104,23 @@ protected:
         ASSERT_EQ(
             Obs2Ioda::netcdfPutVarDouble(netcdfID, nullptr,
                 v1ChannelVariableNames.at(0), channelVariableData.at(0).
-                data()
-            ), 0);
+                data() ), 0
+        );
         ASSERT_EQ(
             Obs2Ioda::netcdfPutVarDouble(netcdfID, nullptr,
                 v1ChannelVariableNames.at(1), channelVariableData.at(1).
-                data()
-            ), 0);
+                data() ), 0
+        );
         ASSERT_EQ(
             Obs2Ioda::netcdfPutVarDouble(netcdfID, nullptr,
                 v1ChannelVariableNames.at(2), channelVariableData.at(2).
-                data()
-            ), 0);
+                data() ), 0
+        );
         ASSERT_EQ(
             Obs2Ioda::netcdfPutVarDouble(netcdfID, nullptr,
                 v1StandardVariableName.c_str(), standardVariableData.
-                data()
-            ), 0);
+                data() ), 0
+        );
     }
 
     /**
@@ -139,7 +147,8 @@ TEST_F(IodaV1ToV3Test, GroupObsValueExists) {
  */
 TEST_F(IodaV1ToV3Test, BrightnessTemperatureVariableExists) {
     const auto variable = file->getGroup(ObsValueGroupName).getVar(
-        v3ChannelVariableName);
+        v3ChannelVariableName
+    );
     ASSERT_FALSE(variable.isNull());
 }
 
@@ -148,7 +157,8 @@ TEST_F(IodaV1ToV3Test, BrightnessTemperatureVariableExists) {
  */
 TEST_F(IodaV1ToV3Test, BrightnessTemperatureSecondDimIsChannel) {
     const auto variable = file->getGroup(ObsValueGroupName).getVar(
-        v3ChannelVariableName);
+        v3ChannelVariableName
+    );
     ASSERT_EQ(variable.getDim(1).getName(), "Channel");
 }
 
@@ -157,7 +167,8 @@ TEST_F(IodaV1ToV3Test, BrightnessTemperatureSecondDimIsChannel) {
  */
 TEST_F(IodaV1ToV3Test, WriteDataToChannelVariable) {
     const auto variable = file->getGroup(ObsValueGroupName).getVar(
-        v3ChannelVariableName);
+        v3ChannelVariableName
+    );
     std::vector<double> data(locationDimSize * channelDimSize);
     variable.getVar(data.data());
     int index = 0;
@@ -174,7 +185,8 @@ TEST_F(IodaV1ToV3Test, WriteDataToChannelVariable) {
  */
 TEST_F(IodaV1ToV3Test, WriteDataToStandardVariable) {
     const auto variable = file->getGroup(MetaDataGroupName).getVar(
-        v3StandardVariableName);
+        v3StandardVariableName
+    );
     std::vector<double> data(locationDimSize);
     variable.getVar(data.data());
     for (size_t i = 0; i < locationDimSize; i++) {
@@ -185,8 +197,7 @@ TEST_F(IodaV1ToV3Test, WriteDataToStandardVariable) {
 /**
  * @brief Main entry point for running all GoogleTest unit tests in this suite.
  */
-int main(int argc,
-         char **argv) {
+int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

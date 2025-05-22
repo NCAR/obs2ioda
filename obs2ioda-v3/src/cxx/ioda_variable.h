@@ -58,10 +58,11 @@ public:
     /**
      * @brief Extract the channel index from the variable name.
      * @param name The full name of the variable including channel.
+     * @param channels List of sensor channels relevant to the variable.
      * @return Zero-based index of the channel.
      * @throws std::runtime_error if the name is invalid or has no channel index.
      */
-    int getChannelIndex(const std::string& name);
+    int getChannelIndex(const std::string& name, const std::vector<int>& channels);
 };
 
 #endif // IODA_VARIABLE_H

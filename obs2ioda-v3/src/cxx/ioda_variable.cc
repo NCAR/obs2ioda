@@ -27,7 +27,7 @@ std::string IodaVariable::getName() const {
     return m_name;
 }
 
-int IodaVariable::getChannelIndex(const std::string &name) {
+int IodaVariable::getChannelIndex(const std::string &name, const std::vector<int>& channels) {
     if (m_name != m_schema.getVariable(name)->getValidName()) {
         throw std::runtime_error("Invalid variable name: " + name);
     }
@@ -38,7 +38,11 @@ int IodaVariable::getChannelIndex(const std::string &name) {
     std::regex regex(m_channelIndexRegexPattern);
     std::smatch match;
     if (std::regex_search(name, match, regex)) {
-        return std::stoi(match[1].str()) - 1; // Convert to zero-based index
+        auto it = std::find(channels.begin(), channels.end(), std::stoi(match[1]));
+        if (it != channels.end()) {
+            return  std::distance(channels.begin(), it);
+        }
+            throw std::runtime_error("Channel index not found in: " + name);
     }
     throw std::runtime_error("No channel index found in: " + name);
 }
