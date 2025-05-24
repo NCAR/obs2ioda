@@ -11,6 +11,7 @@ configure_file(
 )
 
 set(OBS2IODA_V3_EXECUTABLE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/obs2ioda_v3")
+set(GOES_ABI_EXECUTABLE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/goes_abi_converter")
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/FilePathConfig.py.in

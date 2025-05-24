@@ -1,6 +1,6 @@
 program Goes_ReBroadcast_converter
 !
-! Purpose: Convert GOES ReBroadcast netCDF files to ioda-v1 format.
+! Purpose: Convert GOES ReBroadcast netCDF files to ioda-v3 format.
 !          Currently only processes bands 7-16.
 !
 ! input files:
@@ -30,10 +30,6 @@ program Goes_ReBroadcast_converter
    integer, parameter  :: i_long   = selected_int_kind(8)   ! long integer
    integer, parameter  :: i_kind   = i_long                 ! default integer
    integer, parameter  :: r_kind   = r_single               ! default real
-
-   ! prefix of Clear Sky Mask (Binary Cloud Mask) output of cspp-geo-aitf package
-   !character(len=14), parameter :: BCM_id = 'CG_ABI-L2-ACMC'
-   character(len=14), parameter :: BCM_id = 'OR_ABI-L2-ACMF'
 
    integer(i_kind), parameter :: nband      = 10  ! IR bands 7-16
    integer(i_kind) :: band_start = 7
@@ -79,13 +75,14 @@ program Goes_ReBroadcast_converter
    character(len=256)              :: data_dir
    character(len=18)               :: data_id
    character(len=3)                :: sat_id
+   character(len=14)               :: BCM_id ! prefix of Clear Sky Mask (Binary Cloud Mask) output of cspp-geo-aitf package
    integer(i_kind)                 :: n_subsample
    logical                         :: do_superob
    integer(i_kind)                 :: superob_halfwidth
    logical                         :: do_thinning
-   logical                         :: write_iodav1
+   logical                         :: write_iodav3
 
-   namelist /data_nml/ nc_list_file, data_dir, data_id, sat_id, do_thinning, n_subsample, do_superob, superob_halfwidth
+   namelist /data_nml/ nc_list_file, data_dir, data_id, sat_id, do_thinning, n_subsample, do_superob, superob_halfwidth, BCM_id
 
    real(r_kind)                    :: sdtb ! to be done
    integer(i_kind)                 :: istat
@@ -122,8 +119,9 @@ program Goes_ReBroadcast_converter
    n_subsample       = 1
    do_superob        = .false.
    superob_halfwidth = 1
+   BCM_id           =  'CG_ABI-L2-ACMC'
    !
-   write_iodav1      = .true.
+   write_iodav3      = .true.
    !
    ! read namelist
    !
@@ -344,15 +342,15 @@ program Goes_ReBroadcast_converter
    if ( allocated(qf_2d) )  deallocate(qf_2d)
    if ( allocated(cm_2d) )  deallocate(cm_2d)
 
-   if ( write_iodav1 ) then
+   if ( write_iodav3 ) then
       do it = 1, ntime
          out_fname = trim(data_id)//'_'//sat_id//'_'//time_start(it)//'.nc4'
          write(0,*) 'Writing ', trim(out_fname)
          if ( allocated(rdata(it)%cm) ) then
-            call output_iodav1(trim(out_fname), time_start(it), nx, ny, nband, got_latlon, &
+            call output_iodav3(trim(out_fname), time_start(it), nx, ny, nband, got_latlon, &
                glat, glon, gzen, solzen, rdata(it)%bt, rdata(it)%qf, rdata(it)%sd, rdata(it)%cm)
          else
-            call output_iodav1(trim(out_fname), time_start(it), nx, ny, nband, got_latlon, &
+            call output_iodav3(trim(out_fname), time_start(it), nx, ny, nband, got_latlon, &
                glat, glon, gzen, solzen, rdata(it)%bt, rdata(it)%qf, rdata(it)%sd)
          end if
       end do
@@ -789,36 +787,33 @@ subroutine check(status)
    integer, intent(in) :: status
    integer, parameter :: success = 0
    if(status /= success) then
-      print *, 'Error in output_iodav1. Error code = ', status
+      print *, 'Error in output_iodav3. Error code = ', status
       call exit(1)
    end if
 end subroutine check
 
-   subroutine transpose_and_flatten(bt_in, flat_bt)
-      implicit none
-      real, intent(in)  :: bt_in(:,:)       ! shape: (nband, nlocs)
-      real, intent(out) :: flat_bt(:)       ! shape: nband * nlocs
-      integer :: nband, nlocs
-        integer :: i, j
+subroutine transpose_and_flatten(mat, flat_mat_trans)
+   implicit none
+   real, intent(in)  :: mat(:,:)
+   real, intent(out) :: flat_mat_trans(:)
+   integer :: m, n, i, j
 
-      ! Get dimensions of input array
-      nband = size(bt_in, 1)
-      nlocs = size(bt_in, 2)
+   ! Get dimensions of input matrix
+   m = size(mat, 1)
+   n = size(mat, 2)
 
-      ! Safety check
-      if (size(flat_bt) /= nband * nlocs) then
-         print *, "Error: flat_bt must have size nband * nlocs"
-         stop 1
-      end if
+   ! Safety check
+   if (size(flat_mat_trans) /= m * n) then
+      print *, "Error: flat_mat_trans must have size m*n"
+      stop 1
+   end if
 
-      ! Transpose and flatten
-      flat_bt = reshape(transpose(bt_in), [nband * nlocs])
-
-   end subroutine transpose_and_flatten
+   ! Transpose and flatten
+   flat_mat_trans = reshape(transpose(mat), [m*n])
+end subroutine transpose_and_flatten
 
 
-
-   subroutine output_iodav1(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
+subroutine output_iodav3(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
    use netcdf_cxx_mod
    use netcdf
    use define_mod, only: i_kind, r_kind, missing_i, missing_r
@@ -870,7 +865,7 @@ end subroutine check
    integer(i_kind) :: iline, isample, iband
    integer(i_kind) :: iloc
    integer(i_kind) :: iyear, imonth, iday, ihour, imin, isec
-   integer(i_kind) :: ndatetimeDimID, nlocsDimID, nvarsDimID, nstringDimID, nchansDimID
+   integer(i_kind) :: ndatetime_dimid, nlocs_dimid, nvars_dimid, nstring_dimid, nchans_dimid
 
    character(len=60), parameter :: var_tb = "brightness_temperature"
 
@@ -1066,22 +1061,26 @@ end subroutine check
          end do fov_loop
       end do scan_loop
    end if
+
+   allocate (rtmp1d(nlocs*nchans))
    name_var_tb(1) = var_tb
+
    call check(netcdfCreate(fname, ncid))
    call check(netcdfAddGroup(ncid, 'ObsValue'))
    call check(netcdfAddGroup(ncid, 'ObsError'))
    call check(netcdfAddGroup(ncid, 'PreQC'))
    call check(netcdfAddGroup(ncid, 'MetaData'))
-   call check(netcdfAddGroup(ncid, 'VarMetaData'))
-   call check(netcdfAddDim(ncid, 'nvars', nvars, nvarsDimID))
-   call check(netcdfAddDim(ncid, 'nlocs', nlocs, nlocsDimID))
-   call check(netcdfAddDim(ncid, 'nstring', nstring, nstringDimID))
-   call check(netcdfAddDim(ncid, 'ndatetime', ndatetime, ndatetimeDimID))
-   call check(netcdfAddDim(ncid, 'nchans', nchans, nchansDimID))
+   call check(netcdfAddDim(ncid, 'nvars', nvars, nvars_dimid))
+   call check(netcdfAddDim(ncid, 'nlocs', nlocs, nlocs_dimid))
+   call check(netcdfAddDim(ncid, 'nstring', nstring, nstring_dimid))
+   call check(netcdfAddDim(ncid, 'ndatetime', ndatetime, ndatetime_dimid))
+   call check(netcdfAddDim(ncid, 'nchans', nchans, nchans_dimid))
    call check(netcdfAddVar(ncid, "brightness_temperature", NF90_REAL, 2, ['nlocs ', 'nchans'], 'ObsValue', fillValue=missing_r))
    call check(netcdfPutAtt(ncid, 'units', 'K', "brightness_temperature", 'ObsValue'))
    call check(netcdfAddVar(ncid, "brightness_temperature", NF90_REAL, 2, ['nlocs ', 'nchans'], 'ObsError', fillValue=missing_r))
+   call check(netcdfPutAtt(ncid, 'units', 'K', "brightness_temperature", 'ObsError'))
    call check(netcdfAddVar(ncid, "brightness_temperature", NF90_INT, 2, ['nlocs ', 'nchans'], 'PreQC', fillValue=missing_i))
+   call check(netcdfPutAtt(ncid, 'units', 'K', "brightness_temperature", 'ObsValue'))
    call check(netcdfAddVar(ncid, 'latitude', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
    call check(netcdfAddVar(ncid, 'longitude', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
    call check(netcdfAddVar(ncid, 'solar_azimuth_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
@@ -1091,9 +1090,8 @@ end subroutine check
    call check(netcdfAddVar(ncid, 'sensor_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
    call check(netcdfAddVar(ncid, 'sensor_view_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
    call check(netcdfAddVar(ncid, 'datetime', NF90_STRING, 1, ['nlocs'], 'MetaData', fillValue=" "))
-   call check(netcdfAddVar(ncid, 'sensor_channel', NF90_INT, 1, ['nchans'], 'VarMetaData', fillValue=missing_i))
-   call check(netcdfAddVar(ncid, 'variable_names', NF90_STRING, 1, ['nvars'], 'VarMetaData', fillValue=" "))
-   allocate (rtmp1d(nlocs*nchans))
+   call check(netcdfAddVar(ncid, 'sensor_channel', NF90_INT, 1, ['nchans'], 'MetaData', fillValue=missing_i))
+   call check(netcdfAddVar(ncid, 'variable_names', NF90_STRING, 1, ['nvars'], 'MetaData', fillValue=" "))
    call transpose_and_flatten(bt_out, rtmp1d)
    call check(netcdfPutVar(ncid, 'brightness_temperature', rtmp1d, 'ObsValue'))
    call transpose_and_flatten(err_out, rtmp1d)
@@ -1108,9 +1106,9 @@ end subroutine check
    call check(netcdfPutVar(ncid, 'solar_zenith_angle', sun_zen_out, 'MetaData'))
    call check(netcdfPutVar(ncid, 'sensor_zenith_angle', sat_zen_out, 'MetaData'))
    call check(netcdfPutVar(ncid, 'sensor_view_angle', sat_zen_out, 'MetaData'))
-   call check(netcdfPutVar(ncid, 'sensor_channel', (/7,8,9,10,11,12,13,14,15,16/), 'VarMetaData'))
+   call check(netcdfPutVar(ncid, 'sensor_channel', (/7,8,9,10,11,12,13,14,15,16/), 'MetaData'))
    call check(netcdfPutVar(ncid, 'datetime', datetime, 'MetaData'))
-   call check(netcdfPutVar(ncid, 'variable_names', (/name_var_tb/), 'VarMetaData'))
+   call check(netcdfPutVar(ncid, 'variable_names', (/name_var_tb/), 'MetaData'))
    call check(netcdfClose(ncid))
 
    deallocate (name_var_tb)
@@ -1126,7 +1124,7 @@ end subroutine check
    deallocate (err_out)
    deallocate (qf_out)
 
-end subroutine output_iodav1
+end subroutine output_iodav3
 
 subroutine calc_solar_zenith_angle(nx, ny, xlat, xlon, xtime, julian, solzen, got_latlon)
 
