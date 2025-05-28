@@ -6,8 +6,8 @@ use define_mod, only: nobtype, nvar_info, n_ncdim, n_ncgrp, nstring, ndatetime, 
    xdata, itrue, ifalse, vflag, ninst, inst_list, write_nc_conv, write_nc_radiance, &
    write_nc_radiance_geo, ninst_geo, geoinst_list, &
    var_tb, nsen_info, type_var_info, type_sen_info, dim_var_info, dim_sen_info, &
-   unit_var_met, iflag_conv, iflag_radiance, set_brit_obserr, set_ahi_obserr
-use netcdf, only: nf90_int, nf90_float, nf90_char, nf90_int64, nf90_string
+   unit_var_met, iflag_conv, iflag_radiance, set_brit_obserr, set_ahi_obserr, &
+   nf90_int, nf90_float, nf90_char, nf90_int64, nf90_string
 use ufo_vars_mod, only: ufo_vars_getindex
 use netcdf_cxx_mod, only: netcdfCreate, netcdfAddDim, netcdfPutAtt, netcdfAddVar, &
    netcdfSetFill, netcdfAddGroup, netcdfPutVar, netcdfClose

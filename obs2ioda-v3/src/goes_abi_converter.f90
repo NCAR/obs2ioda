@@ -16,9 +16,8 @@ program Goes_ReBroadcast_converter
 !          n_subsample = 1
 !        /
 
-   use netcdf_mod, only: open_netcdf_for_write, close_netcdf, &
-      def_netcdf_dims, def_netcdf_var, def_netcdf_end, &
-      put_netcdf_var, missing_r
+   use define_mod, only:  missing_r
+   use utils_mod, only: transpose_and_flatten
 
    implicit none
    include 'netcdf.inc'
@@ -791,27 +790,6 @@ subroutine check(status)
       call exit(1)
    end if
 end subroutine check
-
-subroutine transpose_and_flatten(mat, flat_mat_trans)
-   implicit none
-   real, intent(in)  :: mat(:,:)
-   real, intent(out) :: flat_mat_trans(:)
-   integer :: m, n, i, j
-
-   ! Get dimensions of input matrix
-   m = size(mat, 1)
-   n = size(mat, 2)
-
-   ! Safety check
-   if (size(flat_mat_trans) /= m * n) then
-      print *, "Error: flat_mat_trans must have size m*n"
-      stop 1
-   end if
-
-   ! Transpose and flatten
-   flat_mat_trans = reshape(transpose(mat), [m*n])
-end subroutine transpose_and_flatten
-
 
 subroutine output_iodav3(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
    use netcdf_cxx_mod

@@ -23,7 +23,6 @@ set(NCEP_BUFR_LIB CACHE STRING "" )
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
 
-add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v3")
-add_subdirectory("${CMAKE_SOURCE_DIR}/goes_abi")
 add_subdirectory("${CMAKE_SOURCE_DIR}/config")
+add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v3")
 add_subdirectory("${CMAKE_SOURCE_DIR}/test")

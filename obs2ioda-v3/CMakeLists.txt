@@ -9,7 +9,6 @@ set(v3_SOURCES
         satwnd_mod.f90
         kinds.f90
         ncio_mod.f90
-        netcdf_mod.f90
         prepbufr_mod.f90
         radiance_mod.f90
         ufo_variables_mod.F90
@@ -24,6 +23,10 @@ set(obs2ioda_v3_SOURCES
         main.f90
 )
 list(TRANSFORM obs2ioda_v3_SOURCES PREPEND "src/")
+set(goes_abi_converter_SOURCES
+        goes_abi_converter.f90
+)
+list(TRANSFORM goes_abi_converter_SOURCES PREPEND "src/")
 set(v3_PUBLIC_LINK_LIBRARIES NetCDF::NetCDF_Fortran "${NCEP_BUFR_LIB}" obs2ioda_cxx)
 add_library(v3 SHARED ${v3_SOURCES})
 obs2ioda_fortran_library(v3 "${v3_PUBLIC_LINK_LIBRARIES}")
@@ -31,3 +34,6 @@ set(obs2ioda_v3_PUBLIC_LINK_LIBRARIES v3)
 add_executable(obs2ioda_v3 ${obs2ioda_v3_SOURCES})
 obs2ioda_fortran_executable(obs2ioda_v3 "${obs2ioda_v3_PUBLIC_LINK_LIBRARIES}")
 
+set(goes_abi_converter_PUBLIC_LINK_LIBRARIES v3)
+add_executable(goes_abi_converter ${goes_abi_converter_SOURCES})
+obs2ioda_fortran_executable(goes_abi_converter "${goes_abi_converter_PUBLIC_LINK_LIBRARIES}")
