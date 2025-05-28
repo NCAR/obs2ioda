@@ -17,6 +17,7 @@ set(v3_SOURCES
         f_c_string_1D_t_mod.f90
         netcdf_cxx_i_mod.f90
         netcdf_cxx_mod.f90
+        goes_abi_converter_mod.f90
 )
 list(TRANSFORM v3_SOURCES PREPEND "src/")
 set(obs2ioda_v3_SOURCES
