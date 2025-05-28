@@ -19,6 +19,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAK
 
 # Set the Fortran compiler and flags
 set(NCEP_BUFR_LIB CACHE STRING "" )
+set(BUILD_GOES_ABI_CONVERTER OFF CACHE BOOL "Build the GOES ABI converter")
 
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
