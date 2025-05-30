@@ -25,5 +25,5 @@ set(BUILD_GOES_ABI_CONVERTER OFF CACHE BOOL "Build the GOES ABI converter")
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/config")
-add_subdirectory("${CMAKE_SOURCE_DIR}/obs2ioda-v3")
+add_subdirectory("${CMAKE_SOURCE_DIR}/src")
 add_subdirectory("${CMAKE_SOURCE_DIR}/test")

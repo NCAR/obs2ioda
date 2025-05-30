@@ -10,6 +10,7 @@ contains
             call exit(1)
         end if
     end subroutine check
+
     ! transpose_and_flatten:
     !   Transposes a 2D real matrix and flattens it into a 1D array.
     !
@@ -43,22 +44,79 @@ contains
         flat_mat_trans = reshape(transpose(mat), [m*n])
     end subroutine transpose_and_flatten
 
+    ! set_datetime:
+    !   Converts a Gregorian calendar date and time to a 64-bit integer representation.
+    !
+    !   Arguments:
+    !     - year (integer, intent(in)):
+    !       Gregorian year (e.g., 2025).
+    !     - month (integer, intent(in)):
+    !       Month of the year (1–12).
+    !     - day (integer, intent(in)):
+    !       Day of the month (1–31).
+    !     - hour (integer, intent(in)):
+    !       Hour of the day (0–23).
+    !     - min (integer, intent(in)):
+    !       Minute of the hour (0–59).
+    !     - sec (integer, intent(in)):
+    !       Second of the minute (0–59).
+    !     - datetime (integer(i_llong), intent(out)):
+    !       Computed datetime in 64-bit integer format (e.g., seconds since epoch).
+    subroutine set_datetime(year, month, day, hour, min, sec, datetime)
+        use kinds , only: i_kind, i_llong, r_double
+        use utils_mod, only: get_julian_time
+        implicit none
 
-    subroutine write_iodav3_netcdf(fname, nlocs, nvars, nchans, nstring, ndatetime, missing_r, missing_i, &
+        integer, intent(in) :: year, month, day, hour, min, sec
+        integer(i_llong), intent(out) :: datetime
+        real(r_double) :: gstime
+
+        call get_julian_time(year, month, day, hour, min, sec, gstime, datetime)
+    end subroutine set_datetime
+
+
+    ! write_iodav3_netcdf:
+    !   Writes GOES-ABI observation data into a NetCDF file formatted for IODA-v3.
+    !
+    !   Arguments:
+    !     - fname (character(len=*), intent(in)):
+    !       Path to the output NetCDF file.
+    !     - nlocs (integer(i_kind), intent(in)):
+    !       Number of observation locations.
+    !     - nchans (integer(i_kind), intent(in)):
+    !       Number of instrument channels.
+    !     - missing_r (real(r_kind), intent(in)):
+    !       Fill value for missing real values.
+    !     - missing_i (integer(i_kind), intent(in)):
+    !       Fill value for missing integer values.
+    !     - datetime (integer(i_llong), dimension(nlocs), intent(in)):
+    !       Array of datetime values in 64-bit integer format.
+    !     - lat_out, lon_out (real(r_kind), dimension(nlocs), intent(in)):
+    !       Latitude and longitude values.
+    !     - scan_pos_out, sat_zen_out, sat_azi_out (real(r_kind), dimension(nlocs), intent(in)):
+    !       Scan position and sensor viewing geometry.
+    !     - sun_zen_out, sun_azi_out (real(r_kind), dimension(nlocs), intent(in)):
+    !       Solar geometry values.
+    !     - bt_out (real(r_kind), dimension(nchans, nlocs), intent(in)):
+    !       Brightness temperature values (K).
+    !     - err_out (real(r_kind), dimension(nchans, nlocs), intent(in)):
+    !       Observation error estimates.
+    !     - qf_out (real(r_kind), dimension(nchans, nlocs), intent(in)):
+    !       Pre-quality control flags.
+    subroutine write_iodav3_netcdf(fname, nlocs, nchans, missing_r, missing_i, &
             datetime, lat_out, lon_out, scan_pos_out, sat_zen_out, sat_azi_out, &
-            sun_zen_out, sun_azi_out, bt_out, err_out, qf_out, name_var_tb)
+            sun_zen_out, sun_azi_out, bt_out, err_out, qf_out)
 
         use netcdf_cxx_mod
-        use define_mod, only: r_kind, i_kind
-        use netcdf, only: NF90_REAL, NF90_INT, NF90_STRING
+        use define_mod, only: r_kind, i_kind, i_llong
+        use netcdf, only: NF90_REAL, NF90_INT, NF90_INT64
         implicit none
 
         character(len=*), intent(in) :: fname
-        integer(i_kind),  intent(in) :: nlocs, nvars, nchans, nstring, ndatetime
+        integer(i_kind),  intent(in) :: nlocs, nchans
         real(r_kind),     intent(in) :: missing_r
         integer(i_kind),  intent(in) :: missing_i
-        character(len=ndatetime), intent(in) :: datetime(nlocs)
-        character(len=nstring),  intent(in) :: name_var_tb(nvars)
+        integer(i_llong), intent(in) :: datetime(nlocs)
         real(r_kind), intent(in) :: lat_out(nlocs), lon_out(nlocs)
         real(r_kind), intent(in) :: scan_pos_out(nlocs), sat_zen_out(nlocs), sat_azi_out(nlocs)
         real(r_kind), intent(in) :: sun_zen_out(nlocs), sun_azi_out(nlocs)
@@ -66,7 +124,7 @@ contains
         real(r_kind), intent(in) :: err_out(nchans, nlocs)
         real(r_kind), intent(in) :: qf_out(nchans, nlocs)
 
-        integer :: ncid, nlocs_dimid, nvars_dimid, nchans_dimid, nstring_dimid, ndatetime_dimid
+        integer :: ncid, nlocs_dimid, nchans_dimid
         real(r_kind), allocatable :: rtmp1d(:)
 
         allocate(rtmp1d(nlocs*nchans))
@@ -77,10 +135,7 @@ contains
         call check(netcdfAddGroup(ncid, 'PreQC'))
         call check(netcdfAddGroup(ncid, 'MetaData'))
 
-        call check(netcdfAddDim(ncid, 'nvars', nvars, nvars_dimid))
         call check(netcdfAddDim(ncid, 'nlocs', nlocs, nlocs_dimid))
-        call check(netcdfAddDim(ncid, 'nstring', nstring, nstring_dimid))
-        call check(netcdfAddDim(ncid, 'ndatetime', ndatetime, ndatetime_dimid))
         call check(netcdfAddDim(ncid, 'nchans', nchans, nchans_dimid))
 
         ! Define variables
@@ -98,9 +153,8 @@ contains
         call check(netcdfAddVar(ncid, 'solar_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
         call check(netcdfAddVar(ncid, 'sensor_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
         call check(netcdfAddVar(ncid, 'sensor_view_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
-        call check(netcdfAddVar(ncid, 'datetime', NF90_STRING, 1, ['nlocs'], 'MetaData', fillValue=" "))
+        call check(netcdfAddVar(ncid, 'datetime', NF90_INT64, 1, ['nlocs'], 'MetaData', fillValue=missing_i))
         call check(netcdfAddVar(ncid, 'sensor_channel', NF90_INT, 1, ['nchans'], 'MetaData', fillValue=missing_i))
-        call check(netcdfAddVar(ncid, 'variable_names', NF90_STRING, 1, ['nvars'], 'MetaData', fillValue=" "))
 
         call transpose_and_flatten(bt_out, rtmp1d)
         call check(netcdfPutVar(ncid, 'brightness_temperature', rtmp1d, 'ObsValue'))
@@ -119,7 +173,6 @@ contains
         call check(netcdfPutVar(ncid, 'sensor_view_angle', sat_zen_out, 'MetaData'))
         call check(netcdfPutVar(ncid, 'sensor_channel', (/7,8,9,10,11,12,13,14,15,16/), 'MetaData'))
         call check(netcdfPutVar(ncid, 'datetime', datetime, 'MetaData'))
-        call check(netcdfPutVar(ncid, 'variable_names', name_var_tb, 'MetaData'))
         call check(netcdfClose(ncid))
         deallocate(rtmp1d)
     end subroutine write_iodav3_netcdf

@@ -37,5 +37,3 @@ if (BUILD_GOES_ABI_CONVERTER)
     add_executable(goes_abi_converter ${goes_abi_converter_SOURCES})
     obs2ioda_fortran_executable(goes_abi_converter "${goes_abi_converter_PUBLIC_LINK_LIBRARIES}")
 endif ()
-
-add_subdirectory(tests)

@@ -1,12 +1,12 @@
-module write_ioda_v3_test_mod
+module write_goes_abi_ioda_v3_test_mod
     use define_mod, only: r_kind, i_kind
+    use kinds, only: i_llong
     implicit none
 
-    type :: write_ioda_v3_test_t
+    type :: write_goes_abi_ioda_v3_test_t
         character(len=:), allocatable :: fname
-        integer(i_kind) :: nlocs, nvars, nchans, nstring, ndatetime
-        character(len=20), dimension(:), allocatable :: datetime
-        character(len=10), dimension(:), allocatable :: name_var_tb
+        integer(i_kind) :: nlocs, nchans
+        integer(i_llong), allocatable :: datetime(:)
         real(r_kind), dimension(:), allocatable :: lat_out, lon_out
         real(r_kind), dimension(:), allocatable :: scan_pos_out
         real(r_kind), dimension(:), allocatable :: sat_zen_out, sat_azi_out
@@ -14,13 +14,13 @@ module write_ioda_v3_test_mod
         real(r_kind), dimension(:,:), allocatable :: bt_out, err_out, qf_out
 
     contains
-        procedure :: setup
+        procedure :: init
     end type
 
 contains
 
-    subroutine setup(self)
-        class(write_ioda_v3_test_t), intent(inout) :: self
+    subroutine init(self)
+        class(write_goes_abi_ioda_v3_test_t), intent(inout) :: self
         integer :: i, j
         character(len=100) :: output_dir
 
@@ -33,16 +33,12 @@ contains
         end if
 
         ! Set configuration
-        self%fname     = trim(output_dir)//"write_ioda_v3.nc"
+        self%fname     = trim(output_dir)//"write_goes_abi_ioda_v3.nc"
         self%nlocs     = 2
-        self%nvars     = 1
         self%nchans    = 3
-        self%nstring   = 10
-        self%ndatetime = 20
 
         ! Allocate arrays
         allocate(self%datetime(self%nlocs))
-        allocate(self%name_var_tb(self%nvars))
         allocate(self%lat_out(self%nlocs), self%lon_out(self%nlocs), self%scan_pos_out(self%nlocs))
         allocate(self%sat_zen_out(self%nlocs), self%sat_azi_out(self%nlocs))
         allocate(self%sun_zen_out(self%nlocs), self%sun_azi_out(self%nlocs))
@@ -51,8 +47,7 @@ contains
         allocate(self%qf_out(self%nchans, self%nlocs))
 
         ! Metadata
-        self%datetime       = ["20250101T0000Z", "20250101T0010Z"]
-        self%name_var_tb(1) = "brightness_temperature"
+        self%datetime       = (/1735689600, 1735690200/)
         self%lat_out        = [45.0_r_kind, 46.0_r_kind]
         self%lon_out        = [-120.0_r_kind, -121.0_r_kind]
         self%scan_pos_out   = [0.0_r_kind, 1.0_r_kind]
@@ -73,26 +68,26 @@ contains
             end do
         end do
 
-    end subroutine setup
+    end subroutine init
 
-end module write_ioda_v3_test_mod
+end module write_goes_abi_ioda_v3_test_mod
 
 
-program test_write_ioda_v3
+program test_write_goes_abi_ioda_v3
     use goes_abi_converter_mod
     use define_mod, only: r_kind, i_kind, missing_r, missing_i
-    use write_ioda_v3_test_mod
+    use write_goes_abi_ioda_v3_test_mod
     implicit none
 
-    type(write_ioda_v3_test_t) :: d
+    type(write_goes_abi_ioda_v3_test_t) :: d
 
     ! Initialize test data
-    call d%setup()
+    call d%init()
 
     ! Write IODA v3 NetCDF file
-    call write_iodav3_netcdf(d%fname, d%nlocs, d%nvars, d%nchans, d%nstring, d%ndatetime, &
+    call write_iodav3_netcdf(d%fname, d%nlocs, d%nchans, &
             missing_r, missing_i, d%datetime, d%lat_out, d%lon_out, &
             d%scan_pos_out, d%sat_zen_out, d%sat_azi_out, &
-            d%sun_zen_out, d%sun_azi_out, d%bt_out, d%err_out, d%qf_out, d%name_var_tb)
+            d%sun_zen_out, d%sun_azi_out, d%bt_out, d%err_out, d%qf_out)
 
-end program test_write_ioda_v3
+end program test_write_goes_abi_ioda_v3

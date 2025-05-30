@@ -17,7 +17,7 @@ program Goes_ReBroadcast_converter
 !        /
 
    use define_mod, only:  missing_r
-   use goes_abi_converter_mod, only: write_iodav3_netcdf
+   use goes_abi_converter_mod, only: write_iodav3_netcdf, set_datetime
 
    implicit none
    include 'netcdf.inc'
@@ -29,6 +29,7 @@ program Goes_ReBroadcast_converter
    integer, parameter  :: i_long   = selected_int_kind(8)   ! long integer
    integer, parameter  :: i_kind   = i_long                 ! default integer
    integer, parameter  :: r_kind   = r_single               ! default real
+   character(len=14), parameter :: BCM_id = 'CG_ABI-L2-ACMC'
 
    integer(i_kind), parameter :: nband      = 10  ! IR bands 7-16
    integer(i_kind) :: band_start = 7
@@ -74,14 +75,13 @@ program Goes_ReBroadcast_converter
    character(len=256)              :: data_dir
    character(len=18)               :: data_id
    character(len=3)                :: sat_id
-   character(len=14)               :: BCM_id ! prefix of Clear Sky Mask (Binary Cloud Mask) output of cspp-geo-aitf package
    integer(i_kind)                 :: n_subsample
    logical                         :: do_superob
    integer(i_kind)                 :: superob_halfwidth
    logical                         :: do_thinning
    logical                         :: write_iodav3
 
-   namelist /data_nml/ nc_list_file, data_dir, data_id, sat_id, do_thinning, n_subsample, do_superob, superob_halfwidth, BCM_id
+   namelist /data_nml/ nc_list_file, data_dir, data_id, sat_id, do_thinning, n_subsample, do_superob, superob_halfwidth
 
    real(r_kind)                    :: sdtb ! to be done
    integer(i_kind)                 :: istat
@@ -118,7 +118,6 @@ program Goes_ReBroadcast_converter
    n_subsample       = 1
    do_superob        = .false.
    superob_halfwidth = 1
-   BCM_id           =  'CG_ABI-L2-ACMC'
    !
    write_iodav3      = .true.
    !
@@ -784,6 +783,7 @@ end subroutine read_GRB
 
    subroutine output_iodav3(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
    use define_mod, only: i_kind, r_kind, missing_i, missing_r
+   use kinds, only: i_llong, r_double
    implicit none
 
    character(len=*),   intent(in) :: fname
@@ -800,12 +800,10 @@ end subroutine read_GRB
    integer(i_kind),    intent(in), optional :: cloudmask(nx,ny)
 
    integer(i_kind), parameter :: nstring = 50
-   integer(i_kind), parameter :: ndatetime = 20
-   integer(i_kind) :: nvars
    integer(i_kind) :: nlocs
    integer(i_kind) :: nchans
 
-   character(len=ndatetime), allocatable  :: datetime(:)   ! ccyy-mm-ddThh:mm:ssZ
+   integer(i_llong), allocatable :: datetime(:)
    real(r_kind), allocatable :: lat_out(:)
    real(r_kind), allocatable :: lon_out(:)
    real(r_kind), allocatable :: scan_pos_out(:)
@@ -818,23 +816,16 @@ end subroutine read_GRB
    real(r_kind), allocatable :: qf_out(:,:)
 
    integer(i_kind) :: ncid_nlocs
-   integer(i_kind) :: ncid_nvars
-   integer(i_kind) :: ncid_nstring
-   integer(i_kind) :: ncid_ndatetime
    integer(i_kind) :: ncfileid
    character(len=nstring) :: ncname
    real(r_kind), allocatable :: rtmp1d(:)
-   integer(i_kind), allocatable :: itmp1d(:)
 
-   character(len=nstring), allocatable :: name_var_tb(:)
    character(len=4) :: c4
 
    integer(i_kind) :: iline, isample, iband
    integer(i_kind) :: iloc
    integer(i_kind) :: iyear, imonth, iday, ihour, imin, isec
-   integer(i_kind) :: ndatetime_dimid, nlocs_dimid, nvars_dimid, nstring_dimid, nchans_dimid
-
-   character(len=60), parameter :: var_tb = "brightness_temperature"
+   integer(i_kind) :: nlocs_dimid, nchans_dimid
 
    integer            :: superob_width ! Must be ≥ 0
    integer            :: first_boxcenter, last_boxcenter_x, last_boxcenter_y, box_bottom, box_upper, box_left, box_right
@@ -842,7 +833,6 @@ end subroutine read_GRB
    real(r_kind)       :: temp1 = 0.0
    real(r_kind),    allocatable :: bt_sup(:,:,:)   ! superobbed brightness temperature(nband,nx,ny)
 
-   nvars = 1
    nchans = nband
 
    if ( do_thinning ) then
@@ -865,7 +855,6 @@ end subroutine read_GRB
         return
      end if
 
-     allocate (name_var_tb(1))
      allocate (datetime(nlocs))
      allocate (lat_out(nlocs))
      allocate (lon_out(nlocs))
@@ -893,8 +882,8 @@ end subroutine read_GRB
            if ( all(qf(:,isample,iline) > 1) ) cycle
            if ( all(bt(:,isample,iline)<0.0) ) cycle
            iloc = iloc + 1
-           write(unit=datetime(iloc), fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a)')  &
-                 iyear, '-', imonth, '-', iday, 'T', ihour, ':', imin, ':', isec, 'Z'
+
+           call set_datetime(iyear, imonth, iday, ihour, imin, isec, datetime(iloc))
            lat_out(iloc) = lat(isample,iline)
            lon_out(iloc) = lon(isample,iline)
            sat_zen_out(iloc) = sat_zen(isample,iline)
@@ -904,7 +893,7 @@ end subroutine read_GRB
            scan_pos_out(iloc) = isample
            sat_azi_out(iloc) = missing_r
            sun_azi_out(iloc) = missing_r
-           err_out(1:nband,iloc) = 1.0 !missing_r
+           err_out(1:nband,iloc) = 1.0
         end do
      end do
    end if
@@ -1029,13 +1018,9 @@ end subroutine read_GRB
       end do scan_loop
    end if
 
-   name_var_tb(1) = var_tb
-   call write_iodav3_netcdf(fname, nlocs, nvars, nchans, nstring, ndatetime, missing_r, missing_i, &
+   call write_iodav3_netcdf(fname, nlocs, nchans, missing_r, missing_i, &
            datetime, lat_out, lon_out, scan_pos_out, sat_zen_out, sat_azi_out, &
-           sun_zen_out, sun_azi_out, bt_out, err_out, qf_out, name_var_tb)
-
-
-   deallocate (name_var_tb)
+           sun_zen_out, sun_azi_out, bt_out, err_out, qf_out)
    deallocate (datetime)
    deallocate (lat_out)
    deallocate (lon_out)

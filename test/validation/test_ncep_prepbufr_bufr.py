@@ -2,12 +2,12 @@ import numpy as np
 from typing import Tuple
 from netCDF4 import Dataset
 from pathlib import Path
-from conftest import extract_structure, format_netcdf_assert_msg
+from test_utils.utils import extract_structure, format_netcdf_assert_msg
 import pytest
 
-@pytest.mark.validation
-def test_group_names_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_group_names_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     ref_groups = set(extract_structure(ref_path).keys())
     test_groups = set(extract_structure(test_path).keys())
     assert ref_groups == test_groups, (
@@ -15,9 +15,9 @@ def test_group_names_match(file_pair: Tuple[Path, Path]) -> None:
         f"Group name mismatch\nReference: {ref_groups}\nTest:      {test_groups}"
     )
 
-@pytest.mark.validation
-def test_variable_names_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_variable_names_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     ref_struct = extract_structure(ref_path)
     test_struct = extract_structure(test_path)
     for group in ref_struct:
@@ -28,9 +28,9 @@ def test_variable_names_match(file_pair: Tuple[Path, Path]) -> None:
             f"Variable name mismatch\nReference: {ref_vars}\nTest:      {test_vars}"
         )
 
-@pytest.mark.validation
-def test_variable_dtype_and_dimensions_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_variable_dtype_and_dimensions_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     ref_struct = extract_structure(ref_path)
     test_struct = extract_structure(test_path)
     for group in ref_struct:
@@ -44,9 +44,9 @@ def test_variable_dtype_and_dimensions_match(file_pair: Tuple[Path, Path]) -> No
                 test_path.name, group, varname, "Dimension mismatch", ref["dimensions"], test["dimensions"]
             )
 
-@pytest.mark.validation
-def test_variable_attributes_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_variable_attributes_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     ref_struct = extract_structure(ref_path)
     test_struct = extract_structure(test_path)
     for group in ref_struct:
@@ -57,9 +57,9 @@ def test_variable_attributes_match(file_pair: Tuple[Path, Path]) -> None:
                 test_path.name, group, varname, "Attribute name set mismatch", ref_attrs, test_attrs
             )
 
-@pytest.mark.validation
-def test_variable_attribute_values_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_variable_attribute_values_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     with Dataset(ref_path.as_posix(), "r") as ref_ds, Dataset(test_path.as_posix(), "r") as test_ds:
         def recurse(ref_grp, test_grp) -> None:
             for group_name in ref_grp.groups:
@@ -82,9 +82,9 @@ def test_variable_attribute_values_match(file_pair: Tuple[Path, Path]) -> None:
                         )
         recurse(ref_ds, test_ds)
 
-@pytest.mark.validation
-def test_variable_data_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_variable_data_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     ref_struct = extract_structure(ref_path)
     test_struct = extract_structure(test_path)
     for group in ref_struct:
@@ -120,9 +120,9 @@ def test_variable_data_match(file_pair: Tuple[Path, Path]) -> None:
                     "Non-numeric array mismatch", ref_data, test_data
                 )
 
-@pytest.mark.validation
-def test_global_attributes_match(file_pair: Tuple[Path, Path]) -> None:
-    ref_path, test_path = file_pair
+@pytest.mark.ncep_prepbufr_bufr
+def test_global_attributes_match(ncep_prepbufr_bufr_file_pair: Tuple[Path, Path]) -> None:
+    ref_path, test_path = ncep_prepbufr_bufr_file_pair
     with Dataset(ref_path.as_posix(), "r") as ref_ds, Dataset(test_path.as_posix(), "r") as test_ds:
         ref_attrs = set(ref_ds.ncattrs())
         test_attrs = set(test_ds.ncattrs())
