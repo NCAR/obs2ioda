@@ -11,15 +11,14 @@ configure_file(
 )
 
 set(OBS2IODA_V3_EXECUTABLE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/obs2ioda_v3")
-set(GOES_ABI_EXECUTABLE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/goes_abi_converter")
+set(TEST_WRITE_IODA_V3_EXECUTABLE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_write_ioda_v3")
+set(VALIDATION_TEST_DIRECTORY "${CMAKE_SOURCE_DIR}/test/validation")
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/FilePathConfig.py.in
         ${CMAKE_SOURCE_DIR}/test/validation/FilePathConfig.py
         @ONLY
 )
-
-set(VALIDATION_TEST_DIRECTORY "${CMAKE_SOURCE_DIR}/test/validation")
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/pytest.ini.in

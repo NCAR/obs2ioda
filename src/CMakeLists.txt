@@ -1,5 +1,5 @@
 
-add_subdirectory(src/cxx)
+add_subdirectory(cxx)
 
 # Define sources
 set(v3_SOURCES
@@ -19,15 +19,12 @@ set(v3_SOURCES
         netcdf_cxx_mod.f90
         goes_abi_converter_mod.f90
 )
-list(TRANSFORM v3_SOURCES PREPEND "src/")
 set(obs2ioda_v3_SOURCES
         main.f90
 )
-list(TRANSFORM obs2ioda_v3_SOURCES PREPEND "src/")
 set(goes_abi_converter_SOURCES
         goes_abi_converter.f90
 )
-list(TRANSFORM goes_abi_converter_SOURCES PREPEND "src/")
 set(v3_PUBLIC_LINK_LIBRARIES NetCDF::NetCDF_Fortran "${NCEP_BUFR_LIB}" obs2ioda_cxx)
 add_library(v3 SHARED ${v3_SOURCES})
 obs2ioda_fortran_library(v3 "${v3_PUBLIC_LINK_LIBRARIES}")
@@ -40,3 +37,5 @@ if (BUILD_GOES_ABI_CONVERTER)
     add_executable(goes_abi_converter ${goes_abi_converter_SOURCES})
     obs2ioda_fortran_executable(goes_abi_converter "${goes_abi_converter_PUBLIC_LINK_LIBRARIES}")
 endif ()
+
+add_subdirectory(tests)

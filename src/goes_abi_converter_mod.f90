@@ -10,6 +10,39 @@ contains
             call exit(1)
         end if
     end subroutine check
+    ! transpose_and_flatten:
+    !   Transposes a 2D real matrix and flattens it into a 1D array.
+    !
+    !   Arguments:
+    !     - mat (real, dimension(:,:), intent(in)):
+    !       The input 2D matrix to be transposed and flattened.
+    !     - flat_mat_trans (real, dimension(:), intent(out)):
+    !       The output 1D array containing the flattened transpose of `mat`.
+    !       Must be pre-allocated with size equal to size(mat,1) * size(mat,2).
+    !
+    !   Notes:
+    !     - The subroutine performs an internal check to ensure `flat_mat_trans`
+    !       has the correct size. If not, it prints an error message and stops execution.
+    subroutine transpose_and_flatten(mat, flat_mat_trans)
+        implicit none
+        real, intent(in)  :: mat(:,:)
+        real, intent(out) :: flat_mat_trans(:)
+        integer :: m, n, i, j
+
+        ! Get dimensions of input matrix
+        m = size(mat, 1)
+        n = size(mat, 2)
+
+        ! Safety check
+        if (size(flat_mat_trans) /= m * n) then
+            print *, "Error: flat_mat_trans must have size m*n"
+            stop 1
+        end if
+
+        ! Transpose and flatten
+        flat_mat_trans = reshape(transpose(mat), [m*n])
+    end subroutine transpose_and_flatten
+
 
     subroutine write_iodav3_netcdf(fname, nlocs, nvars, nchans, nstring, ndatetime, missing_r, missing_i, &
             datetime, lat_out, lon_out, scan_pos_out, sat_zen_out, sat_azi_out, &
@@ -18,7 +51,6 @@ contains
         use netcdf_cxx_mod
         use define_mod, only: r_kind, i_kind
         use netcdf, only: NF90_REAL, NF90_INT, NF90_STRING
-        use utils_mod, only: transpose_and_flatten
         implicit none
 
         character(len=*), intent(in) :: fname

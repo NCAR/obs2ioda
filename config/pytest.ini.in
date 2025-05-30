@@ -1,2 +1,5 @@
 [pytest]
+markers =
+    validation: run obs2ioda validation test suite
+    goes_abi: run GOES ABI converter tests
 testpaths = @VALIDATION_TEST_DIRECTORY@
