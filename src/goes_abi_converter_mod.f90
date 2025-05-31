@@ -44,37 +44,6 @@ contains
         flat_mat_trans = reshape(transpose(mat), [m*n])
     end subroutine transpose_and_flatten
 
-    ! set_datetime:
-    !   Converts a Gregorian calendar date and time to a 64-bit integer representation.
-    !
-    !   Arguments:
-    !     - year (integer, intent(in)):
-    !       Gregorian year (e.g., 2025).
-    !     - month (integer, intent(in)):
-    !       Month of the year (1–12).
-    !     - day (integer, intent(in)):
-    !       Day of the month (1–31).
-    !     - hour (integer, intent(in)):
-    !       Hour of the day (0–23).
-    !     - min (integer, intent(in)):
-    !       Minute of the hour (0–59).
-    !     - sec (integer, intent(in)):
-    !       Second of the minute (0–59).
-    !     - datetime (integer(i_llong), intent(out)):
-    !       Computed datetime in 64-bit integer format (e.g., seconds since epoch).
-    subroutine set_datetime(year, month, day, hour, min, sec, datetime)
-        use kinds , only: i_kind, i_llong, r_double
-        use utils_mod, only: get_julian_time
-        implicit none
-
-        integer, intent(in) :: year, month, day, hour, min, sec
-        integer(i_llong), intent(out) :: datetime
-        real(r_double) :: gstime
-
-        call get_julian_time(year, month, day, hour, min, sec, gstime, datetime)
-    end subroutine set_datetime
-
-
     ! write_iodav3_netcdf:
     !   Writes GOES-ABI observation data into a NetCDF file formatted for IODA-v3.
     !

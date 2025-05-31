@@ -13,17 +13,17 @@ add_test(NAME test_transpose_and_flatten
         COMMAND test_transpose_and_flatten
 )
 
-set(test_set_datetime_SOURCES
-        set_datetime.test.f90
+set(test_get_julian_time_SOURCES
+        get_julian_time.test.f90
 )
-set(test_set_datetime_LIBRARY_DEPENDENCIES
+set(test_get_julian_time_LIBRARY_DEPENDENCIES
         v3
 )
-add_executable(test_set_datetime ${test_set_datetime_SOURCES})
-target_link_libraries(test_set_datetime
+add_executable(test_get_julian_time ${test_get_julian_time_SOURCES})
+target_link_libraries(test_get_julian_time
         PRIVATE
-        ${test_set_datetime_LIBRARY_DEPENDENCIES}
+        ${test_get_julian_time_LIBRARY_DEPENDENCIES}
 )
-add_test(NAME test_set_datetime
-        COMMAND test_set_datetime
+add_test(NAME test_get_julian_time
+        COMMAND test_get_julian_time
 )

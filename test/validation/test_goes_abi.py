@@ -5,6 +5,14 @@ import numpy as np
 
 @pytest.mark.goes_abi
 def test_variable_names_match(goes_abi_file_pair):
+    """
+    Verify that all variable names in each group match between reference and output files.
+
+    Parameters
+    ----------
+    goes_abi_file_pair : tuple
+        Tuple containing (reference_file_path, output_file_path).
+    """
     reference_file, output_file = goes_abi_file_pair
     ref_struct = extract_structure(reference_file)
     test_struct = extract_structure(output_file)
@@ -18,6 +26,14 @@ def test_variable_names_match(goes_abi_file_pair):
 
 @pytest.mark.goes_abi
 def test_dtype_match(goes_abi_file_pair):
+    """
+    Validate that all variables have matching data types between reference and output files.
+
+    Parameters
+    ----------
+    goes_abi_file_pair : tuple
+        Tuple containing (reference_file_path, output_file_path).
+    """
     reference_file, output_file = goes_abi_file_pair
     ref_struct = extract_structure(reference_file)
     test_struct = extract_structure(output_file)
@@ -32,6 +48,14 @@ def test_dtype_match(goes_abi_file_pair):
 
 @pytest.mark.goes_abi
 def test_dimensions_match(goes_abi_file_pair):
+    """
+    Validate that the dimensions of all variables match between reference and output files.
+
+    Parameters
+    ----------
+    goes_abi_file_pair : tuple
+        Tuple containing (reference_file_path, output_file_path).
+    """
     reference_file, output_file = goes_abi_file_pair
     ref_struct = extract_structure(reference_file)
     test_struct = extract_structure(output_file)
@@ -46,6 +70,14 @@ def test_dimensions_match(goes_abi_file_pair):
 
 @pytest.mark.goes_abi
 def test_attributes_match(goes_abi_file_pair):
+    """
+    Validate that all variable attribute names and values match between reference and output files.
+
+    Parameters
+    ----------
+    goes_abi_file_pair : tuple
+        Tuple containing (reference_file_path, output_file_path).
+    """
     reference_file, output_file = goes_abi_file_pair
     ref_struct = extract_structure(reference_file)
     test_struct = extract_structure(output_file)
@@ -60,6 +92,14 @@ def test_attributes_match(goes_abi_file_pair):
 
 @pytest.mark.goes_abi
 def test_data_match(goes_abi_file_pair):
+    """
+    Validate that variable data arrays match between reference and output files.
+
+    Parameters
+    ----------
+    goes_abi_file_pair : tuple
+        Tuple containing (reference_file_path, output_file_path).
+    """
     reference_file, output_file = goes_abi_file_pair
     ref_struct = extract_structure(reference_file)
     test_struct = extract_structure(output_file)

@@ -1,3 +1,21 @@
+"""
+Test suite definition and setup for NCEP PREPBUFR BUFR to IODA-v3 conversion validation.
+
+This module downloads test data (if needed), extracts it, and runs the `obs2ioda` executable
+to produce IODA-v3 output files. It then uses `TestSuite` to configure pytest to compare
+those outputs to known-good reference files.
+
+Functions
+---------
+setup_validation
+    Downloads test data and runs obs2ioda to generate output files if not already present.
+
+Variables
+---------
+NCEP_PREBUFR_BUFR_SUITE
+    Configured TestSuite instance for NCEP PREPBUFR BUFR validation.
+"""
+
 import requests
 from pathlib import Path
 import tarfile
@@ -7,6 +25,18 @@ from .FilePathConfig import OBS2IODA_V3_EXECUTABLE_PATH
 
 
 def setup_validation(output_dir: Path):
+    """
+    Set up the NCEP PREPBUFR BUFR validation environment.
+
+    Downloads and extracts test data if it does not already exist locally.
+    Then runs the `obs2ioda` executable on all relevant BUFR files
+    to generate IODA-v3 output in the given output directory.
+
+    Parameters
+    ----------
+    output_dir : Path
+        Directory where converted output files will be written.
+    """
     url = "https://www2.mmm.ucar.edu/obs2ioda/test_data/data.tar.gz"
     base_dir = Path.cwd() / "test/validation"
     archive = base_dir / Path(url).name

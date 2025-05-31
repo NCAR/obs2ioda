@@ -4,6 +4,14 @@ from .FilePathConfig import TEST_WRITE_GOES_ABI_IODA_V3_EXECUTABLE_PATH, VALIDAT
 from .utils import run_executable
 
 def setup_goes_abi(output_dir: Path):
+    """
+    Setup function for GOES-ABI test suite. Runs the test executable and creates output.
+
+    Parameters
+    ----------
+    output_dir : Path
+        Directory to write test output to.
+    """
     output_file = output_dir / "write_goes_abi_ioda_v3.nc"
     output_dir.mkdir(parents=True, exist_ok=True)
     run_executable(TEST_WRITE_GOES_ABI_IODA_V3_EXECUTABLE_PATH, str(output_dir), str(output_file))

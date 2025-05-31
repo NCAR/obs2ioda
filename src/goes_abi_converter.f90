@@ -17,7 +17,7 @@ program Goes_ReBroadcast_converter
 !        /
 
    use define_mod, only:  missing_r
-   use goes_abi_converter_mod, only: write_iodav3_netcdf, set_datetime
+   use goes_abi_converter_mod, only: write_iodav3_netcdf
 
    implicit none
    include 'netcdf.inc'
@@ -784,6 +784,7 @@ end subroutine read_GRB
    subroutine output_iodav3(fname, time_start, nx, ny, nband, got_latlon, lat, lon, sat_zen, sun_zen, bt, qf, sdtb, cloudmask)
    use define_mod, only: i_kind, r_kind, missing_i, missing_r
    use kinds, only: i_llong, r_double
+   use utils_mod, only: get_julian_time
    implicit none
 
    character(len=*),   intent(in) :: fname
@@ -819,6 +820,7 @@ end subroutine read_GRB
    integer(i_kind) :: ncfileid
    character(len=nstring) :: ncname
    real(r_kind), allocatable :: rtmp1d(:)
+   real(r_double) :: gstime
 
    character(len=4) :: c4
 
@@ -883,7 +885,7 @@ end subroutine read_GRB
            if ( all(bt(:,isample,iline)<0.0) ) cycle
            iloc = iloc + 1
 
-           call set_datetime(iyear, imonth, iday, ihour, imin, isec, datetime(iloc))
+           call get_julian_time(iyear, imonth, iday, ihour, imin, isec, gstime, datetime(iloc))
            lat_out(iloc) = lat(isample,iline)
            lon_out(iloc) = lon(isample,iline)
            sat_zen_out(iloc) = sat_zen(isample,iline)
