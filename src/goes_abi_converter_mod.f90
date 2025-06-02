@@ -77,7 +77,7 @@ contains
             sun_zen_out, sun_azi_out, bt_out, err_out, qf_out)
 
         use netcdf_cxx_mod
-        use define_mod, only: r_kind, i_kind, i_llong
+        use define_mod, only: r_kind, i_kind, i_llong, missing_long
         use netcdf, only: NF90_REAL, NF90_INT, NF90_INT64
         implicit none
 
@@ -122,9 +122,10 @@ contains
         call check(netcdfAddVar(ncid, 'solar_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
         call check(netcdfAddVar(ncid, 'sensor_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
         call check(netcdfAddVar(ncid, 'sensor_view_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
-        call check(netcdfAddVar(ncid, 'datetime', NF90_INT64, 1, ['nlocs'], 'MetaData', fillValue=missing_i))
+        call check(netcdfAddVar(ncid, 'dateTime', NF90_INT64, 1, ['nlocs'], 'MetaData', fillValue=missing_long))
+        call check(netcdfPutAtt(ncid, "units", "seconds since 1970-01-01T00:00:00Z", varName = 'dateTime', &
+                groupName = "MetaData"))
         call check(netcdfAddVar(ncid, 'sensor_channel', NF90_INT, 1, ['nchans'], 'MetaData', fillValue=missing_i))
-
         call transpose_and_flatten(bt_out, rtmp1d)
         call check(netcdfPutVar(ncid, 'brightness_temperature', rtmp1d, 'ObsValue'))
         call transpose_and_flatten(err_out, rtmp1d)
@@ -141,7 +142,7 @@ contains
         call check(netcdfPutVar(ncid, 'sensor_zenith_angle', sat_zen_out, 'MetaData'))
         call check(netcdfPutVar(ncid, 'sensor_view_angle', sat_zen_out, 'MetaData'))
         call check(netcdfPutVar(ncid, 'sensor_channel', (/7,8,9,10,11,12,13,14,15,16/), 'MetaData'))
-        call check(netcdfPutVar(ncid, 'datetime', datetime, 'MetaData'))
+        call check(netcdfPutVar(ncid, 'dateTime', datetime, 'MetaData'))
         call check(netcdfClose(ncid))
         deallocate(rtmp1d)
     end subroutine write_iodav3_netcdf

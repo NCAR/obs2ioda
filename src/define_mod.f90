@@ -10,6 +10,7 @@ real(r_kind),    parameter :: t_kelvin          = 273.15
 real(r_kind),    parameter :: missing_r         = -999.0
 integer(i_kind), parameter :: StrLen            = 512
 integer(i_kind), parameter :: missing_i         = -999
+integer(i_llong), parameter :: missing_long     = -999
 integer(i_kind), parameter :: not_use           = 100
 integer(i_kind), parameter :: itrue             = 1
 integer(i_kind), parameter :: ifalse            = 0
