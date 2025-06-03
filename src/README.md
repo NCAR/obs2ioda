@@ -22,10 +22,13 @@ If you have an environment preconfigured for `mpas-jedi`, simply source that env
    ```bash
    find . -name *libbufr*
    ```
-1. Next, run CMake to configure the build. Specify the `CMAKE_BUILD_TYPE` option to set the build type. Currently, the supported types are `Release`, `RelWithDebInfo`, and `Debug`. Don't forget to include the path to the NCEP BUFR library:
-   ```bash
-   cmake <OBS2IODA_ROOT_DIR> -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH> -DCMAKE_BUILD_TYPE=<BUILD_TYPE>
-   ```
+1. Run `CMake` from the `build` directory to configure the project. Be sure to set the build type (`Release`, `RelWithDebInfo`, or `Debug`) and provide the required path to the `NCEP BUFR` library. To build the `GOES-ABI` converter, enable it explicitly with `-DBUILD_GOES_ABI_CONVERTER=ON`.
+    ```bash
+    cmake <OBS2IODA_ROOT_DIR> \
+    -DNCEP_BUFR_LIB=<NCEP_BUFR_LIB_PATH> \
+    -DCMAKE_BUILD_TYPE=<BUILD_TYPE> \
+    -DBUILD_GOES_ABI_CONVERTER=ON
+    ```
 1. Finally, build `obs2ioda` using `CMake`'s build tool. In this case, we use `GNU Make`, but other build tools supported by `CMake` can be used:
    ```bash
    make
@@ -38,7 +41,7 @@ The `obs2ioda-v3` executable will reside in the `bin` directory within the build
    ```bash
    ctest --verbose
    ```
-    *(The `--verbose` flag is optional.)*
+   *(The `--verbose` flag is optional.)*
 
 #### Running the Validation Test Suite
 **Steps 1–2 are optional** if you already have a Python environment with `pytest`, `netcdf4`, and `requests` installed.
@@ -56,13 +59,35 @@ The `obs2ioda-v3` executable will reside in the `bin` directory within the build
    pip install pytest netcdf4 requests
    ```
 
+Here’s the updated README instructions with the `-m` flag usage included and clarified:
+
+---
+
 1. **Run the test suite** from the `obs2ioda` build directory. To display detailed output and see which tests are being run, use the `--verbose` flag:
 
-```bash
-pytest --verbose
-```
+   ```bash
+   pytest --verbose
+   ```
 
-*(The `--verbose` flag is optional.)*
+1. **Run a specific test suite** by using the `-m` flag followed by the suite name. For example, to run only the GOES-ABI tests:
+
+   ```bash
+   pytest -m goes_abi --verbose
+   ```
+
+   Or to run the NCEP PREPBUFR tests:
+
+   ```bash
+   pytest -m ncep_prepbufr_bufr --verbose
+   ```
+
+---
+
+### Currently Available Test Suites
+
+* `goes_abi`
+* `ncep_prepbufr_bufr`
+
 
 ---
 ## Installing NCEP BUFR Library
@@ -191,3 +216,63 @@ Number of pixels to skip must be specified in the (-s) option. The default value
   100 is chosen to make the original prepbufr quality marker easily readable.
 * Subroutine filter_obs_satwnd applies QC for GOES-16/GOES-17 AMVs as in GSI's read_satwnd.f90.  
   @PreQC value is set to 15 for rejected obs.
+
+Thanks — here's the updated and cleaned-up README reflecting IODA **v3** output instead of v1:
+
+---
+
+## Converting GOES-ABI Files
+
+```bash
+Usage: goes_abi_converter
+```
+
+Runtime options are configured through the Fortran namelist file `namelist.goes_abi_converter`.
+Input filenames (excluding the path) should be listed in a plain text file.
+
+---
+
+### Example: `namelist.goes_abi_converter`
+
+```fortran
+&data_nml
+  nc_list_file = 'flist.txt'
+  data_dir     = '/data/goes',         ! Path to the GRB netCDF files
+  data_id      = 'OR_ABI-L1b-RadF-M6', ! File prefix
+  sat_id       = 'G16',
+  n_subsample  = 1
+/
+```
+
+---
+
+### Example: `flist.txt`
+
+```
+OR_ABI-L1b-RadF-M6C07_G16_s20212370000202_e20212370009522_c20212370009562.nc
+OR_ABI-L1b-RadF-M6C08_G16_s20212370000202_e20212370009510_c20212370009564.nc
+OR_ABI-L1b-RadF-M6C09_G16_s20212370000202_e20212370009516_c20212370009566.nc
+OR_ABI-L1b-RadF-M6C10_G16_s20212370000202_e20212370009522_c20212370009559.nc
+OR_ABI-L1b-RadF-M6C11_G16_s20212370000202_e20212370009510_c20212370009563.nc
+OR_ABI-L1b-RadF-M6C12_G16_s20212370000202_e20212370009516_c20212370009569.nc
+OR_ABI-L1b-RadF-M6C13_G16_s20212370000202_e20212370009521_c20212370009573.nc
+OR_ABI-L1b-RadF-M6C14_G16_s20212370000202_e20212370009510_c20212370009579.nc
+OR_ABI-L1b-RadF-M6C15_G16_s20212370000202_e20212370009516_c20212370009582.nc
+OR_ABI-L1b-RadF-M6C16_G16_s20212370000202_e20212370009522_c20212370009576.nc
+```
+
+---
+
+### Output
+
+For each scan time listed in `flist.txt`, one IODA-v3 NetCDF file is generated. Example output:
+
+```
+OR_ABI-L1b-RadF-M6_G16_2021-08-25T00:00:20.2Z.nc4
+```
+
+---
+
+### Notes
+
+* **Currently, only bands 7–16 are processed.**
