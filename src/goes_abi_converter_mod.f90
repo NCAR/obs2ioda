@@ -125,7 +125,7 @@ contains
         call check(netcdfAddVar(ncid, 'solar_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
         call check(netcdfAddVar(ncid, 'sensor_zenith_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
         call check(netcdfAddVar(ncid, 'sensor_view_angle', NF90_REAL, 1, ['nlocs'], 'MetaData', fillValue=missing_r))
-        call check(netcdfAddVar(ncid, 'datetime', NF90_INT64, 1, ['nlocs'], 'MetaData', fillValue=missing_i))
+        call check(netcdfAddVar(ncid, 'dateTime', NF90_INT64, 1, ['nlocs'], 'MetaData'))
         call check(netcdfAddVar(ncid, 'sensor_channel', NF90_INT, 1, ['nchans'], 'MetaData', fillValue=missing_i))
 
         call transpose_and_flatten(bt_out, rtmp1d)
@@ -144,7 +144,7 @@ contains
         call check(netcdfPutVar(ncid, 'sensor_zenith_angle', sat_zen_out, 'MetaData'))
         call check(netcdfPutVar(ncid, 'sensor_view_angle', sat_zen_out, 'MetaData'))
         call check(netcdfPutVar(ncid, 'sensor_channel', (/7,8,9,10,11,12,13,14,15,16/), 'MetaData'))
-        call check(netcdfPutVar(ncid, 'datetime', datetime, 'MetaData'))
+        call check(netcdfPutVar(ncid, 'dateTime', datetime, 'MetaData'))
         call check(netcdfClose(ncid))
         deallocate(rtmp1d)
     end subroutine write_iodav3_netcdf
