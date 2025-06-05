@@ -984,8 +984,7 @@ end subroutine read_GRB
             end if
 
             iloc = iloc + 1
-            write(unit=datetime(iloc), fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a)')  &
-                  iyear, '-', imonth, '-', iday, 'T', ihour, ':', imin, ':', isec, 'Z'
+            call get_julian_time(iyear, imonth, iday, ihour, imin, isec, gstime, datetime(iloc))
 
             ! Super-ob BT for this channel
             do k = 1, nband
