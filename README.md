@@ -37,7 +37,6 @@ The `obs2ioda-v3` executable will reside in the `bin` directory within the build
 
 ### Running the Obs2Ioda Test Suite
 #### Running the Unit Test Suite
-1. **Run the unit test suite** using `ctest`. To see detailed output and the list of tests being executed, add the `--verbose` flag:
 1. **Run the unit test suite** using `ctest` from the `obs2ioda` build directory. To see detailed output and the list of tests being executed, add the `--verbose` flag:
    ```bash
    ctest --verbose
@@ -45,7 +44,7 @@ The `obs2ioda-v3` executable will reside in the `bin` directory within the build
    *(The `--verbose` flag is optional.)*
 
 #### Running the Validation Test Suite
-**Steps 1–2 are optional** if you already have a Python environment with `pytest`, `netcdf4`, and `requests` installed.
+**Steps 1–2 are optional** if you already have a Python environment with `pytest`, `netCDF4`, and `requests` installed.
 
 1. **Create and activate a virtual environment** in the `obs2ioda` root directory:
 
@@ -57,7 +56,7 @@ The `obs2ioda-v3` executable will reside in the `bin` directory within the build
 1. **Install required dependencies**:
 
    ```bash
-   pip install pytest netcdf4 requests
+   pip install pytest netCDF4 requests
    ```
 
 1. **Run the test suite** from the `obs2ioda` build directory. To display detailed output and see which tests are being run, use the `--verbose` flag:
