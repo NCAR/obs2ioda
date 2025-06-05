@@ -242,6 +242,8 @@ subroutine read_satwnd(filename, filedate)
          if ( lalodat(1) < r8bfms ) rlink % lat = lalodat(1)
          if ( lalodat(2) < r8bfms ) rlink % lon = lalodat(2)
 
+         if ( rlink % lon /= missing_r ) rlink % lon = mod(rlink % lon + 180.0, 360.0) - 180.0
+
          rlink % satid  = nint(infodat(1))  ! SAID satellite identifier
 
          rlink % obtype = 'satwnd'
