@@ -27,3 +27,18 @@ target_link_libraries(test_get_julian_time
 add_test(NAME test_get_julian_time
         COMMAND test_get_julian_time
 )
+
+set(test_float_comparison_SOURCES
+        float_comparison.test.f90
+)
+set(test_float_comparison_LIBRARY_DEPENDENCIES
+        v3
+)
+add_executable(test_float_comparison ${test_float_comparison_SOURCES})
+target_link_libraries(test_float_comparison
+        PRIVATE
+        ${test_float_comparison_LIBRARY_DEPENDENCIES}
+)
+add_test(NAME test_float_comparison
+        COMMAND test_float_comparison
+)
