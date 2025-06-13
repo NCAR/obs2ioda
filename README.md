@@ -207,7 +207,7 @@ gnssro_obs_YYYYMMDDHH.h5
 
 ## Converting Himawari Standard Data (HSD) FLDK files
 ```
-Usage: obs2ioda-v3 -i input_dir -ahi -t YYYYMMDDHHNN -s num_pixels_to_skip
+Usage: obs2ioda-v3 -i input_dir -ahi -t YYYYMMDDHHNN -s num_pixels_to_skip -superob half_width 
 ```
 
 Input files are a list of Himawari Standard Data, e.g. HS_H08_20200815_0000_B14_FLDK_R20_S0210.DAT in the input_dir.  
