@@ -207,12 +207,15 @@ gnssro_obs_YYYYMMDDHH.h5
 
 ## Converting Himawari Standard Data (HSD) FLDK files
 ```
-Usage: obs2ioda-v3 -i input_dir -ahi -t YYYYMMDDHHNN -s num_pixels_to_skip -superob half_width 
+Usage: obs2ioda-v3 -i input_dir -ahi -t YYYYMMDDHHNN -s num_pixels_to_skip [-superob half_width]
 ```
 
-Input files are a list of Himawari Standard Data, e.g. HS_H08_20200815_0000_B14_FLDK_R20_S0210.DAT in the input_dir.  
-Minute must be specified in the time (-t) option.  
-Number of pixels to skip must be specified in the (-s) option.
+* Input files are a list of Himawari Standard Data, e.g. HS_H08_20200815_0000_B14_FLDK_R20_S0210.DAT in the input_dir.  
+* Minute must be specified in the time (-t) option.  
+* Number of pixels to skip must be specified in the (-s) option.
+* By providing the optional -superob argument, the code enables superobbing for AHI observations. The superob_halfwidth parameter 
+sets the half-width of the superobbing grid. Based on this value, the code defines a grid box and calculates the average 
+brightness temperature within that box.
 
 ## Notes
 * The output prefix (before _obs) is defined in define_mod.f90
