@@ -261,7 +261,7 @@ real(r_double)  :: lon_sat, h_sat, r_eq
 integer(i_kind) :: nodivisionsegm = 1
 integer         :: superob_width ! Must be ≥ 0
 integer         :: first_boxcenter, last_boxcenter_x, last_boxcenter_y, box_bottom, box_upper, box_left, box_right
-integer         :: ibox, jbox, nkeep, ix, iy, tb, k
+integer         :: ibox, jbox, nkeep, ix, iy, k
 real(r_kind)    :: temp1 = 0.0
 ! end of declaration
 continue
@@ -530,7 +530,6 @@ do iband = 1, nband
          deallocate(header%navicorr%lineShift)
       end if
       close(iunit)
-
    end do
 end do
 
