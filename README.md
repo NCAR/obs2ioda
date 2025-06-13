@@ -7,8 +7,6 @@ Please make sure the following libraries are installed:
 - NetCDF
 - NCEP BUFR library. (Instructions for installing the NCEP BUFR library are provided in a subsequent section)
 
-If you have an environment preconfigured for `mpas-jedi`, simply source that environment prior to building `obs2ioda`.
-
 ### Build Instructions
 **If you are building `obs2ioda` on a platform other than Derecho, skip Step 2.**
 1. First, clone the repository into your preferred directory (`<OBS2IODA_ROOT_DIR>`):
