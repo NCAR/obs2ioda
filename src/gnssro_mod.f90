@@ -308,6 +308,8 @@ contains
                if (abs(azim) > 360._r_kind .or. azim < 0._r_kind) then
                   azim = r_missing
                endif
+               ! Make sure the range of longitude is between -180 and 180.
+               rlon = mod(rlon + 180.0, 360.0) - 180.0
                ! append data if values are in valid range
                if (good) then
                   ndata = ndata + 1 
