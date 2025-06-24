@@ -902,6 +902,10 @@ end subroutine read_GRB
            err_out(1:nband,iloc) = 1.0
         end do
      end do
+     call sat_zen_fnpy%init_from_2d("sat_zen.npy", sat_zen)
+     call sat_zen_fnpy%write()
+     call bt_fnpy%init_from_2d(".bt.npy", bt(1, :,:))
+     call bt_fnpy%write()
    end if
 
    ! Superobbing code is based on WRFDA's AHI superobbing code from https://github.com/wrf-model/WRF/blob/develop/var/da/da_radiance/da_read_obs_netcdf4ahi_jaxa.inc
