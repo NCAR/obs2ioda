@@ -1,0 +1,3 @@
+[submodule "external/fnpy"]
+	path = external/fnpy
+	url = https://github.com/amstokely/fnpy.git
