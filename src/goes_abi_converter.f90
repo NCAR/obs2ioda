@@ -904,7 +904,7 @@ end subroutine read_GRB
      end do
      call sat_zen_fnpy%init_from_2d("sat_zen.npy", sat_zen)
      call sat_zen_fnpy%write()
-     call bt_fnpy%init_from_2d(".bt.npy", bt(1, :,:))
+     call bt_fnpy%init_from_2d("bt.npy", bt(1, :,:))
      call bt_fnpy%write()
    end if
 
