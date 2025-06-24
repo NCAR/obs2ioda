@@ -786,6 +786,7 @@ end subroutine read_GRB
    use define_mod, only: i_kind, r_kind, missing_i, missing_r
    use kinds, only: i_llong, r_double
    use utils_mod, only: get_julian_time
+   use fnpy_mod, only: fnpy_t
    implicit none
 
    character(len=*),   intent(in) :: fname
@@ -822,6 +823,8 @@ end subroutine read_GRB
    character(len=nstring) :: ncname
    real(r_kind), allocatable :: rtmp1d(:)
    real(r_double) :: gstime
+   type(fnpy_t) :: sat_zen_fnpy
+   type(fnpy_t) :: bt_fnpy
 
    character(len=4) :: c4
 
@@ -923,6 +926,12 @@ end subroutine read_GRB
             nlocs = nlocs + 1
         end do lon_loop
       end do
+
+
+      call sat_zen_fnpy%init_from_2d("sat_zen.npy", sat_zen)
+      call sat_zen_fnpy%write()
+      call bt_fnpy%init_from_2d(".bt.npy", bt(1, :,:))
+      call bt_fnpy%write()
 
      write(0,*) 'nlocs = ', nlocs
      if ( nlocs <= 0 ) then
