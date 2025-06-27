@@ -6,6 +6,7 @@ set(v3_SOURCES
         define_mod.f90
         gnssro_mod.f90
         hsd.f90
+        hsd_cxx_i_mod.f90
         satwnd_mod.f90
         kinds.f90
         ncio_mod.f90

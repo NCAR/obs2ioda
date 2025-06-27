@@ -20,6 +20,7 @@ use define_mod, only: missing_r, missing_i, nstring, ndatetime, &
    nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, set_brit_obserr, strlen
 use ufo_vars_mod, only: ufo_vars_getindex
 use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
+use hsd_cxx_i_mod, only: calc_solar_zenith_angle
 use utils_mod, only: get_julian_time
 
 implicit none
@@ -224,6 +225,7 @@ real(r_double), parameter :: rad2deg = 180.0/pi
 contains
 
 subroutine read_HSD(ccyymmddhhnn, inpdir, do_superob, superob_halfwidth)
+use, intrinsic :: ieee_arithmetic
 
 implicit none
 
@@ -288,6 +290,7 @@ hh       = ccyymmddhhnn(9:10)
 nn       = ccyymmddhhnn(11:12)
 read(mm, '(i2)') imm  !month
 read(dd, '(i2)') idd  !day
+read(hh, '(i2)') ihh  !hour
 jday = 0
 do i = 1, imm - 1
    jday = jday + mmday(i)
@@ -478,11 +481,13 @@ do iband = 1, nband
                   valid(ipixel, iline) = .true.
                   latitude(ipixel, iline) = lat
                   longitude(ipixel, iline) = lon
-                  call calc_solar_zenith_angle( &
+                  solzen(ipixel, iline) = calc_solar_zenith_angle( &
                      latitude(ipixel, iline), &
                      longitude(ipixel, iline), &
-                     ihh, imm, jday, &
-                     solzen(ipixel, iline))
+                     ihh, imm, jday)
+                    if ( ieee_is_nan(solzen(ipixel, iline))) then
+                        call exit(1)
+                    end if
                   ! calculate geostationary satellite zenith angle
                   rlat = lat * deg2rad ! in radian
                   rlon = lon * deg2rad ! in radian
@@ -888,48 +893,6 @@ subroutine pixlin_to_lonlat(pix, lin, lon, lat, ierr)
 
  return
 end subroutine pixlin_to_lonlat
-
-subroutine calc_solar_zenith_angle(xlat, xlon, gmt, minute, julian, solzen)
-
-! the calulcation is adapted from subroutines radconst and calc_coszen in
-! WRF phys/module_radiation_driver.F
-
- implicit none
-
- real(r_single),  intent(in)    :: xlat, xlon
- integer(i_kind), intent(in)    :: gmt, minute, julian
- real(r_single),  intent(inout) :: solzen
-
- real(r_single) :: obliq = 23.5
- real(r_single) :: deg_per_day = 360.0/365.0
- real(r_single) :: slon   ! longitude of the sun
- real(r_single) :: declin ! declination of the sun
- real(r_single) :: hrang, da, eot, xt, tloctm, rlat
-
- ! initialize to missing values
- solzen = missing_r
-
- ! calculate longitude of the sun from vernal equinox
- if ( julian >= 80 ) slon = (julian - 80 ) * deg_per_day
- if ( julian <  80 ) slon = (julian + 285) * deg_per_day
-
- declin = asin(sin(obliq*deg2rad)*sin(slon*deg2rad)) ! in radian
-
- da = 6.2831853071795862*(julian-1)/365.
- eot = (0.000075+0.001868*cos(da)-0.032077*sin(da) &
-        -0.014615*cos(2.0*da)-0.04089*sin(2.0*da))*(229.18)
- xt = gmt + (minute + eot)/60.0
-
- if ( abs(xlon) > 360.0 .or. abs(xlat) > 90.0 ) return
- tloctm = xt + xlon/15.0
- hrang = 15.0*(tloctm-12.0) * deg2rad
- rlat = xlat * deg2rad
- solzen = acos( sin(rlat)*sin(declin) + &
-                cos(rlat)*cos(declin)*cos(hrang) )
- solzen = solzen * rad2deg
-
- return
-end subroutine calc_solar_zenith_angle
 
 subroutine hisd_radiance_to_tbb (radiance, tbb)
 
