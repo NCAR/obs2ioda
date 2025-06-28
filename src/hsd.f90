@@ -20,7 +20,7 @@ use define_mod, only: missing_r, missing_i, nstring, ndatetime, &
    nvar_info, name_var_info, type_var_info, nsen_info, type_sen_info, set_brit_obserr, strlen
 use ufo_vars_mod, only: ufo_vars_getindex
 use netcdf, only: nf90_float, nf90_int, nf90_char, nf90_int64
-use hsd_cxx_i_mod, only: calc_solar_zenith_angle
+use hsd_cxx_i_mod, only: calc_solar_zenith_angle, pixlin_to_lonlat
 use utils_mod, only: get_julian_time
 
 implicit none
@@ -265,6 +265,8 @@ integer         :: superob_width ! Must be ≥ 0
 integer         :: first_boxcenter, last_boxcenter_x, last_boxcenter_y, box_bottom, box_upper, box_left, box_right
 integer         :: ibox, jbox, nkeep, ix, iy, k
 real(r_kind)    :: temp1 = 0.0
+integer(i_kind) :: valid_pixel = 0
+
 ! end of declaration
 continue
 
@@ -476,8 +478,16 @@ do iband = 1, nband
 
             if ( abs(latitude(ipixel, iline)) > 90.0 .or. &
                  abs(longitude(ipixel, iline)) > 360.0 ) then
-               call pixlin_to_lonlat(ipixel, iline, lon, lat, ierr)
-               if ( ierr == 0 ) then
+!               call pixlin_to_lonlat(ipixel, iline, lon, lat)
+               call pixlin_to_lonlat(ipixel, iline, header%proj%subLon, header%proj%cfac, header%proj%lfac, header%proj%coff, header%proj%loff, &
+                       header%proj%satDis, header%proj%eqtrRadius, header%proj%polrRadius,                      &
+                       header%proj%projParam3, header%proj%projParamSd, &
+                       lon, lat, valid_pixel)
+                if ( ieee_is_nan(lon) .or. ieee_is_nan(lat) ) then
+                    call exit(1)
+               end if
+
+               if ( valid_pixel == 1 ) then
                   valid(ipixel, iline) = .true.
                   latitude(ipixel, iline) = lat
                   longitude(ipixel, iline) = lon
@@ -809,90 +819,6 @@ else
 end if ! if do_superob
 
 end subroutine read_HSD
-
-subroutine pixlin_to_lonlat(pix, lin, lon, lat, ierr)
-
- implicit none
-
- integer(i_kind), intent(in)  :: pix, lin
- real(r_double),  intent(out) :: lon, lat
- integer(i_kind), intent(out) :: ierr
-
- real(r_double) :: SCLUNIT = 2.0**(-16)
- real(r_double) :: x, y
- real(r_double) :: Sd, Sn, S1, S2, S3, Sxy
- real(r_double) :: c, l
-
- ! initialize
- lon = missing_r
- lat = missing_r
- ierr = 0
-
- ! pix, lin -> c, l
- c = float(pix)
- l = float(lin)
-
- ! intermediate coordinates (x,y)
- ! Global Specification 4.4.4 Scaling Function
- ! https://www.cgms-info.org/wp-content/uploads/2021/10/cgms-lrit-hrit-global-specification-(v2-8-of-30-oct-2013).pdf
- !    c = COFF + nint(x * 2^-16 * CFAC)
- !    l = LOFF + nint(y * 2^-16 * LFAC)
- ! The intermediate coordinates (x,y) are as follows :
- !    x = (c -COFF) / (2^-16 * CFAC)
- !    y = (l -LOFF) / (2^-16 * LFAC)
- !    SCLUNIT = 2^-16
- x = deg2rad * ( c - header%proj%coff) / ( SCLUNIT * header%proj%cfac)
- y = deg2rad * ( l - header%proj%loff) / ( SCLUNIT * header%proj%lfac)
-
- ! longtitude,latitude
- ! Global Specification 4.4.3.2
- ! The invers projection function is as follows :
- !   lon = arctan(S2/S1) + sub_lon
- !   lat = arctan( (Req^2/Rpol^2) * S3 / Sxy )
- !
- ! Thererin the variables S1,S2,S3,Sxy are as follows :
- !    S1  = Rs - Sn * cos(x) * cos(y)
- !    S2  = Sn * sin(x) * cos(y)
- !    S3  =-Sn * sin(y)
- !    Sxy = sqrt(S1^2 + S2^2)
- !    Sn  =(Rs * cos(x) * cos(y) - Sd ) /
- !         (cos(y) * cos(y) + (Req^2/Rpol^2) * sin(y) * sin(y))
- !    Sd  =sqrt( (Rs * cos(x) * cos(y))^2
- !               - ( cos(y) * cos(y) + (Req^2/Rpol^2) * sin(y) * sin(y) )
- !               * (Rs^2 - Req^2)
- ! The variables Rs,Rpol,Req,(Req^2/Rpol^2),(Rs^2 - Req^2) are as follows :
- !    Rs  : distance from Earth center to satellite= head->proj->satDis
- !    Rpol: polar radius of the Earth              = head->proj->polrRadius
- !    Req : equator raidus of the Earth            = head->proj->eqtrRadius
- !    (Req^2/Rpol^2)                               = head->proj->projParam3
- !    (Rs^2 - Req^2)                               = head->proj->projParamSd
- Sd = (header%proj%satDis * cos(x) * cos(y)) * &
-      (header%proj%satDis * cos(x) * cos(y)) - &
-      (cos(y) * cos(y) + header%proj%projParam3 * sin(y) * sin(y)) * &
-       header%proj%projParamSd
- if ( Sd < 0 ) then
-    !write(*,*) 'Error in Sd'
-    ierr = -1
-    return
- else
-    Sd = sqrt(Sd)
- end if
- Sn = (header%proj%satDis * cos(x) * cos(y) -Sd) / &
-      (cos(y) * cos(y) + header%proj%projParam3 * sin(y) * sin(y))
- S1 = header%proj%satDis - (Sn * cos(x) * cos(y))
- S2 = Sn * sin(x) * cos(y)
- S3 =-Sn * sin(y)
- Sxy=sqrt( S1 * S1 + S2 * S2)
-
- lon = rad2deg * atan2(S2,S1) + header%proj%subLon
- lat = rad2deg * atan(header%proj%projParam3 * S3 / Sxy)
-
- ! check longtitude
- if ( lon >  180.0 ) lon = lon - 360.0
- if ( lon < -180.0 ) lon = lon + 360.0
-
- return
-end subroutine pixlin_to_lonlat
 
 subroutine hisd_radiance_to_tbb (radiance, tbb)
 
