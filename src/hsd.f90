@@ -288,6 +288,7 @@ hh       = ccyymmddhhnn(9:10)
 nn       = ccyymmddhhnn(11:12)
 read(mm, '(i2)') imm  !month
 read(dd, '(i2)') idd  !day
+read(hh, '(i2)') ihh  !hour
 jday = 0
 do i = 1, imm - 1
    jday = jday + mmday(i)
