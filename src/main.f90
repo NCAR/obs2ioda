@@ -3,7 +3,7 @@ program obs2ioda
 use define_mod, only: write_nc_conv, write_nc_radiance, write_nc_radiance_geo, StrLen, xdata, &
    ninst, output_info_type, set_output_info
 use kinds, only: i_kind
-use prepbufr_mod, only: read_prepbufr, sort_obs_conv, filter_obs_conv, do_tv_to_ts
+use prepbufr_mod, only: read_prepbufr, sort_obs_conv, filter_obs_conv, do_tv_to_ts, report_conv
 use radiance_mod, only: read_amsua_amsub_mhs, read_airs_colocate_amsua, sort_obs_radiance, &
    read_iasi, read_cris, radiance_to_temperature
 use ncio_mod, only: write_obs
@@ -57,6 +57,7 @@ integer(i_kind)         :: itime
 integer(i_kind)         :: superob_halfwidth
 character (len=DateLen14) :: dtime, datetmp
 type(output_info_type) :: file_output_info
+type(report_conv), pointer :: phead=>null()
 
 
 do_tv_to_ts = .true.
@@ -130,16 +131,17 @@ do ifile = 1, nfile
       if ( .not. fexist ) then
          write(*,*) 'Warning: ', trim(inpdir)//trim(filename), ' not found for decoding...'
       else
+
          ! read prepbufr file and store data in sequential linked list for conv obs
-         call read_prepbufr(trim(inpdir)//trim(filename), filedate)
+         call read_prepbufr(phead, trim(inpdir)//trim(filename), filedate)
 
          if ( apply_gsi_qc ) then
             write(*,*) '--- applying some additional QC as in GSI read_prepbufr.f90 for the global model ---'
-            call filter_obs_conv
+            call filter_obs_conv(phead)
          end if
 
          ! transfer info from limked list to arrays grouped by obs/variable types
-         call sort_obs_conv(filedate, nfgat)
+         call sort_obs_conv(phead, filedate, nfgat)
 
          ! write out netcdf files
          if ( nfgat > 1 ) then

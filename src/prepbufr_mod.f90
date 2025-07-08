@@ -17,6 +17,7 @@ public  :: read_prepbufr
 public  :: sort_obs_conv
 public  :: filter_obs_conv
 public  :: do_tv_to_ts
+public :: report_conv
 
 ! variables for storing data
 type field_type
@@ -75,7 +76,6 @@ type report_conv
      procedure :: init => init_report
 end type report_conv
 
-type(report_conv), pointer :: phead=>null(), plink=>null()
 
 integer(i_kind), parameter :: lim_qm = 4
 logical :: do_tv_to_ts
@@ -85,12 +85,15 @@ contains
 
 !--------------------------------------------------------------
 
-subroutine read_prepbufr(filename, filedate)
+subroutine read_prepbufr(phead, filename, filedate)
 
    implicit none
 
+   type(report_conv), pointer, intent(inout) :: phead
    character (len=*),  intent(in)  :: filename
    character (len=10), intent(out) :: filedate  ! ccyymmddhh
+
+   type(report_conv), pointer :: plink=>null()  ! pointer to the current report
 
    real(r_kind), parameter  :: r8bfms = 9.0E08  ! threshold to check for BUFR missing value
 
@@ -657,12 +660,14 @@ end subroutine read_prepbufr
 
 !--------------------------------------------------------------
 
-subroutine sort_obs_conv(filedate, nfgat)
+subroutine sort_obs_conv(phead, filedate, nfgat)
 
    implicit none
 
    character(len=*), intent(in) :: filedate
    integer(i_kind),  intent(in) :: nfgat
+   type(report_conv), pointer, intent(inout) :: phead
+   type(report_conv), pointer :: plink=>null()
 
    integer(i_kind)                       :: i, iv, k, ii
    integer(i_kind)                       :: ityp, irec, ivar, itim
@@ -895,7 +900,7 @@ end subroutine sort_obs_conv
 
 !--------------------------------------------------------------
 
-subroutine filter_obs_conv
+subroutine filter_obs_conv(phead)
 
 ! refer to GSI/read_prepbufr.f90
 !
@@ -903,6 +908,10 @@ subroutine filter_obs_conv
 ! to do: come up with a better way to handle iuse
 
    implicit none
+
+   type(report_conv), pointer, intent(inout) :: phead
+   type(report_conv), pointer :: plink=>null()
+
 
    logical         :: adjust_obserr
    integer(i_kind) :: zqm
