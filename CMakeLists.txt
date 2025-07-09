@@ -1,7 +1,6 @@
 # Check CMake version
 cmake_minimum_required(VERSION 3.10)
 
-include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_Functions.cmake")
 enable_testing()
 include(FetchContent)
 # Define the project
@@ -17,13 +16,7 @@ set(OBS2IODA_MODULE_DIR ${PROJECT_NAME}/module/${CMAKE_Fortran_COMPILER_ID}/${CM
 install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/${OBS2IODA_MODULE_DIR}/)
 
 
-# Set the Fortran compiler and flags
-set(NCEP_BUFR_LIB CACHE STRING "" )
-set(BUILD_GOES_ABI_CONVERTER OFF CACHE BOOL "Build the GOES ABI converter")
-
-# Find required packages
-find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
+find_package(NetCDF REQUIRED COMPONENTS CXX C)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/config")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src")
-add_subdirectory("${CMAKE_SOURCE_DIR}/test")
