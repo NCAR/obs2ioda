@@ -1,0 +1,47 @@
+module test_f_c_string_array_t_mod
+    use iso_c_binding, only : c_ptr, c_associated
+    use funit
+    use f_c_string_array_t_mod, only : f_c_string_array_t, check_f_c_string_array
+    implicit none
+
+    !> @brief C interface for checking if the first string in the array is "abc".
+    interface
+        function str_array_equals_abc(c_string_array) bind(C, name = "str_array_equals_abc")
+            import :: c_ptr
+            type(c_ptr), value :: c_string_array
+            integer :: str_array_equals_abc
+        end function str_array_equals_abc
+
+        !> @brief C interface for checking if the string array is ["abc", "def", "ghi"].
+        function str_array_equals_abc_def_ghi(c_string_array) bind(C, name = "str_array_equals_abc_def_ghi")
+            import :: c_ptr
+            type(c_ptr), value :: c_string_array
+            integer :: str_array_equals_abc_def_ghi
+        end function str_array_equals_abc_def_ghi
+    end interface
+contains
+
+    @test
+    subroutine test_single_string_array()
+        type(f_c_string_array_t) :: abc, abc_def_ghi
+        integer :: status
+        abc = f_c_string_array_t(["abc"])
+        status = abc%to_c()
+        @assertEqual(status, 0, "Failed to transfer string array from Fortran to C.")
+        status = str_array_equals_abc(abc%get_c_string_array())
+        @assertEqual(status, 0, "C string array does not equal '[abc]'.")
+
+    end subroutine test_single_string_array
+
+    @test
+    subroutine test_multiple_string_array()
+        type(f_c_string_array_t) :: abc_def_ghi
+        integer :: status
+        abc_def_ghi = f_c_string_array_t(["abc", "def", "ghi"])
+        status = abc_def_ghi%to_c()
+        @assertEqual(status, 0, "Failed to transfer string array from Fortran to C.")
+        status = str_array_equals_abc_def_ghi(check_f_c_string_array(abc_def_ghi%get_c_string_array()))
+        @assertEqual(status, 0, "C string array does not equal '[abc, def, ghi]'.")
+    end subroutine test_multiple_string_array
+
+end module test_f_c_string_array_t_mod

@@ -1,0 +1,137 @@
+module test_netcdf_dimension_mod
+    use funit
+    use iso_c_binding, only : c_int
+    use netcdf_cxx_mod
+    use netcdf_test_utils_mod
+    implicit none
+
+    @TestCase
+    type, extends(TestCase) :: test_netcdf_dimension
+        character(len=256) :: add_dimension_filename
+        character(len=256) :: add_dimension_to_group_filename
+        character(len=256) :: add_dimension_to_null_group_filename
+        character(len=256) :: add_dimension_to_nested_group_filename
+        character(len=256), dimension(4) :: test_filenames
+    contains
+        procedure :: setUp
+        procedure :: tearDown
+    end type test_netcdf_dimension
+
+contains
+
+    subroutine setUp(this)
+        class(test_netcdf_dimension), intent(inout) :: this
+        this%add_dimension_filename = "add_dimension.nc4"
+        this%test_filenames(1) = this%add_dimension_filename
+
+        this%add_dimension_to_group_filename = "add_dimension_to_group.nc4"
+        this%test_filenames(2) = this%add_dimension_to_group_filename
+
+        this%add_dimension_to_null_group_filename = "add_dimension_to_null_group.nc4"
+        this%test_filenames(3) = this%add_dimension_to_null_group_filename
+
+        this%add_dimension_to_nested_group_filename = "add_dimension_to_nested_group.nc4"
+        this%test_filenames(4) = this%add_dimension_to_nested_group_filename
+    end subroutine setUp
+
+    subroutine tearDown(this)
+        class(test_netcdf_dimension), intent(inout) :: this
+        integer :: i
+        do i = 1, size(this%test_filenames)
+            call delete_file(this%test_filenames(i))
+        end do
+    end subroutine tearDown
+
+    @Test
+    subroutine test_add_dimension(this)
+        class(test_netcdf_dimension), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        integer(c_int) :: fileMode, dimID
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        status = netcdfCreate(this%add_dimension_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID)
+        @assertEqual(0, status, message="Failed to add dimension to NetCDF file.")
+        @assertEqual(1, dimID, message="Dimension ID should be greater than or equal to 0, instead")
+
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_dimension
+
+    @Test
+    subroutine test_add_dimension_to_group(this)
+        class(test_netcdf_dimension), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: dimensionName = "dimension"
+        character(len=20) :: groupName = "group"
+        integer(c_int) :: dimensionLength = 10_c_int
+        integer(c_int) :: fileMode, dimID
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        status = netcdfCreate(this%add_dimension_to_group_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, groupName)
+        @assertEqual(0, status, message="Failed to add group to NetCDF file.")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID, groupName)
+        @assertEqual(0, status, message="Failed to add dimension to group in NetCDF file.")
+        @assertEqual(1, dimID, message="Dimension ID should be greater than or equal to 0, instead")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_dimension_to_group
+
+    @Test
+    subroutine test_add_dimension_to_null_group(this)
+        class(test_netcdf_dimension), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: dimensionName = "dimension"
+        character(len=20) :: groupName = "group"
+        integer(c_int) :: dimensionLength = 10_c_int
+        integer(c_int) :: fileMode, dimID
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        status = netcdfCreate(this%add_dimension_to_null_group_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID, groupName)
+        @assertEqual(-33, status, message="Adding dimension to a null group should fail with an error code of -33.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_dimension_to_null_group
+
+    @Test
+    subroutine test_add_dimension_to_nested_group(this)
+        class(test_netcdf_dimension), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: dimensionName = "dimension"
+        character(len=20) :: parentGroupName = "parentGroup"
+        character(len=20) :: childGroupName = "childGroup"
+        integer(c_int) :: dimensionLength = 10_c_int
+        integer(c_int) :: fileMode, dimID
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        status = netcdfCreate(this%add_dimension_to_null_group_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, parentGroupName)
+        @assertEqual(0, status, message="Failed to add parent group to NetCDF file.")
+        status = netcdfAddGroup(netcdfID, childGroupName, parentGroupName)
+        @assertEqual(0, status, message="Failed to add child group to parent group in NetCDF file.")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID, childGroupName)
+        @assertEqual(-33, status, message="Adding dimensions to nested groups is not supported and should fail with a -33 error code.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_dimension_to_nested_group
+end module test_netcdf_dimension_mod

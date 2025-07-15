@@ -1,0 +1,86 @@
+module test_calc_solar_zenith_angle_mod
+    use funit
+    implicit none
+contains
+    ! Test that solar zenith angle is ~0° at equator on equinox at noon
+    @test
+    subroutine test_equator_noon()
+        use ieee_arithmetic, only : ieee_is_nan
+        use ahi_HSD_mod, only : calc_solar_zenith_angle
+        use kinds, only : r_single
+        implicit none
+        integer :: status
+
+        real(r_single) :: solzen, expected
+        real(r_single), parameter :: tol = 3.0_r_single
+
+        call calc_solar_zenith_angle(0.0, 0.0, 12, 0, 79, solzen)
+        expected = 0.0
+        @assertEqual(expected, solzen, tolerance=tol, message="Solar zenith angle at equator at noon should be ~0°")
+        call calc_solar_zenith_angle(0.0, 0.0, 12, 0, 80, solzen)
+        @assertEqual(expected, solzen, tolerance=tol, message="Solar zenith angle at equator at noon should be ~0°")
+    end subroutine test_equator_noon
+
+    ! Test that invalid hour input returns NaN
+    @test
+    subroutine test_invalid_hour()
+        use ieee_arithmetic, only : ieee_is_nan
+        use ahi_HSD_mod, only : calc_solar_zenith_angle
+        use kinds, only : r_single
+        implicit none
+
+        integer :: status
+        real(r_single) :: solzen
+
+        call calc_solar_zenith_angle(0.0, 0.0, 25, 0, 80, solzen)
+        @assertTrue(ieee_is_nan(solzen), message="Solar zenith angle should be NaN for invalid hour input")
+    end subroutine test_invalid_hour
+
+    ! Test that invalid minute input returns NaN
+    @test
+    subroutine test_invalid_minute()
+        use ieee_arithmetic, only : ieee_is_nan
+        use ahi_HSD_mod, only : calc_solar_zenith_angle
+        use kinds, only : r_single
+        implicit none
+
+        integer :: status
+        real(r_single) :: solzen
+
+        call calc_solar_zenith_angle(0.0, 0.0, 0, 61, 80, solzen)
+        @assertTrue(ieee_is_nan(solzen), message="Solar zenith angle should be NaN for invalid minute input")
+    end subroutine test_invalid_minute
+
+    ! Test that invalid Julian day input returns NaN
+    @test
+    subroutine test_invalid_day()
+        use ieee_arithmetic, only : ieee_is_nan
+        use ahi_HSD_mod, only : calc_solar_zenith_angle
+        use kinds, only : r_single
+        implicit none
+
+        integer :: status
+        real(r_single) :: solzen
+
+        call calc_solar_zenith_angle(0.0, 0.0, 0, 0, 367, solzen)
+        @assertTrue(ieee_is_nan(solzen), message="Solar zenith angle should be NaN for invalid Julian day input")
+    end subroutine test_invalid_day
+
+    ! Test symmetry of solar zenith angle before and after noon
+    @test
+    subroutine test_symmetric_noon()
+        use ieee_arithmetic, only : ieee_is_nan
+        use ahi_HSD_mod, only : calc_solar_zenith_angle
+        use kinds, only : r_single
+        implicit none
+
+        integer :: status
+        real(r_single), parameter :: tol = 3.0_r_single
+        real(r_single) :: angle1, angle2
+
+        call calc_solar_zenith_angle(0.0, 0.0, 11, 8, 80, angle1)
+        call calc_solar_zenith_angle(0.0, 0.0, 13, 8, 79, angle2)
+        @assertEqual(angle1, angle2, tolerance=tol, message="Solar zenith angle should be symmetric before and after noon")
+    end subroutine test_symmetric_noon
+
+end module test_calc_solar_zenith_angle_mod

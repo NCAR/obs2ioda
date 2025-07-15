@@ -1,0 +1,97 @@
+module test_netcdf_group_mod
+    use funit
+    use iso_c_binding, only : c_int
+    use netcdf_cxx_mod
+    use netcdf_test_utils_mod
+    implicit none
+
+    @TestCase
+    type, extends(TestCase) :: test_netcdf_group
+        character(len=256) :: add_group_filename
+        character(len=256) :: add_nested_group_filename
+        character(len=256) :: add_child_group_to_null_parent_group_filename
+        character(len=256), dimension(3) :: test_filenames
+    contains
+        procedure :: setUp
+        procedure :: tearDown
+    end type test_netcdf_group
+
+contains
+
+    subroutine setUp(this)
+        class(test_netcdf_group), intent(inout) :: this
+        this%add_group_filename = "add_group.nc4"
+        this%test_filenames(1) = this%add_group_filename
+
+        this%add_nested_group_filename = "add_nested_group.nc4"
+        this%test_filenames(2) = this%add_nested_group_filename
+
+        this%add_child_group_to_null_parent_group_filename = "add_child_group_to_null_parent_group.nc4"
+        this%test_filenames(3) = this%add_child_group_to_null_parent_group_filename
+    end subroutine setUp
+
+    subroutine tearDown(this)
+        class(test_netcdf_group), intent(inout) :: this
+        integer :: i
+        do i = 1, size(this%test_filenames)
+            call delete_file(this%test_filenames(i))
+        end do
+    end subroutine tearDown
+
+    @Test
+    subroutine test_add_group(this)
+        class(test_netcdf_group), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: groupName = "group"
+
+        netcdfID = -1
+        status = netcdfCreate(this%add_group_filename, netcdfID, 2_c_int)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, groupName)
+        @assertEqual(0, status, message="Failed to add group to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_group
+
+    @Test
+    subroutine test_add_nested_group(this)
+        class(test_netcdf_group), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: parentGroupName = "parent_group"
+        character(len=20) :: childGroupName = "child_group"
+
+        netcdfID = -1
+        status = netcdfCreate(this%add_nested_group_filename, netcdfID, 2_c_int)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, parentGroupName)
+        @assertEqual(0, status, message="Failed to add group to NetCDF file.")
+        ! Add a child group to the parent group
+        status = netcdfAddGroup(netcdfID, childGroupName, parentGroupName)
+        @assertEqual(0, status, message="Failed to add child group to parent group in NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_nested_group
+
+    @Test
+    subroutine test_add_add_child_group_to_null_parent_group(this)
+        class(test_netcdf_group), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len=20) :: parentGroupName = "parent_group"
+        character(len=20) :: childGroupName = "child_group"
+
+        netcdfID = -1
+        status = netcdfCreate(this%add_nested_group_filename, netcdfID, 2_c_int)
+        @assertEqual(0, status, message="Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+        ! Attempt to add a child group to a null parent group
+        status = netcdfAddGroup(netcdfID, childGroupName, parentGroupName)
+        @assertEqual(-1, status, message="Status should be -1 when adding a child group to a non-existent parent group.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_add_add_child_group_to_null_parent_group
+end module test_netcdf_group_mod

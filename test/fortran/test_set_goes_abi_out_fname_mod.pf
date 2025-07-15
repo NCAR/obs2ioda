@@ -1,0 +1,47 @@
+module test_set_goes_abi_out_fname_mod
+    use goes_abi_converter_mod, only : set_goes_abi_out_fname
+    use funit
+    implicit none
+
+contains
+    @test
+    subroutine test_set_goes_abi_out_fname_regular_satellite()
+        character(len = 256) :: fname
+        character(len = 10) :: sat_id
+        character(len = 22) :: time_start
+        character(len = 256) :: expected_fname
+
+        ! Test 1 - Regular satellite ID and start time
+        sat_id = "G16"
+        time_start = "2018-04-15T00:00:41.9Z"
+        expected_fname = "abi_g16_obs_2018041500_00.h5"
+        call set_goes_abi_out_fname(fname, sat_id, time_start)
+        @assertEqual(expected_fname, fname, message = "Filename mismatch for regular satellite ID and start time")
+    end subroutine
+
+    @test
+    subroutine test_set_goes_abi_out_fname_regular_satellite_different_minutes()
+        character(len = 256) :: fname
+        character(len = 10) :: sat_id
+        character(len = 22) :: time_start
+        character(len = 256) :: expected_fname
+        sat_id = "G16"
+        time_start = "2018-04-15T00:15:41.9Z"
+        expected_fname = "abi_g16_obs_2018041500_15.h5"
+        call set_goes_abi_out_fname(fname, sat_id, time_start)
+        @assertEqual(expected_fname, fname, message = "Filename mismatch for regular satellite ID and start time with different minutes")
+    end subroutine
+
+    @test
+    subroutine test_set_goes_abi_out_fname_different_satellite()
+        character(len = 256) :: fname
+        character(len = 10) :: sat_id
+        character(len = 22) :: time_start
+        character(len = 256) :: expected_fname
+        sat_id = "G6"
+        time_start = "2018-04-15T00:15:41.9Z"
+        expected_fname = "abi_g6_obs_2018041500_15.h5"
+        call set_goes_abi_out_fname(fname, sat_id, time_start)
+        @assertEqual(expected_fname, fname, message = "Filename mismatch for different satellite ID")
+    end subroutine
+end module test_set_goes_abi_out_fname_mod

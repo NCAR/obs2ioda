@@ -1,0 +1,28 @@
+module test_to_lower_mod
+    use funit
+    implicit none
+contains
+    @test
+    subroutine test_to_lower_alphabetic()
+        use utils_mod, only : to_lower
+        implicit none
+        character(len = 100) :: input_str, output_str, expected
+        input_str = "HELLO WORLD"
+        expected = "hello world"
+        output_str = to_lower(input_str)
+
+        @assertEqual(output_str, expected, "To lower case conversion failed for alphabetic input")
+    end subroutine test_to_lower_alphabetic
+
+    @test
+    subroutine test_to_lower_alphanumeric()
+        use utils_mod, only : to_lower
+        implicit none
+        character(len = 100) :: input_str, output_str, expected
+        input_str = "Test123"
+        expected = "test123"
+        output_str = to_lower(input_str)
+        @assertEqual(output_str, expected, "To lower case conversion failed for alphanumeric input")
+
+    end subroutine
+end module test_to_lower_mod

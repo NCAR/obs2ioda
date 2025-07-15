@@ -3,7 +3,7 @@ module netcdf_cxx_mod
     use f_c_string_t_mod, only: f_c_string_t, check_f_c_string
     use f_c_string_array_t_mod, only: f_c_string_array_t, check_f_c_string_array
     use netcdf_cxx_i_mod, only: c_netcdfCreate, c_netcdfClose, c_netcdfAddGroup, c_netcdfAddDim, &
-            c_netcdfAddVar, c_netcdfPutVarInt, c_netcdfPutVarInt64, c_netcdfPutVarReal, c_netcdfPutVarDouble, c_netcdfPutVarChar, &
+            c_netcdfAddVar, c_netcdfPutVarInt, c_netcdfPutVarInt64, c_netcdfPutVarReal, c_netcdfPutVarDouble, c_netcdfPutVarString, &
             c_netcdfSetFillInt, c_netcdfSetFillInt64, c_netcdfSetFillReal, c_netcdfSetFillString, &
             c_netcdfPutAttInt, c_netcdfPutAttString, c_netcdfPutAttIntArray, c_netcdfPutAttRealArray
     implicit none
@@ -289,7 +289,7 @@ contains
             f_c_string_array_values = f_c_string_array_t(values)
             status = check_f_c_string_array(f_c_string_array_values%to_c())
             c_values = check_f_c_string_array(f_c_string_array_values%get_c_string_array())
-            netcdfPutVar = c_netcdfPutVarChar(netcdfID, c_groupName, &
+            netcdfPutVar = c_netcdfPutVarString(netcdfID, c_groupName, &
                     c_varName, c_values)
         class default
             netcdfPutVar = -2

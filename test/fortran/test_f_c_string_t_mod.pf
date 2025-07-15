@@ -1,0 +1,48 @@
+module test_f_c_string_t_mod
+    use iso_c_binding, only : c_ptr, c_associated
+    use f_c_string_t_mod
+    use funit
+    implicit none
+
+    !> @brief C interface to a function that checks if a C string equals "abc".
+    interface
+        function str_equals_abc(c_string) bind(C, name = "str_equals_abc")
+            import :: c_ptr
+            type(c_ptr), value :: c_string
+            integer :: f_c_string_cpp_test
+        end function str_equals_abc
+
+        !> @brief C interface to a function that checks if a C string equals "abc def".
+        function str_equals_abc_space_def(c_string) bind(C, name = "str_equals_abc_space_def")
+            import :: c_ptr
+            type(c_ptr), value :: c_string
+            integer :: f_c_string_cpp_test
+        end function str_equals_abc_space_def
+    end interface
+contains
+
+    @test
+    subroutine test_f_c_string_t_no_spaces()
+        type(f_c_string_t) :: abc
+        integer :: status
+
+        !> @test Convert "abc" to C string and verify with C++ side
+        abc = f_c_string_t("abc")
+        status = abc%to_c()
+        @assertEqual(0, status, message = "To C conversion failed for 'abc'")
+        status = str_equals_abc(abc%get_c_string())
+        @assertEqual(0, status, message = "C string should equal 'abc' after conversion")
+    end subroutine
+
+    @test
+    subroutine test_f_c_string_t_with_spaces()
+        type(f_c_string_t) ::abc_def
+        integer :: status
+        !> @test Convert "abc def" to C string and verify with C++ side
+        abc_def = f_c_string_t("abc def")
+        status = abc_def%to_c()
+        @assertEqual(0, status, message = "To C conversion failed for 'abc def'")
+        status = str_equals_abc_space_def(abc_def%get_c_string())
+        @assertEqual(0, status, message = "C string should equal 'abc def' after conversion")
+    end subroutine
+end module test_f_c_string_t_mod

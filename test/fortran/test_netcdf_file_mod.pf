@@ -1,0 +1,78 @@
+module test_netcdf_file_mod
+    use funit
+    use iso_c_binding, only : c_int
+    use netcdf_cxx_mod
+    use netcdf_test_utils_mod
+    implicit none
+
+    @TestCase
+    type, extends(TestCase) :: test_netcdf_file
+        character(len=256) :: create_file_filename
+        character(len=256) :: create_read_only_file_filename
+        character(len=256), dimension(2) :: test_filenames
+    contains
+        procedure :: setUp
+        procedure :: tearDown
+    end type test_netcdf_file
+
+contains
+
+    subroutine setUp(this)
+        class(test_netcdf_file), intent(inout) :: this
+        this%create_file_filename = "create_file.nc4"
+        this%test_filenames(1) = this%create_file_filename
+
+        this%create_read_only_file_filename = "create_read_only_file.nc4"
+        this%test_filenames(2) = this%create_read_only_file_filename
+    end subroutine setUp
+
+    subroutine tearDown(this)
+        class(test_netcdf_file), intent(inout) :: this
+        integer :: i
+        do i = 1, size(this%test_filenames)
+            call delete_file(this%test_filenames(i))
+        end do
+    end subroutine tearDown
+
+    @Test
+    subroutine test_create_file(this)
+        class(test_netcdf_file), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+
+        netcdfID = -1
+        status = netcdfCreate(this%create_file_filename, netcdfID, 2_c_int)
+        @assertEqual(0, status, message="Failed to create NetCDF file")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file")
+    end subroutine test_create_file
+
+    @Test
+    subroutine test_create_read_only_file(this)
+        class(test_netcdf_file), intent(inout) :: this
+        integer(c_int) :: status, netcdfID
+        character(len=20) :: groupName = "group"
+
+        ! Step 1: Create and close a file
+        netcdfID = -1
+        status = netcdfCreate(this%create_read_only_file_filename, netcdfID, 2_c_int)
+        @assertEqual(0, status)
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status)
+
+        ! Step 2: Reopen file in read-only mode
+        status = netcdfCreate(this%create_read_only_file_filename, netcdfID, 0_c_int)
+        @assertEqual(status, 0, message="Failed to open file in read-only mode")
+        @assertTrue(netcdfID >= 0, message="NetCDF ID should be greater than or equal to 0")
+
+        ! Step 3: Try to write (should fail)
+        status = netcdfAddGroup(netcdfID, groupName)
+        @assertEqual(status, -37, message="Write operation should fail in read-only mode")
+
+        ! Step 4: Cleanly close the file
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message="Failed to close NetCDF file.")
+    end subroutine test_create_read_only_file
+end module test_netcdf_file_mod

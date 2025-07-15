@@ -1,0 +1,237 @@
+module test_netcdf_variable_mod
+    use funit
+    use iso_c_binding, only : c_int
+    use netcdf_cxx_mod
+    use netcdf_test_utils_mod
+    use netcdf, only : nf90_int, nf90_string, nf90_char
+    implicit none
+
+    @TestCase
+    type, extends(TestCase) :: test_netcdf_variable
+        character(len = 256) :: add_global_variable_filename
+        character(len = 256) :: add_duplicate_variable_filename
+        character(len = 256) :: add_variable_with_null_dimension_filename
+        character(len = 256) :: add_variable_to_group_filename
+        character(len = 256) :: add_variable_with_fill_value_filename
+        character(len = 256) :: write_data_to_int_variable
+        integer :: num_tests = 6
+        character(len = 256), dimension(:), allocatable :: test_filenames
+    contains
+        procedure :: setUp
+        procedure :: tearDown
+    end type test_netcdf_variable
+
+contains
+
+    subroutine setUp(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        allocate(this%test_filenames(this%num_tests))
+
+        this%add_global_variable_filename = "add_global_variable.nc4"
+        this%test_filenames(1) = this%add_global_variable_filename
+
+        this%add_duplicate_variable_filename = "add_duplicate_variable.nc4"
+        this%test_filenames(2) = this%add_duplicate_variable_filename
+
+        this%add_variable_with_null_dimension_filename = "add_variable_with_null_dimension.nc4"
+        this%test_filenames(3) = this%add_variable_with_null_dimension_filename
+
+        this%add_variable_to_group_filename = "add_variable_to_group.nc4"
+        this%test_filenames(4) = this%add_variable_to_group_filename
+
+        this%add_variable_with_fill_value_filename = "add_variable_with_fill_value.nc4"
+        this%test_filenames(5) = this%add_variable_with_fill_value_filename
+
+        this%write_data_to_int_variable = "write_data_to_int_variable.nc4"
+        this%test_filenames(6) = this%write_data_to_int_variable
+    end subroutine setUp
+
+    subroutine tearDown(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer :: i
+        do i = 1, size(this%test_filenames)
+            call delete_file(this%test_filenames(i))
+        end do
+    end subroutine tearDown
+
+    @Test
+    subroutine test_add_global_variable(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        character(len = 20) :: variableName = "variable"
+        integer :: netcdfDataType = nf90_int
+        integer(c_int) :: fileMode, dimID, numDims
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        numDims = 1_c_int
+        status = netcdfCreate(this%add_global_variable_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID)
+        @assertEqual(0, status, message = "Failed to add dimension to NetCDF file.")
+        @assertEqual(1, dimID, message = "Dimension ID should be greater than or equal to 0, instead")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName])
+        @assertEqual(0, status, message = "Failed to add variable to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_global_variable
+
+    @Test
+    subroutine test_add_duplicate_variable(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        character(len = 20) :: variableName = "variable"
+        integer :: netcdfDataType = nf90_int
+        integer(c_int) :: fileMode, dimID, numDims
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        numDims = 1_c_int
+        status = netcdfCreate(this%add_duplicate_variable_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID)
+        @assertEqual(0, status, message = "Failed to add dimension to NetCDF file.")
+        @assertEqual(1, dimID, message = "Dimension ID should be greater than or equal to 0, instead")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName])
+        @assertEqual(0, status, message = "Failed to add variable to NetCDF file.")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName])
+        @assertEqual(-42, status, message = "Adding a duplicate variable should fail with an error code of -42.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_duplicate_variable
+
+    @Test
+    subroutine test_add_variable_with_null_dimension(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        character(len = 20) :: variableName = "variable"
+        integer :: netcdfDataType = nf90_int
+        integer(c_int) :: fileMode, dimID, numDims
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        numDims = 1_c_int
+        status = netcdfCreate(this%add_variable_with_null_dimension_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName])
+        @assertEqual(-1, status, message = "Adding a variable with a null dimension should fail with an error code of -1.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_variable_with_null_dimension
+
+    @Test
+    subroutine test_add_variable_to_group(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        character(len = 20) :: variableName = "variable"
+        character(len = 20) :: groupName = "group"
+        integer :: netcdfDataType = nf90_int
+        integer(c_int) :: fileMode, dimID, numDims
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        numDims = 1_c_int
+        status = netcdfCreate(this%add_variable_to_group_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, groupName)
+        @assertEqual(0, status, message = "Failed to add group to NetCDF file.")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID)
+        @assertEqual(0, status, message = "Failed to add dimension to NetCDF file.")
+        @assertEqual(1, dimID, message = "Dimension ID should be greater than or equal to 0, instead")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName], groupName = groupName)
+        @assertEqual(0, status, message = "Failed to add variable to group in NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_variable_to_group
+
+    @Test
+    subroutine test_add_variable_with_fill_value(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        character(len = 20) :: intVariableName = "intVariable"
+        character(len = 20) :: stringVariableName = "stringVariable"
+        integer :: fillValueInt = -9999
+        character(len = 20) :: fillValueString = "missing"
+        integer :: netcdfStringDataType = nf90_string
+        integer :: netcdfIntDataType = nf90_int
+        integer :: badNetcdfDataType = -1
+        integer(c_int) :: fileMode, dimID, numDims
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        numDims = 1_c_int
+        status = netcdfCreate(this%add_variable_with_fill_value_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID)
+        @assertEqual(0, status, message = "Failed to add dimension to NetCDF file.")
+        @assertEqual(1, dimID, message = "Dimension ID should be greater than or equal to 0, instead")
+        status = netcdfAddVar(netcdfID, intVariableName, netcdfIntDataType, &
+                numDims, [dimensionName], fillValue = fillValueInt)
+        @assertEqual(0, status, message = "Failed to add integer variable with fill value to NetCDF file.")
+        status = netcdfAddVar(netcdfID, stringVariableName, netcdfStringDataType, &
+                numDims, [dimensionName], fillValue = fillValueInt)
+        @assertEqual(-45, status, message = "Variable/fillValue type mismatch should fail with an error code of -45.")
+        status = netcdfAddVar(netcdfID, stringVariableName, netcdfStringDataType, &
+                numDims, [dimensionName], fillValue = fillValueString)
+        @assertEqual(0, status, message = "Failed to add string variable with fill value to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_variable_with_fill_value
+
+    @Test
+    subroutine test_write_data_to_int_array_variable(this)
+        class(test_netcdf_variable), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimensionLength = 10_c_int
+        character(len = 20) :: variableName = "variable"
+        integer :: netcdfDataType = nf90_int
+        integer(c_int) :: fileMode, dimID, numDims
+        real(c_float), dimension(11) :: data
+        integer :: i
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        numDims = 1_c_int
+        data = [(i, i = 1, dimensionLength)]
+        status = netcdfCreate(this%write_data_to_int_variable, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddDim(netcdfID, dimensionName, dimensionLength, dimID)
+        @assertEqual(0, status, message = "Failed to add dimension to NetCDF file.")
+        @assertEqual(1, dimID, message = "Dimension ID should be greater than or equal to 0, instead")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName])
+        @assertEqual(0, status, message = "Failed to add variable to NetCDF file.")
+        status = netcdfPutVar(netcdfID, variableName, data)
+        @assertEqual(0, status, message = "Failed to write data to NetCDF variable.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_write_data_to_int_array_variable
+end module test_netcdf_variable_mod

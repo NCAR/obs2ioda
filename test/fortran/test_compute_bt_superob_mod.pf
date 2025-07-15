@@ -1,0 +1,21 @@
+module test_compute_bt_superob_mod
+    use funit
+    implicit none
+contains
+
+
+    @test
+    subroutine test_compute_bt_superob_valid_values()
+        use ahi_HSD_mod, only : compute_bt_superob
+        use kinds, only : r_double, r_kind
+        real(r_kind) :: result, expected
+        real(r_kind), allocatable :: bt(:, :)
+        integer :: status
+
+        allocate(bt(2, 2))
+        bt = reshape([280.0, 282.0, 284.0, 286.0], shape(bt))
+        result = compute_bt_superob(bt, -999.0_r_kind)
+        expected = 283.0
+        @assertEqual(expected, result, tolerance = 1.0e-6_r_kind, message ="Failed to compute superob with valid values")
+    end subroutine test_compute_bt_superob_valid_values
+end module test_compute_bt_superob_mod
