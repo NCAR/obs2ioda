@@ -1,13 +1,13 @@
 # Set Fortran compiler flags specific to the GNU Compiler
 # -ffree-line-length-none: Remove the limit on the length of lines in the source file
 set(FORTRAN_COMPILER_GNU_FLAGS
-    $<$<COMPILE_LANGUAGE:Fortran>:-ffree-line-length-none -Wno-error>
+    $<$<COMPILE_LANGUAGE:Fortran>:-ffree-line-length-none>
 )
 
 # Set Fortran compiler flags specific to the GNU Compiler and Linux OS.
 # -mcmodel=medium: Allow for larger datasets in memory
 set(FORTRAN_COMPILER_GNU_LINUX_FLAGS
-        $<$<COMPILE_LANGUAGE:Fortran>:-mcmodel=medium>
+        $<$<COMPILE_LANGUAGE:Fortran>:-mcmodel=medium -Wno-line-truncation>
 )
 
 # Set Debugging Fortran compiler flags specific to the GNU Compiler

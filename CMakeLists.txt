@@ -8,7 +8,7 @@ include("${CMAKE_SOURCE_DIR}/cmake/add_pfunit.cmake")
 project(obs2ioda LANGUAGES Fortran CXX)
 enable_testing()
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

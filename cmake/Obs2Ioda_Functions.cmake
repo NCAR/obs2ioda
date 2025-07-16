@@ -31,7 +31,7 @@ function(obs2ioda_fortran_library target public_link_libraries)
              ${FORTRAN_COMPILER_GNU_FLAGS}
         )
         if (CMAKE_SYSTEM_NAME MATCHES Linux)
-            list(APPEND OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PRIVATE
+            list(APPEND OBS2IODA_FORTRAN_TARGET_COMPILE_OPTIONS_PUBLIC
                  ${FORTRAN_COMPILER_GNU_LINUX_FLAGS}
             )
         endif ()
