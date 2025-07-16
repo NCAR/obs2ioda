@@ -3,6 +3,7 @@
 
 
 #include <netcdf>
+#include <variant>
 #include <ncChar.h>
 
 namespace Obs2Ioda {
