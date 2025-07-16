@@ -61,3 +61,7 @@ add_pfunit_ctest(test_netcdf_variable_mod
         TEST_SOURCES test_netcdf_variable_mod.pf
         LINK_LIBRARIES v3 netcdf_test_utils
 )
+add_pfunit_ctest(test_netcdf_attribute_mod
+        TEST_SOURCES test_netcdf_attribute_mod.pf
+        LINK_LIBRARIES v3 netcdf_test_utils
+)

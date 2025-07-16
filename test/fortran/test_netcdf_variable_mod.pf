@@ -57,9 +57,9 @@ contains
     subroutine tearDown(this)
         class(test_netcdf_variable), intent(inout) :: this
         integer :: i
-!        do i = 1, size(this%test_filenames)
-!            call delete_file(this%test_filenames(i))
-!        end do
+        do i = 1, size(this%test_filenames)
+            call delete_file(this%test_filenames(i))
+        end do
     end subroutine tearDown
 
     @Test

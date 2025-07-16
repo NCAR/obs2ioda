@@ -1,0 +1,178 @@
+module test_netcdf_attribute_mod
+    use funit
+    use iso_c_binding, only : c_int
+    use netcdf_cxx_mod
+    use netcdf_test_utils_mod
+    use netcdf, only : nf90_int, nf90_string, nf90_char
+    implicit none
+
+    @TestCase
+    type, extends(TestCase) :: test_netcdf_attribute
+        character(len = 256) :: add_global_attribute_filename
+        character(len = 256) :: add_attribute_to_group_filename
+        character(len = 256) :: add_attribute_to_variable_filename
+        character(len = 256) :: add_string_attribute_filename
+        character(len = 256) :: add_array_attribute_filename
+        integer :: num_tests = 5
+        character(len = 256), dimension(:), allocatable :: test_filenames
+    contains
+        procedure :: setUp
+        procedure :: tearDown
+    end type test_netcdf_attribute
+
+contains
+
+    subroutine setUp(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        allocate(this%test_filenames(this%num_tests))
+
+        this%add_global_attribute_filename = "add_global_attribute.nc4"
+        this%test_filenames(1) = this%add_global_attribute_filename
+
+        this%add_attribute_to_group_filename = "add_attribute_to_group.nc4"
+        this%test_filenames(2) = this%add_attribute_to_group_filename
+
+        this%add_attribute_to_variable_filename = "add_attribute_to_variable.nc4"
+        this%test_filenames(3) = this%add_attribute_to_variable_filename
+
+        this%add_string_attribute_filename = "add_string_attribute.nc4"
+        this%test_filenames(4) = this%add_string_attribute_filename
+
+        this%add_array_attribute_filename = "add_array_attribute.nc4"
+        this%test_filenames(5) = this%add_array_attribute_filename
+
+    end subroutine setUp
+
+    subroutine tearDown(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        integer :: i
+        do i = 1, size(this%test_filenames)
+            call delete_file(this%test_filenames(i))
+        end do
+    end subroutine tearDown
+
+    @Test
+    subroutine test_add_global_attribute(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: attributeName = "attribute"
+        integer(c_int) :: fileMode
+        integer(c_int) :: data
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        data = 1
+        status = netcdfCreate(this%add_global_attribute_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfPutAtt(netcdfID, attributeName, data)
+        @assertEqual(0, status, message = "Failed to add attribute to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_global_attribute
+
+    @Test
+    subroutine test_add_attribute_to_group(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: attributeName = "attribute"
+        character(len = 20) :: groupName = "group"
+        integer(c_int) :: fileMode
+        integer(c_int) :: data
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        data = 1
+        status = netcdfCreate(this%add_attribute_to_group_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, groupName)
+        @assertEqual(0, status, message = "Failed to add group to NetCDF file.")
+        status = netcdfPutAtt(netcdfID, attributeName, data, groupName = groupName)
+        @assertEqual(0, status, message = "Failed to add attribute to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_attribute_to_group
+
+    @Test
+    subroutine test_add_attribute_to_variable(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: attributeName = "attribute"
+        character(len = 20) :: groupName = "group"
+        character(len = 20) :: variableName = "variable"
+        character(len = 20) :: dimensionName = "dimension"
+        integer(c_int) :: dimID, dimLength, numDims
+        integer(c_int) :: netcdfDataType = nf90_int
+        integer(c_int) :: fileMode
+        integer(c_int) :: data
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        data = 1
+        dimLength = 10
+        numDims = 1
+        status = netcdfCreate(this%add_attribute_to_variable_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfAddGroup(netcdfID, groupName)
+        @assertEqual(0, status, message = "Failed to add group to NetCDF file.")
+        status = netcdfAddDim(netcdfID, dimensionName, dimLength, dimID)
+        @assertEqual(0, status, message = "Failed to add dimension to NetCDF file.")
+        status = netcdfAddVar(netcdfID, variableName, netcdfDataType, &
+                numDims, [dimensionName], groupName = groupName)
+        @assertEqual(0, status, message = "Failed to add variable to NetCDF file.")
+        status = netcdfPutAtt(netcdfID, attributeName, data, groupName = groupName, varName = variableName)
+        @assertEqual(0, status, message = "Failed to add attribute to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_attribute_to_variable
+
+    @Test
+    subroutine test_add_string_attribute(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: attributeName = "attribute"
+        integer(c_int) :: fileMode
+        character(len = 3) :: data
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        data = "abc"
+        status = netcdfCreate(this%add_global_attribute_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfPutAtt(netcdfID, attributeName, data)
+        @assertEqual(0, status, message = "Failed to add a string attribute to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_string_attribute
+
+    @Test
+    subroutine test_add_array_attribute(this)
+        class(test_netcdf_attribute), intent(inout) :: this
+        integer(c_int) :: status
+        integer(c_int) :: netcdfID
+        character(len = 20) :: attributeName = "attribute"
+        integer(c_int) :: fileMode
+        integer(c_int) :: data(3)
+        integer(c_int) :: attLength
+
+        netcdfID = -1
+        fileMode = 2_c_int
+        data = [1, 2, 3]
+        attLength = size(data)
+        status = netcdfCreate(this%add_global_attribute_filename, netcdfID, fileMode)
+        @assertEqual(0, status, message = "Failed to create NetCDF file.")
+        @assertTrue(netcdfID >= 0, message = "NetCDF ID should be greater than or equal to 0")
+        status = netcdfPutAttArray(netcdfID, attributeName, data, attLength)
+        @assertEqual(0, status, message = "Failed to add an array attribute to NetCDF file.")
+        status = netcdfClose(netcdfID)
+        @assertEqual(0, status, message = "Failed to close NetCDF file.")
+    end subroutine test_add_array_attribute
+
+end module test_netcdf_attribute_mod

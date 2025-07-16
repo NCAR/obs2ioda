@@ -80,32 +80,21 @@ contains
     !       The identifier of the NetCDF file where the group will be added.
     !     - groupName (character(len=*), intent(in)):
     !       The name of the new group to be created within the specified parent group.
-    !     - parentGroupName (character(len=*), intent(in), optional):
-    !       The name of the parent group under which the new group will be added.
-    !       If not provided, the new group will be created in the root group.
     !
     !   Returns:
     !     - integer(c_int): A status code indicating the outcome of the operation:
     !         - 0: Success.
     !         - Non-zero: Failure
-    function netcdfAddGroup(netcdfID, groupName, parentGroupName)
+    function netcdfAddGroup(netcdfID, groupName)
         integer(c_int), value, intent(in) :: netcdfID
-        character(len = *), intent(in), optional :: parentGroupName
         character(len = *), intent(in) :: groupName
         integer(c_int) :: netcdfAddGroup
         integer :: status
-        type(c_ptr) :: c_parentGroupName
         type(c_ptr) :: c_groupName
-        type(f_c_string_t) :: f_c_string_parentGroupName
+        type(c_ptr) :: c_parentGroupName
         type(f_c_string_t) :: f_c_string_groupName
 
-        if (present(parentGroupName)) then
-            f_c_string_parentGroupName = f_c_string_t(parentGroupName)
-            status = check_f_c_string(f_c_string_parentGroupName%to_c())
-            c_parentGroupName = check_f_c_string(f_c_string_parentGroupName%get_c_string())
-        else
-            c_parentGroupName = c_null_ptr
-        end if
+        c_parentGroupName = c_null_ptr
         f_c_string_groupName = f_c_string_t(groupName)
         status = check_f_c_string(f_c_string_groupName%to_c())
         c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
@@ -124,33 +113,24 @@ contains
     !       Length of the dimension.
     !  - dimID (integer(c_int), intent(out)):
     !       Identifier of the new dimension.
-    !   - groupName (character(len=*), intent(in), optional):
-    !       Name of the target group. If absent, the dimension is added as a global dimension.
     !
     ! Returns:
     !    - integer(c_int): A status code indicating the outcome of the operation:
     !       - 0: Success.
     !       - Non-zero: Failure
-    function netcdfAddDim(netcdfID, dimName, len, dimID, groupName)
+    function netcdfAddDim(netcdfID, dimName, len, dimID)
         integer(c_int), value, intent(in) :: netcdfID
         character(len = *), intent(in) :: dimName
         integer(c_int), value, intent(in) :: len
         integer(c_int), intent(out) :: dimID
-        character(len = *), optional, intent(in) :: groupName
         integer(c_int) :: netcdfAddDim
-        type(c_ptr) :: c_groupName
         type(c_ptr) :: c_dimName
+        type(c_ptr) :: c_groupName
         type(f_c_string_t) :: f_c_string_groupName
         type(f_c_string_t) :: f_c_string_dimName
         integer(c_int) :: status
 
-        if (present(groupName)) then
-            f_c_string_groupName = f_c_string_t(groupName)
-            status = check_f_c_string(f_c_string_groupName%to_c())
-            c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
-        else
-            c_groupName = c_null_ptr
-        end if
+        c_groupName = c_null_ptr
         f_c_string_dimName = f_c_string_t(dimName)
         status = check_f_c_string(f_c_string_dimName%to_c())
         c_dimName = check_f_c_string(f_c_string_dimName%get_c_string())
