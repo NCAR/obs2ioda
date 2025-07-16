@@ -29,7 +29,8 @@ contains
         time_start = "2018-04-15T00:15:41.9Z"
         expected_fname = "abi_g16_obs_2018041500_15.h5"
         call set_goes_abi_out_fname(fname, sat_id, time_start)
-        @assertEqual(expected_fname, fname, message = "Filename mismatch for regular satellite ID and start time with different minutes")
+        @assertEqual(expected_fname, fname, message = "Filename mismatch for regular"&
+                "satellite ID and start time with different minutes")
     end subroutine
 
     @test
