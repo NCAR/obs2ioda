@@ -3,6 +3,7 @@
 
 
 #include <netcdf>
+#include <ncChar.h>
 
 namespace Obs2Ioda {
 
@@ -85,6 +86,7 @@ namespace Obs2Ioda {
                           "Unsupported data type for NetCDF variable");
         }
     }
+
 
 /**
  * @brief Logs detailed information about a NetCDF exception.

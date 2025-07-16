@@ -21,7 +21,8 @@ module write_goes_abi_ioda_v3_test_mod
         real(r_kind), dimension(:), allocatable :: scan_pos_out
         real(r_kind), dimension(:), allocatable :: sat_zen_out, sat_azi_out
         real(r_kind), dimension(:), allocatable :: sun_zen_out, sun_azi_out
-        real(r_kind), dimension(:,:), allocatable :: bt_out, err_out, qf_out
+        real(r_kind), dimension(:,:), allocatable :: bt_out, err_out
+        integer(i_kind), dimension(:,:), allocatable :: qf_out
 
     contains
         procedure :: init
@@ -75,7 +76,7 @@ contains
         do j = 1, self%nlocs
             do i = 1, self%nchans
                 self%err_out(i, j) = 10.0_r_kind * i + j
-                self%qf_out(i, j)  = 100.0_r_kind * i + j
+                self%qf_out(i, j)  = 100_i_kind * i + j
             end do
         end do
     end subroutine init

@@ -23,7 +23,7 @@ def run_executable(executable: Path, *args: str) -> None:
     """
     result = subprocess.run([str(executable), *args], capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError(f"{executable.name} failed:\n{result.stderr}")
+        raise RuntimeError(f"{executable} failed:\n{result.stderr}")
 
 
 def clean_directory(dir_path: Path):

@@ -82,11 +82,24 @@ namespace Obs2Ioda {
                     varName)->getValidName();
             const auto var = group->getVar(iodaVarName);
             // Validate the data type of the variable
-            validateNetcdfDataType<T>(var.getType().getId(),
-                                      "Invalid data type for NetCDF variable: " +
-                                      std::string(varName));
+            validateNetcdfDataType<T>(
+                    var.getType().getId(),
+                    "Invalid data type for NetCDF variable '" +
+                    std::string(varName) +
+                    "': expected " + std::string(typeid(T).name()) +
+                    ", got NetCDF type ID " + var.getType().getName()
+            );
             if constexpr (std::is_same<T, const char *>::value &&
                           netcdfChar) {
+                if (var.getDims().size() != 2) {
+                    std::string msg =
+                            "Expected a 2D char variable for NetCDF variable '" +
+                            std::string(varName) + "', but got " +
+                            std::to_string(var.getDims().size()) +
+                            " dimensions.";
+                    throw netCDF::exceptions::NcBadDim(msg.c_str(), __FILE__,
+                                                       __LINE__);
+                }
                 auto numStrings = var.getDims()[0].getSize();
                 auto stringLen = var.getDims()[1].getSize();
                 auto flattenedCharValues = flattenCharArray(values,
@@ -211,9 +224,13 @@ namespace Obs2Ioda {
                     varName)->getValidName();
             auto var = group->getVar(iodaVarName);
             // Validate the data type of the variable
-            validateNetcdfDataType<T>(var.getType().getId(),
-                                      "Invalid data type for NetCDF variable: " +
-                                      std::string(varName));
+            validateNetcdfDataType<T>(
+                    var.getType().getId(),
+                    "Invalid data type for NetCDF variable '" +
+                    std::string(varName) +
+                    "': expected " + std::string(typeid(T).name()) +
+                    ", got NetCDF type ID " + var.getType().getName()
+            );
             var.setFill(
                     fillMode != 0,  // true if fillMode is non-zero
                     fillValue

@@ -4,7 +4,7 @@ module test_transpose_and_flatten_mod
     implicit none
 contains
     @test
-    subroutine test_transpose_and_flatten()
+    subroutine test_transpose_and_flatten_real()
 
         real, dimension(2, 3) :: mat
         real, dimension(6) :: flat, expected
@@ -18,7 +18,26 @@ contains
 
         ! Call the subroutine
         call transpose_and_flatten(mat, flat)
-        @assertTrue(all(flat == expected), message="Transpose and flatten did not produce expected result")
+        @assertTrue(all(flat == expected), message="Transpose and flatten failed for real matrix")
 
-    end subroutine test_transpose_and_flatten
+    end subroutine test_transpose_and_flatten_real
+
+    @test
+    subroutine test_transpose_and_flatten_int()
+
+        integer, dimension(2, 3) :: mat
+        integer, dimension(6) :: flat, expected
+        integer :: i
+
+        ! Initialize test matrix: columns are [1 2], [3 4], [5 6]
+        mat = reshape([1, 2, 3, 4, 5, 6], shape(mat))
+
+        ! Expected result after transpose and flatten
+        expected = [1, 3, 5, 2, 4, 6]
+
+        ! Call the subroutine
+        call transpose_and_flatten(mat, flat)
+        @assertTrue(all(flat == expected), message="Transpose and flatten failed for integer matrix")
+
+    end subroutine test_transpose_and_flatten_int
 end module test_transpose_and_flatten_mod
