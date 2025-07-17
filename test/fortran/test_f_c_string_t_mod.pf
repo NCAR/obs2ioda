@@ -22,6 +22,28 @@ module test_f_c_string_t_mod
 contains
 
     @test
+    subroutine test_f_c_string_t_call_to_c_before_init()
+        type(f_c_string_t) :: abc
+        integer :: status
+
+        !> @test Calling to_c before initialization should fail
+        status = abc%to_c()
+        @assertEqual(-1, status, message = "Calling to_c before initialization should fail")
+    end subroutine
+
+    @test
+    subroutine test_f_c_string_t_double_c_memcpy()
+        type(f_c_string_t) :: abc
+        integer :: status
+
+        !> @test Double C memcpy should fail
+        abc = f_c_string_t("abc")
+        status = abc%to_c()
+        status = abc%to_c()
+        @assertEqual(-1, status, message = "Transfering C string twice should fail")
+    end subroutine
+
+    @test
     subroutine test_f_c_string_t_no_spaces()
         type(f_c_string_t) :: abc
         integer :: status

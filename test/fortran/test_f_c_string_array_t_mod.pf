@@ -22,6 +22,24 @@ module test_f_c_string_array_t_mod
 contains
 
     @test
+    subroutine test_memcpy_before_initialization()
+        type(f_c_string_array_t) :: abc, abc_def_ghi
+        integer :: status
+        status = abc%to_c()
+        @assertEqual(status, -1, "Calling to_c before initialization should fail.")
+    end subroutine test_memcpy_before_initialization
+
+    @test
+    subroutine test_double_memcpy()
+        type(f_c_string_array_t) :: abc, abc_def_ghi
+        integer :: status
+        abc = f_c_string_array_t(["abc"])
+        status = abc%to_c()
+        status = abc%to_c()
+        @assertEqual(status, -1, "Calling to_c before initialization should fail.")
+    end subroutine test_double_memcpy
+
+    @test
     subroutine test_single_string_array()
         type(f_c_string_array_t) :: abc, abc_def_ghi
         integer :: status
