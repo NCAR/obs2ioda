@@ -93,8 +93,11 @@ contains
         type(c_ptr) :: c_groupName
         type(c_ptr) :: c_parentGroupName
         type(f_c_string_t) :: f_c_string_groupName
+        type(f_c_string_t) :: f_c_string_parentGroupName
 
-        c_parentGroupName = c_null_ptr
+        f_c_string_parentGroupName = f_c_string_t("")
+        status = check_f_c_string(f_c_string_parentGroupName%to_c())
+        c_parentGroupName = check_f_c_string(f_c_string_parentGroupName%get_c_string())
         f_c_string_groupName = f_c_string_t(groupName)
         status = check_f_c_string(f_c_string_groupName%to_c())
         c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
@@ -130,11 +133,12 @@ contains
         type(f_c_string_t) :: f_c_string_dimName
         integer(c_int) :: status
 
-        c_groupName = c_null_ptr
+        f_c_string_groupName = f_c_string_t("")
+        status = check_f_c_string(f_c_string_groupName%to_c())
+        c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         f_c_string_dimName = f_c_string_t(dimName)
         status = check_f_c_string(f_c_string_dimName%to_c())
         c_dimName = check_f_c_string(f_c_string_dimName%get_c_string())
-
         netcdfAddDim = c_netcdfAddDim(netcdfID, c_groupName, c_dimName, len, dimID)
         dimID = dimID + 1
     end function netcdfAddDim
@@ -182,11 +186,11 @@ contains
 
         if (present(groupName)) then
             f_c_string_groupName = f_c_string_t(groupName)
-            status = check_f_c_string(f_c_string_groupName%to_c())
-            c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         else
-            c_groupName = c_null_ptr
+            f_c_string_groupName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_groupName%to_c())
+        c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         f_c_string_varName = f_c_string_t(varName)
         status = check_f_c_string(f_c_string_varName%to_c())
         c_varName = check_f_c_string(f_c_string_varName%get_c_string())
@@ -237,11 +241,11 @@ contains
 
         if (present(groupName)) then
             f_c_string_groupName = f_c_string_t(groupName)
-            status = check_f_c_string(f_c_string_groupName%to_c())
-            c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         else
-            c_groupName = c_null_ptr
+            f_c_string_groupName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_groupName%to_c())
+        c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         f_c_string_varName = f_c_string_t(varName)
         status = check_f_c_string(f_c_string_varName%to_c())
         c_varName = check_f_c_string(f_c_string_varName%get_c_string())
@@ -330,11 +334,11 @@ contains
 
         if (present(groupName)) then
             f_c_string_groupName = f_c_string_t(groupName)
-            status = check_f_c_string(f_c_string_groupName%to_c())
-            c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         else
-            c_groupName = c_null_ptr
+            f_c_string_groupName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_groupName%to_c())
+        c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         f_c_string_varName = f_c_string_t(varName)
         status = check_f_c_string(f_c_string_varName%to_c())
         c_varName = check_f_c_string(f_c_string_varName%get_c_string())
@@ -408,18 +412,18 @@ contains
 
         if (present(groupName)) then
             f_c_string_groupName = f_c_string_t(groupName)
-            status = check_f_c_string(f_c_string_groupName%to_c())
-            c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         else
-            c_groupName = c_null_ptr
+            f_c_string_groupName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_groupName%to_c())
+        c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         if (present(varName)) then
             f_c_string_varName = f_c_string_t(varName)
-            status = check_f_c_string(f_c_string_varName%to_c())
-            c_varName = check_f_c_string(f_c_string_varName%get_c_string())
         else
-            c_varName = c_null_ptr
+            f_c_string_varName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_varName%to_c())
+        c_varName = check_f_c_string(f_c_string_varName%get_c_string())
 
         f_c_string_attName = f_c_string_t(attName)
         status = check_f_c_string(f_c_string_attName%to_c())
@@ -486,18 +490,18 @@ contains
 
         if (present(groupName)) then
             f_c_string_groupName = f_c_string_t(groupName)
-            status = check_f_c_string(f_c_string_groupName%to_c())
-            c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         else
-            c_groupName = c_null_ptr
+            f_c_string_groupName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_groupName%to_c())
+        c_groupName = check_f_c_string(f_c_string_groupName%get_c_string())
         if (present(varName)) then
             f_c_string_varName = f_c_string_t(varName)
-            status = check_f_c_string(f_c_string_varName%to_c())
-            c_varName = check_f_c_string(f_c_string_varName%get_c_string())
         else
-            c_varName = c_null_ptr
+            f_c_string_varName = f_c_string_t("")
         end if
+        status = check_f_c_string(f_c_string_varName%to_c())
+        c_varName = check_f_c_string(f_c_string_varName%get_c_string())
 
         f_c_string_attName = f_c_string_t(attName)
         status = check_f_c_string(f_c_string_attName%to_c())

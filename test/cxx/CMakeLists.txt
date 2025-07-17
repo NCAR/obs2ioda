@@ -39,3 +39,8 @@ set(test_netcdf_variable_SOURCES netcdf_variable.test.cc)
 set(test_netcdf_variable_LIBRARIES GTest::gtest_main obs2ioda_cxx)
 set(test_netcdf_variable_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/cxx)
 add_cxx_ctest(test_netcdf_variable "${test_netcdf_variable_SOURCES}" "${test_netcdf_variable_INCLUDE_DIRS}" "${test_netcdf_variable_LIBRARIES}")
+
+set(test_set_netcdf_group_SOURCES set_netcdf_group.test.cc)
+set(test_set_netcdf_group_LIBRARIES GTest::gtest_main obs2ioda_cxx)
+set(test_set_netcdf_group_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/cxx)
+add_cxx_ctest(test_set_netcdf_group "${test_set_netcdf_group_SOURCES}" "${test_set_netcdf_group_INCLUDE_DIRS}" "${test_set_netcdf_group_LIBRARIES}")

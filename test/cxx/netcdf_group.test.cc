@@ -55,7 +55,7 @@ namespace {
         ASSERT_NE(groupInfo, nullptr);
 
         // Add group
-        int ret = netcdfAddGroup(netcdfID, nullptr, validGroupName);
+        int ret = netcdfAddGroup(netcdfID, "", validGroupName);
         EXPECT_EQ(ret, 0);
 
         // Validate it exists
@@ -91,19 +91,23 @@ namespace {
         EXPECT_TRUE(subGroup.isNull() == false);
     }
 /**
- * @test NonExistantParentGroupThrowsAndIsCaught
- * @brief Tests that adding a group to a nonexistent parent group fails gracefully.
- *
- * This test attempts to add a group under a parent that does not exist in the file.
- * It expects `netcdfAddGroup` to return a negative value, indicating an error was caught
- * and reported correctly (e.g., via `netcdfErrorMessage`).
+ * @test NonExistantParentGroupReturnsError
+ * @brief Tests that adding a group to a nonexistent parent group returns an error code.
  */
     TEST_F(NetcdfAddGroupTest, NonExistantParentGroupThrowsAndIsCaught) {
         std::string invalidName = "ThisGroupDoesNotExist";
-
         int ret = netcdfAddGroup(netcdfID, invalidName.c_str(), invalidName.c_str());
-
         EXPECT_LT(ret, 0);  // netcdfErrorMessage returns -1 or error code
     }
+
+/**
+ * @test AddGroupWithNullParentGroupNameReturnsError
+ * * @brief Tests that adding a group with a null parent group name returns an error.
+ */
+    TEST_F(NetcdfAddGroupTest, AddGroupWithNullParentGroupNameReturnsError) {
+        int ret = netcdfAddGroup(netcdfID, nullptr, "InvalidGroup");
+        EXPECT_EQ(ret, -116);  // Expect error for null parent group name
+    }
+
 
 }  // namespace

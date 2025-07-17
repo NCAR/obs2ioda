@@ -48,7 +48,7 @@ namespace {
 
         int value = 42;
         int ret = netcdfPutAttInt(netcdfID, "my_attr", &value, "var",
-                                  nullptr);
+                                  "");
         EXPECT_EQ(ret, 0);
 
         auto attr = var.getAtt("my_attr");
@@ -72,7 +72,7 @@ namespace {
 
         int values[] = {1, 2, 3, 4};
         int ret = netcdfPutAttIntArray(netcdfID, "arr_attr", values, 4,
-                                       "arrvar", nullptr);
+                                       "arrvar", "");
         EXPECT_EQ(ret, 0);
 
         auto attr = var.getAtt("arr_attr");
@@ -88,13 +88,13 @@ namespace {
  * @test PutRealArrayAttributeToGroup
  * @brief Tests writing a float array as a global attribute to the NetCDF file (group).
  *
- * The test calls `netcdfPutAttRealArray` with `nullptr` for both variable and group names,
+ * The test calls `netcdfPutAttRealArray` with `an empty string` for both variable and group names,
  * meaning the attribute is written to the root group. It verifies the content using `getValues`.
  */
     TEST_F(NetcdfPutAttTest, PutRealArrayAttributeToGroup) {
         float values[] = {3.14f, 2.71f};
         int ret = netcdfPutAttRealArray(netcdfID, "real_attr", values,
-                                        2, nullptr, nullptr);
+                                        2, "", "");
         EXPECT_EQ(ret, 0);
 
         auto attr = file->getAtt("real_attr");
@@ -115,8 +115,8 @@ namespace {
  */
     TEST_F(NetcdfPutAttTest, PutStringAttributeToGroup) {
         const char *msg = "hello world";
-        int ret = netcdfPutAttString(netcdfID, "greeting", msg, nullptr,
-                                     nullptr);
+        int ret = netcdfPutAttString(netcdfID, "greeting", msg, "",
+                                     "");
         EXPECT_EQ(ret, 0);
 
         auto attr = file->getAtt("greeting");
@@ -140,7 +140,7 @@ namespace {
 
         const char *label = "temperature";
         int ret = netcdfPutAttString(netcdfID, "label", label, "name",
-                                     nullptr);
+                                     "");
         EXPECT_EQ(ret, 0);
 
         auto attr = var.getAtt("label");
@@ -150,5 +150,45 @@ namespace {
         attr.getValues(value);
         EXPECT_EQ(value, label);
     }
+
+    TEST_F(NetcdfPutAttTest, PutAttWithNullGroupNameReturnsError) {
+        int value = 100;
+        int status = netcdfPutAttInt(netcdfID, "null_group_attr",
+                                     &value, "var", nullptr);
+        EXPECT_EQ(-116, status);  // Expect error for null group name
+    }
+
+    /**
+   * @test PutAttWithNullVarNameReturnsError
+   * @brief Tests that providing a null variable name to `netcdfPutAttInt` results in an error.
+   *
+   * This test verifies the behavior of the `netcdfPutAttInt` function when a null variable
+   * name (`nullptr`) is passed. According to the NetCDF error codes, this should return
+   * an error code (in this case, -59, typically representing `NC_ENOTVAR` or an invalid
+   * argument depending on the implementation).
+   */
+    TEST_F(NetcdfPutAttTest, PutAttWithNullVarNameReturnsError) {
+        int value = 100;
+        int status = netcdfPutAttInt(netcdfID, "null_group_attr",
+                                     &value, nullptr, "");
+        EXPECT_EQ(-59, status);  // Expect error for null group name
+    }
+
+/**
+ * @test PutAttWithNullVarNameAndNullGroupNameReturnsError
+ * @brief Tests that providing both a null variable name and a null group name results in an error.
+ *
+ * This test ensures that when both the variable name (`nullptr`) and the group name (empty string)
+ * are invalid or unspecified, the `netcdfPutAttInt` function fails appropriately. This serves as a
+ * negative test case to confirm robust error checking in attribute assignment.
+ */
+    TEST_F(NetcdfPutAttTest,
+           PutAttWithNullVarNameAndNullGroupNameReturnsError) {
+        int value = 100;
+        int status = netcdfPutAttInt(netcdfID, "null_group_attr",
+                                     &value, nullptr, "");
+        EXPECT_NE(0, status);  // Expect error for null group name
+    }
+
 
 }  // namespace

@@ -55,7 +55,7 @@ namespace {
         auto dimInfo = iodaSchema.getDimension(dimName);
         ASSERT_NE(dimInfo, nullptr);  // schema must define this dimension
 
-        int ret = netcdfAddDim(netcdfID, nullptr, dimName, dimLen, &dimID);
+        int ret = netcdfAddDim(netcdfID, "", dimName, dimLen, &dimID);
         EXPECT_EQ(ret, 0);
         EXPECT_GT(dimID, -1);
 
@@ -98,5 +98,17 @@ namespace {
         EXPECT_TRUE(!dim.isNull());
         EXPECT_EQ(dim.getSize(), dimLen);
     }
+
+    /**
+   * @test AddDimWithNullGroupNameReturnsError
+   * @brief Verifies that adding a dimension with a null group name returns an appropriate error.
+   */
+    TEST_F(NetcdfAddDimTest, AddDimWithNullGroupNameReturnsError) {
+        int dimID = -1;
+        int ret = netcdfAddDim(netcdfID, nullptr, "InvalidDim", 10, &dimID);
+        EXPECT_EQ(ret, -116);  // Expect error for null group name
+        EXPECT_EQ(dimID, -1);  // ID should not be set
+    }
+
 
 }  // namespace
