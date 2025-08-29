@@ -26,8 +26,11 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -mcmodel=large -fPIC")
 set(NCEP_BUFR_LIB CACHE STRING "" )
 set(BUILD_GOES_ABI_CONVERTER OFF CACHE BOOL "Build the GOES ABI converter")
 
+set(eckit_DIR CACHE STRING "")
+
 # Find required packages
 find_package(NetCDF REQUIRED COMPONENTS Fortran C CXX)
+find_package(eckit REQUIRED)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/config")
 add_subdirectory("${CMAKE_SOURCE_DIR}/src")

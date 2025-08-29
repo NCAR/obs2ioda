@@ -6,7 +6,7 @@ FETCHCONTENT_DECLARE(
 FETCHCONTENT_MAKEAVAILABLE(googletest)
 
 set(test_ioda_obs_schema_SOURCES ioda_obs_schema.test.cc)
-set(test_ioda_obs_schema_LIBRARIES yaml-cpp::yaml-cpp GTest::gtest_main obs2ioda_cxx)
+set(test_ioda_obs_schema_LIBRARIES GTest::gtest_main obs2ioda_cxx)
 set(test_ioda_obs_schema_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/cxx)
 add_cxx_ctest(test_ioda_obs_schema "${test_ioda_obs_schema_SOURCES}" "${test_ioda_obs_schema_INCLUDE_DIRS}" "${test_ioda_obs_schema_LIBRARIES}")
 

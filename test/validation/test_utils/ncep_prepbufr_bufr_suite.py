@@ -67,7 +67,7 @@ NCEP_PREBUFR_BUFR_SUITE = TestSuite(
     executable=Path(OBS2IODA_V3_EXECUTABLE_PATH),
     output_dir=Path.cwd() / "test/validation/data/v3/output",
     ref_dir=Path.cwd() / "test/validation/data/v3/reference",
-    ext=".h5",
+    ext=".nc4",
     fixture_name="ncep_prepbufr_bufr_file_pair",
     setup_fn=setup_validation,
 )

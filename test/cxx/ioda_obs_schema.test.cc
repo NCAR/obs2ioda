@@ -1,16 +1,13 @@
 #include <gtest/gtest.h>
-#include <yaml-cpp/yaml.h>
 #include "ioda_obs_schema.h"
 
 
 class IodaObsSchemaFixture : public ::testing::Test {
 protected:
     void SetUp() override {
-        this->schema = YAML::LoadFile(Obs2Ioda::IODA_SCHEMA_YAML);
-        auto yamlNode = std::make_shared<YamlCppNode>(this->schema);
+        auto yamlNode = std::make_shared<YamlEckitNode>(Obs2Ioda::IODA_SCHEMA_YAML);
         this->iodaSchema = std::make_shared<IodaObsSchema>(yamlNode);
     }
-    YAML::Node schema;
     std::shared_ptr<IodaObsSchema> iodaSchema;
 };
 
