@@ -2,30 +2,40 @@
 add_library(netcdf_test_utils SHARED
         netcdf_test_utils_mod.f90
 )
+set_target_properties(
+        netcdf_test_utils
+        PROPERTIES
+        LINKER_LANGUAGE Fortran
+)
+target_include_directories(
+        netcdf_test_utils INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}>
+        $<INSTALL_INTERFACE:include>
+)
 add_pfunit_ctest(test_transpose_and_flatten_mod
         TEST_SOURCES test_transpose_and_flatten_mod.pf
-        LINK_LIBRARIES v3
+        LINK_LIBRARIES v3 netcdf_test_utils
 )
 
 add_pfunit_ctest(test_get_julian_time_mod
         TEST_SOURCES test_get_julian_time_mod.pf
-        LINK_LIBRARIES v3
+        LINK_LIBRARIES v3 netcdf_test_utils
 )
 add_pfunit_ctest(test_to_lower_mod
         TEST_SOURCES test_to_lower_mod.pf
-        LINK_LIBRARIES v3
+        LINK_LIBRARIES v3 netcdf_test_utils
 )
 add_pfunit_ctest(test_set_goes_abi_out_fname_mod
         TEST_SOURCES test_set_goes_abi_out_fname_mod.pf
-        LINK_LIBRARIES v3
+        LINK_LIBRARIES v3 netcdf_test_utils
 )
 add_pfunit_ctest(test_compute_bt_superob_mod
         TEST_SOURCES test_compute_bt_superob_mod.pf
-        LINK_LIBRARIES v3
+        LINK_LIBRARIES v3 netcdf_test_utils
 )
 add_pfunit_ctest(test_calc_solar_zenith_angle_mod
         TEST_SOURCES test_calc_solar_zenith_angle_mod.pf
-        LINK_LIBRARIES v3
+        LINK_LIBRARIES v3 netcdf_test_utils
 )
 
 add_library(f_c_string_cpp_test SHARED
@@ -59,7 +69,7 @@ add_pfunit_ctest(test_netcdf_dimension_mod
 )
 add_pfunit_ctest(test_netcdf_variable_mod
         TEST_SOURCES test_netcdf_variable_mod.pf
-        LINK_LIBRARIES v3 netcdf_test_utils
+        LINK_LIBRARIES v3 netcdf_test_utils NetCDF::NetCDF_Fortran
 )
 add_pfunit_ctest(test_netcdf_attribute_mod
         TEST_SOURCES test_netcdf_attribute_mod.pf

@@ -143,7 +143,7 @@ module netcdf_cxx_i_mod
         !     - This function assumes that `netcdfID` corresponds to a valid NetCDF file.
         !     - All strings must be null-terminated and passed as C pointers.
         function c_netcdfAddVar(&
-                netcdfID, groupName, varName, netcdfDataType, numDims, dimNames) &
+                netcdfID, groupName, varName, netcdfDataType, numDims, dimNames, zlibSettings) &
                 bind(C, name = "netcdfAddVar")
             import :: c_int
             import :: c_ptr
@@ -153,6 +153,7 @@ module netcdf_cxx_i_mod
             integer(c_int), value, intent(in) :: netcdfDataType
             integer(c_int), value, intent(in) :: numDims
             type(c_ptr), value, intent(in) :: dimNames
+            type(c_ptr), value, intent(in) :: zlibSettings
             integer(c_int) :: c_netcdfAddVar
         end function c_netcdfAddVar
 

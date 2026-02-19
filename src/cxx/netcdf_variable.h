@@ -4,6 +4,12 @@
 #include <netcdf>
 
 namespace Obs2Ioda {
+    struct ZlibSettings {
+        int enabled = 0;
+        int shuffle = 1;
+        int deflate = 1;
+        int deflateLevel = 4;
+    };
 
     /**
      * @brief Flattens an array of C-style strings into a 1D character array.
@@ -24,8 +30,9 @@ namespace Obs2Ioda {
      * @return A flattened `std::vector<char>` of size `numStrings * stringLen`.
      */
     std::vector<char>
-    flattenCharArray(const char *const*values, size_t numStrings,
-                     size_t stringLen);
+    flattenCharArray(
+        const char *const*values, size_t numStrings, size_t stringLen
+    );
 
     extern "C" {
     /**
@@ -38,17 +45,16 @@ namespace Obs2Ioda {
      * @param netcdfDataType The NetCDF data type of the variable (e.g., NC_INT, NC_FLOAT).
      * @param numDims The number of dimensions associated with the variable.
      * @param dimNames An array of dimension names specifying the shape of the variable.
+     * @param zlibSettings Compression settings to be applied to the variable.
+     *                     If compression is not desired, all fields should be set to 0.
      * @return int A status code indicating the outcome of the operation:
      *         - 0: Success.
      *         - Non-zero: Failure, with an error message logged.
      */
     int netcdfAddVar(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            nc_type netcdfDataType,
-            int numDims,
-            const char **dimNames
+        int netcdfID, const char *groupName, const char *varName,
+        nc_type netcdfDataType, int numDims, const char **dimNames,
+        const ZlibSettings *zlibSettings
     );
 
     /**
@@ -63,45 +69,33 @@ namespace Obs2Ioda {
     *         - Non-zero: Failure, with an error message logged.
     */
     int netcdfPutVarInt(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const int *values
+        int netcdfID, const char *groupName, const char *varName,
+        const int *values
     );
 
     int netcdfPutVarInt64(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const long long *values
+        int netcdfID, const char *groupName, const char *varName,
+        const long long *values
     );
 
     int netcdfPutVarReal(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const float *values
+        int netcdfID, const char *groupName, const char *varName,
+        const float *values
     );
 
     int netcdfPutVarDouble(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const double *values
+        int netcdfID, const char *groupName, const char *varName,
+        const double *values
     );
 
     int netcdfPutVarString(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const char **values
+        int netcdfID, const char *groupName, const char *varName,
+        const char **values
     );
 
     int netcdfPutVarChar(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            const char **values
+        int netcdfID, const char *groupName, const char *varName,
+        const char **values
     );
 
     /**
@@ -119,35 +113,23 @@ namespace Obs2Ioda {
     *         - Non-zero: Failure, with an error message logged.
     */
     int netcdfSetFillInt(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            int fillMode,
-            int fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, int fillValue
     );
 
     int netcdfSetFillReal(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            int fillMode,
-            float fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, float fillValue
     );
 
     int netcdfSetFillInt64(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            int fillMode,
-            long long fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, long long fillValue
     );
 
     int netcdfSetFillString(
-            int netcdfID,
-            const char *groupName,
-            const char *varName,
-            int fillMode,
-            const char *fillValue
+        int netcdfID, const char *groupName, const char *varName,
+        int fillMode, const char *fillValue
     );
     }
 }

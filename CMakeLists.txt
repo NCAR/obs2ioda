@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 3.10)
 
 include("${CMAKE_SOURCE_DIR}/cmake/Obs2Ioda_Functions.cmake")
 include(FetchContent)
-include("${CMAKE_SOURCE_DIR}/cmake/add_pfunit.cmake")
 # Define the project
 project(obs2ioda LANGUAGES Fortran CXX)
 enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE Release)
+
+set(PFUNIT_DIR CACHE STRING "" )
+find_package(PFUNIT REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -18,7 +20,7 @@ set(OBS2IODA_MODULE_DIR ${PROJECT_NAME}/module/${CMAKE_Fortran_COMPILER_ID}/${CM
 install(DIRECTORY ${CMAKE_BINARY_DIR}/${OBS2IODA_MODULE_DIR}/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/${OBS2IODA_MODULE_DIR}/)
 # In your top-level CMakeLists.txt
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -mcmodel=large -fPIC")
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -mcmodel=large -fPIC")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -mcmodel=large -fPIC -ffree-line-length-512")
 
 
 
