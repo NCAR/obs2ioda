@@ -1,4 +1,19 @@
 # obs2ioda
+----------------------------------
+  
+<div align="center">
+
+Important Note
+==============
+
+**This repository has been superseded by code in the
+https://github.com/JCSDA-internal/ioda-converters repository
+and is not actively maintained.**
+
+</div>
+
+----------------------------------
+
 ## Installation
 obs2ioda utilizes CMake as its primary build system. Follow the steps below to build the project:
 
